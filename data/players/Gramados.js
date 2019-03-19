@@ -83,8 +83,9 @@ function chat(e) {
 	var esccolors = removeFromArray(_RAWCODES, allwdcolors);
 	
 	var newmsg = dpl.getNameTag(sb, ' -> ')+dpl.getChatColorPref(sb, data)+escCcs(e.message.toString(), esccolors);
-;
+
 	var chats = dpl.getChats(data);
+	print('CHAT COUNT OF '+e.player.getName()+": "+chats.length)
 	if(chats.length > 0) {
 		var toldPlayers = [];
 		var wp = w.getAllPlayers();
@@ -104,7 +105,7 @@ function chat(e) {
 		
 		
 	} else {
-		executeCommand(e.player, "/tellraw @a "+newmsg);
+		executeCommand(e.player, "/tellraw @a "+strf(newmsg, true));
 	}
 	//executeCommand(e.player, "/tellraw @a "+strf(newmsg, true)); //Send 'fake' messages
 	//You can loop through players in an array, get their timezone and show them different message
