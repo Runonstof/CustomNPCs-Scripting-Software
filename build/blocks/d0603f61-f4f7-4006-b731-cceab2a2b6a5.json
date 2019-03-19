@@ -1,0 +1,67 @@
+{
+    "ItemGiverChained": [
+    ],
+    "TransportData": [
+    ],
+    "NpcsTimers": [
+        {
+            "Ticks": 0,
+            "TimerTicks": 1,
+            "Repeat": 1b,
+            "ID": 1
+        }
+    ],
+    "FactionData": [
+        {
+            "Points": 1302,
+            "Faction": 2
+        },
+        {
+            "Points": 997,
+            "Faction": 4
+        },
+        {
+            "Points": 1006,
+            "Faction": 5
+        },
+        {
+            "Points": 1005,
+            "Faction": 6
+        },
+        {
+            "Points": 1000,
+            "Faction": 7
+        },
+        {
+            "Points": 1000,
+            "Faction": 8
+        },
+        {
+            "Points": 1000,
+            "Faction": 10
+        },
+        {
+            "Points": 1000,
+            "Faction": 11
+        }
+    ],
+    "BankData": [
+    ],
+    "ItemGiversList": [
+    ],
+    "MailData": [
+    ],
+    "PlayerName": "TheOddlySeagull",
+    "QuestData": {
+        "CompletedQuests": [
+		
+        ],
+        "ActiveQuests": [
+		
+        ]
+    },
+    "UUID": "d0603f61-f4f7-4006-b731-cceab2a2b6a5",
+    "PlayerCompanionId": 0,
+    "DialogData": [
+    ]
+}

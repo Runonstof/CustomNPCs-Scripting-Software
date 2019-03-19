@@ -1,0 +1,49 @@
+{
+    "ItemGiverChained": [
+    ],
+    "TransportData": [
+    ],
+    "NpcsTimers": [
+        {
+            "Ticks": 0,
+            "TimerTicks": 1,
+            "Repeat": 1b,
+            "ID": 1
+        }
+    ],
+    "FactionData": [
+        {
+            "Points": 984,
+            "Faction": 2
+        },
+        {
+            "Points": 1016,
+            "Faction": 6
+        },
+        {
+            "Points": 1000,
+            "Faction": 7
+        },
+        {
+            "Points": 1000,
+            "Faction": 10
+        }
+    ],
+    "BankData": [
+    ],
+    "ItemGiversList": [
+    ],
+    "MailData": [
+    ],
+    "PlayerName": "Runonstof",
+    "QuestData": {
+        "CompletedQuests": [
+        ],
+        "ActiveQuests": [
+        ]
+    },
+    "UUID": "7c0bb938-5828-461d-8226-20643161e85e",
+    "PlayerCompanionId": 0,
+    "DialogData": [
+    ]
+}

@@ -1,0 +1,38 @@
+<?php
+
+//Creates a new template :)
+require_once('bin\functions.php');
+$args = array_take($argv, 1, count($argv));
+
+if(count($args) >= 2) {
+	$hasTemplate = false;
+	$templates = __DIR__ . '\template\*';
+	foreach(glob($templates) as $file) {
+		if(is_file($file)) {
+			$tfile = file_get_contents($file);
+			$tmatch = [];
+			preg_match("/#template\s+([\w]+)\s+([\w\\\]+);/", $tfile, $tmatch);
+			if(count($tmatch) == 3) {
+				$temtag = $tmatch[0];
+				$temname = $tmatch[1];
+				$temdir = $tmatch[2];
+				if($temname == $args[0]) {
+					$tcode = str_replace($temtag, '', $tfile);
+					echo "Copying template \033[33m$temname\033[0m to \033[33m{$args[1]}.js\033[0m...\n";
+					file_put_contents($temdir.'\\'.$args[1].'.js', $tcode);
+					echo "Created \033[33m{$args[1]}.js\033[0m from template \033[33m$temname\033[0m\n";
+					$hasTemplate = true;
+				}
+			} else {
+				echo "\033[31mTemplate ".basename($file)." is not a valid template!\033[0m\n";
+			}
+		}
+	}
+	
+	if(!$hasTemplate) {
+		echo "\033[31mTemplate does not exists!\033[0m\n";
+	}
+} else {
+	echo "\033[31mYou need to provide a name and template!\033[0m";
+}
+echo "\n";

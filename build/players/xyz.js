@@ -1,0 +1,1 @@
+function(a) {var x = 50*a;return(x);}

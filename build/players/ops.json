@@ -1,0 +1,14 @@
+[
+  {
+    "uuid": "d0603f61-f4f7-4006-b731-cceab2a2b6a5",
+    "name": "TheOddlySeagull",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
+	"uuid": "7c0bb938-5828-461d-8226-20643161e85e",
+	"name": "Runonstof",
+	"level": 4,
+	"bypassesPlayerLimit": false
+  }
+]

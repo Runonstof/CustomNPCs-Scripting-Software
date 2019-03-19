@@ -1,0 +1,82 @@
+String.prototype.allMatch = function(regx) {
+	var m = this.match(regx);
+	var rr = [];
+	for(mm in m) {
+		var mt = m[mm];
+		var rx = regx.exec(this);
+		rr.push(rx);
+	}
+	
+	return rr;
+};
+
+
+String.prototype.cmatch = function(regx) {
+	return (this.match(regx) || []).length;
+};
+
+String.prototype.rangeUpper = function(min, max) {
+	var str = '';
+	for(var i = 0; i < this.length; i++) {
+		var c = this.substring(i, i+1); //curchar
+		if(i >= min && i < max) {
+			c=c.toUpperCase();
+		}
+		str+=c.toString();
+	}
+	return str;
+};
+
+String.prototype.pad = function(character, len) {
+	var n = this.toString();
+	for(var i = n.length; i < len; i++) {
+		n += character.toString();
+	}
+	return n;
+};
+
+String.prototype.padMiddle = function(character, len) {
+	
+	var n = this.toString();
+	var sc = Math.floor((len-n.length)/2);
+	var ns = '';
+	for(var i = 0; i < sc; i++) {
+		ns += character.toString();
+	}
+	ns+=n;
+	for(i = 0; i < sc; i++) {
+		ns += character.toString();
+	}
+	return ns;
+};
+
+String.prototype.cInt = function() {
+	return (isNaN(parseInt(this)) ? null : parseInt(this));
+};
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+String.prototype.append = function(ch, amount) {
+	var new_str = this.toString();
+  	for(var i = 0; i < amount; i++) {
+    	if(i >= new_str.length) {
+        	new_str += ch.toString();
+        }
+    }
+  
+  return new_str;
+};
+
+String.prototype.prepend = function(ch, amount) {
+	var new_str = this.toString();
+  	for(var i = 0; i < amount; i++) {
+    	if(i >= new_str.length) {
+        	new_str = ch.toString()+new_str;
+        }
+    }
+  
+  return new_str;
+};
