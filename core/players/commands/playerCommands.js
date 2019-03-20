@@ -220,15 +220,17 @@ function Player(name) {
 			var jobpay = job.data.pay;
 			var jobpayTime = job.data.payTime;
 			var joblastPayed = pjob.lastPayed;
-			var now = new Date().getTime();
-			if(now >= joblastPayed+jobpayTime) {
-				var pm = genMoney(pl.world, jobpay);
-				for(p in pm as pii) {
-					pl.giveItem(pii);
+			if(jobpay > 0) {
+				var now = new Date().getTime();
+				if(now >= joblastPayed+jobpayTime) {
+					var pm = genMoney(pl.world, jobpay);
+					for(p in pm as pii) {
+						pl.giveItem(pii);
+					}
+					tellPlayer(pl, "&aYou have earned "+getAmountCoin(jobpay)+" from job '"+job.getDisplayName(data)+"'&r&a!");
+					plo.data.jobs[j].lastPayed = now;
+					plo.save(data);
 				}
-				tellPlayer(pl, "&aYou have earned "+getAmountCoin(jobpay)+" from job '"+job.getDisplayName(data)+"'&r&a!");
-				plo.data.jobs[j].lastPayed = now;
-				plo.save(data);
 			}
 		}
 		
