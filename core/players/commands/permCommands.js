@@ -106,7 +106,7 @@ function Permission(name) {
 		
 		//Check team
 		if(team != null) {
-			if(this.data.teams.indexOf(team.getDisplayName()) != -1) {
+			if(this.data.teams.indexOf(team.getName()) != -1) {
 				permitted = true;
 			}
 		}
@@ -126,7 +126,7 @@ function Permission(name) {
 		return permitted;
 	};
 	
-	return this;
+	return false;
 }
 
 
@@ -238,7 +238,7 @@ function Permission(name) {
 						if(occurrences(id, el) > 0) { isMatch = true; }
 					});
 					if(args.matches.length == 0 || isMatch) {
-						tellPlayer(pl, "&e - &9&l"+id);
+						tellPlayer(pl, "&e - &9&l"+id+"{run_command:!perms info "+id+"}&r");
 					}
 				}
 			} else {
