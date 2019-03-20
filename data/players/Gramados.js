@@ -94,10 +94,10 @@ function chat(e) {
 	];
 	var players = w.getAllPlayers();
 	var teams = sb.getTeams();
-	
-	var prgx = /@([\w]+)/g;
-	var trgx = /\$([\w]+)/g;
-	var crgx = /#([\w]+)/g;
+	var allChats = new ChatChannel().getAllDataIds(data);
+	var prgx = /@([\w\-\.]+)/g;
+	var trgx = /\$([\w\-\.]+)/g;
+	var crgx = /#([\w\-\.]+)/g;
 	
 	var pmatch = escmsg.match(prgx) || [];
 	for(pm in pmatch as pmt) {
@@ -116,8 +116,21 @@ function chat(e) {
 			}
 		}
 	}
-	//var chatchannels = new ChatChannel().getAllDataIds(data);
 	
+	
+	var cmatch = escmsg.match(crgx) || [];
+	for(cm in cmatch as cmt) {
+		for(cmi in allChats as chat) {
+			chat = new ChatChannel(chat).init(data);
+			var cmm = cmt.replace(crgx, '$1');
+			var cmp = chat.getPermission(data);
+			if(chat.getPermission(data).permits(e.player.getName(), sb, data)) {
+				if(occurrences(chat.name.toLowerCase(), cmm.toLowerCase()) > 0 || occurrences(chat.data.displayName.toLowerCase(), cmm.toLowerCase()) > 0) {
+					escmsg = escmsg.replace(cmt, '&'+getColorId(chat.data.color)+'&l#'+chat.data.displayName+'{run_command:!chat list '+chat.name+'}'+prefcol);
+				}
+			}
+		}
+	}
 	
 	
 	//Concat new message
@@ -132,7 +145,7 @@ function chat(e) {
 				if(toldPlayers.indexOf(wpl.getName()) == -1 && ch.data.players.indexOf(wpl.getName()) > -1) {
 					var wchats = [];
 					new Player(wpl.getName()).init(data).getChats(data).forEach(function(wchat){
-						wchats.push(wchat.name);
+						wchats.push(wchat.getTag('', '$'));
 					});
 					var ccpref = '&9&l[***]{*|show_text:'+wchats.join("\n")+'}&r ';
 					executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(ccpref+newmsg, true));
