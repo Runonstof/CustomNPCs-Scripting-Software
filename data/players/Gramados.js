@@ -97,6 +97,7 @@ function chat(e) {
 	
 	var prgx = /@([\w]+)/g;
 	var trgx = /\$([\w]+)/g;
+	var crgx = /#([\w]+)/g;
 	
 	var pmatch = escmsg.match(prgx) || [];
 	for(pm in pmatch as pmt) {
