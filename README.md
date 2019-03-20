@@ -60,7 +60,7 @@ Most of you wont probably have access to this command
 `!listPotions [...matches]` Lists all potion effects (including those added by mods)    
 `!listBiomes [...matches]` Lists all biomes (including those added by mods)    
 
-`ITEM COMMANDS`
+**ITEM COMMANDS**
 
 Only a few commands yet, but there is gonna be an item edit interface for custom-attributes etc.    
 `!renameItem <...name>` Rename the item in hand, you can use color codes with the `&` character    
