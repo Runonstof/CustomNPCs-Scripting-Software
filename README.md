@@ -108,7 +108,7 @@ Only a few commands yet, but there is gonna be an item edit interface for custom
 `!chat remove <name>` Removes a chat channel    
 `!chat list [...match]` Lists all chat channels (and in what you're talking in), and if at least one match is given, it shows only matching these    
 `!chat setColor <name> <color>` Sets chat color, defaults to `blue` like Discord    
-`!chat setDisplayName <name> <...displayName>` Sets display name, color coding and spaces allowed ofcourse    
+`!chat setDisplayName <name> <...displayName>` Sets display name, spaces allowed, *no color coding* (auto-handled)  
 `!chat setDesc <name> [...desc]` Sets description, can also be nothing.    
 `!chat join <name>` Hmmmmmmmmm???????    
 `!chat leave <name>` ^^    
