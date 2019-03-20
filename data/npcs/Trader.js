@@ -1,20 +1,6 @@
-
-function getPlayerInvFromNbt(pnbt, w) {
-	var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
-	var pinv = pnbt.getList('Inventory', pnbt.getListType('Inventory'));
-	var pitems = [];
-	for(p in pinv as pin) {
-		var pitm = w.createItemFromNbt(API.stringToNbt(pin.toJsonString()));
-		pitems.push(pitm);
-	}
-	
-	return pitems;
-}
-
-function getInvItemCount(pnbt, itemstack, w) {
-	var itnbt = itemstack.getItemNbt();
-	itnbt.remove('Count');
-}
+import core\functions.js;
+import core\players\executeCommand.js;
+import core\players\tell.js;
 
 
 function init(e){
@@ -27,6 +13,10 @@ function load(e) {
 
 function interact(e){
 	yield interact_event;
+	if(e.npc.getRole().getType() == 1 && e.player.getGamemode() == 1) {
+		tellPlayer(e.player, "&cYou cannot trade with this trader in creative mode!");
+		e.setCanceled(true);
+	}
 }
 
 function timer(e){
@@ -71,30 +61,44 @@ function targetLost(e){
 
 function role(e){
 	yield role_event;
+	var w = e.player.world;
+	var pnbt = e.player.getEntityNbt();
+	var npcnbt = e.npc.getEntityNbt();
+	
+	var tradeIgnoreNbt = (parseInt(npcnbt.getByte('TraderIgnoreNBT')) == 1);
 	var role = e.npc.getRole();
-	var pinv = getPlayerInvFromNbt(e.player.getEntityNbt(), e.player.world);
 	if(role.getType() == 1) {
-		var currencies = [
-			e.currency1 != null ? e.currency1.getName(): 'minecraft:air',
-			e.currency2 != null ? e.currency2.getName(): 'minecraft:air',
-		];
-		var hasCurs = [
-			e.currency1 == null,
-			e.currency2 == null,
-		];
-		
-		for(c in currencies as currn) {
-			print((e.currency1 != null ? e.currency1.getItemNbt().toJsonString():''));
-			print((e.currency2 != null ? e.currency2.getItemNbt().toJsonString():''));
-			pinv.forEach(function(pin){
-				if(pin.getName() == currn) {
-					hasCurs[c] = true;
+		if(e.isCancelable()) {
+			if(e.sold != null) {
+				var canTrade = true;
+				var currency = [
+					e.currency1,
+					e.currency2,
+				];
+				
+				for(c in currency as crncy) {
+					if(crncy != null) {
+						var reqamount = crncy.getStackSize();
+						if(getInvItemCount(pnbt, crncy, w, tradeIgnoreNbt) < reqamount) {
+							canTrade = false;
+						}
+					}
 				}
-			});
-		}
-		
-		if(!hasCurs[0] || !hasCurs[1]) {
-			e.setCanceled(true);
+				
+				if(canTrade) {
+					for(c in currency as crncy) {
+						if(crncy != null) {
+						
+							//Delete as IItemStack for NBT
+							e.player.removeItem(crncy, crncy.getStackSize());
+						
+						}
+					}
+					e.player.giveItem(e.sold);
+				}
+				
+				e.setCanceled(true);
+			}
 		}
 	}
 }
