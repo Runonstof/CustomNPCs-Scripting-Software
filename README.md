@@ -38,7 +38,7 @@ The `permission_id` of for example `!perms removePlayers <permission_id> <...pla
 
 Be careful of changing permissioncommand-permissions!    
 `!perms add <permission_id>` Adds a new permission, is currently impractical to do as permission are now automatic, and no cool things for custom permission yet :(    
-`!perms setEnabled <permission_id> <value>` Disabled or Enabled an permission, `<value>` should be true or false.
+`!perms setEnabled <permission_id> <value>` Disabled or Enabled an permission, `<value>` should be true or false.    
 `!perms remove <permission_id>` ONLY REMOVE PERMISSIONS ADDED BY YOURSELF!    
 `!perms addTeams <permission_id> <...teams>` This command add teams to a permission    
 `!perms removeTeams <permission_id> <...teams>` This command removes teams from a permission    
