@@ -82,10 +82,9 @@ function chat(e) {
 	var allwdcolors = dpl.getAllowedColors(data, sb);
 	var esccolors = removeFromArray(_RAWCODES, allwdcolors);
 	
-	var newmsg = dpl.getNameTag(sb, ' -> ')+dpl.getChatColorPref(sb, data)+escCcs(e.message.toString(), esccolors);
+	var newmsg = dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' }')+dpl.getChatColorPref(sb, data)+escCcs(e.message.toString(), esccolors);
 
 	var chats = dpl.getChats(data);
-	print('CHAT COUNT OF '+e.player.getName()+": "+chats.length)
 	if(chats.length > 0) {
 		var toldPlayers = [];
 		var wp = w.getAllPlayers();
@@ -94,7 +93,7 @@ function chat(e) {
 				if(toldPlayers.indexOf(wpl.getName()) == -1 && ch.data.players.indexOf(wpl.getName()) > -1) {
 					var wchats = [];
 					new Player(wpl.getName()).init(data).getChats(data).forEach(function(wchat){
-						wchats.push(wchat.getTag());
+						wchats.push(wchat.name);
 					});
 					var ccpref = '&9&l[***]{*|show_text:'+wchats.join("\n")+'}&r ';
 					executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(ccpref+newmsg, true));
@@ -107,9 +106,7 @@ function chat(e) {
 	} else {
 		executeCommand(e.player, "/tellraw @a "+strf(newmsg, true));
 	}
-	//executeCommand(e.player, "/tellraw @a "+strf(newmsg, true)); //Send 'fake' messages
-	//You can loop through players in an array, get their timezone and show them different message
-	e.setCanceled(true); //<-- Cancel Sending REAL message
+	e.setCanceled(true); //Cancel real message
 }
 
 function containerOpen(e) {
