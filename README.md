@@ -35,10 +35,10 @@ Keep in mind that the commands themselves and their arguments like teams and pla
 
 The `permission_id` of for example `!perms removePlayers <permission_id> <...players>` would be `perms.removePlayers`
 
-Be careful of changing permissioncommand-permissions!
-**!perms add <permission_id>** Adds a new permission, is currently impractical to do as permission are now automatic, and no cool things for custom permission yet :(
+Be careful of changing permissioncommand-permissions!    
+**!perms add <permission_id>** Adds a new permission, is currently impractical to do as permission are now automatic, and no cool things for custom permission yet :(    
 **!perms setEnabled <permission_id> <value>** Disabled or Enabled an permission, `<value>` should be true or false.
-**!perms remove <permission_id>** ONLY REMOVE PERMISSIONS ADDED BY YOURSELF!
+**!perms remove <permission_id>** ONLY REMOVE PERMISSIONS ADDED BY YOURSELF!    
 **!perms addTeams <permission_id> <...teams>** This command add teams to a permission
 **!perms removeTeams <permission_id> <...teams>** This command removes teams from a permission
 **!perms addPlayers <permission_id> <...players>** This command add players to a permission, if you want to make exceptions
