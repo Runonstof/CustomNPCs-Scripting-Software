@@ -9,10 +9,11 @@ Adds:
  - Custom Chat
  
 **HOW DOES IT WORK?**
-*<argument>* Means it is required
-*[argument]* Means it is optional
-*<...arguments>* Means you can provide multiple, *but at least provide one*
-*[...arguments]* Means you can provide multiple, *but is optional*
+
+`<argument>` Means it is required    
+`[argument]` Means it is optional    
+`<...arguments>` Means you can provide multiple, *but at least provide one*    
+`[...arguments]` Means you can provide multiple, *but is optional*    
 
 **FORMATTING TIME**
 
