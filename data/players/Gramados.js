@@ -83,6 +83,7 @@ function chat(e) {
 	var esccolors = removeFromArray(_RAWCODES, allwdcolors);
 	var escmsg = escCcs(e.message.toString(), esccolors);
 	var prefcol = dpl.getChatColorPref(sb, data);
+	var chats = dpl.getChats(data);
 	
 	//Check @, $ and # mentions
 	//@ - Player
@@ -121,7 +122,7 @@ function chat(e) {
 	//Concat new message
 	var newmsg = dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' }')+prefcol+escmsg;
 
-	var chats = dpl.getChats(data);
+	
 	if(chats.length > 0) {
 		var toldPlayers = [];
 		var wp = w.getAllPlayers();
