@@ -7,7 +7,7 @@ But also think outside the box.
 *Issues/Bugreports of commands not listed in README.md will be removed from the Issue Tracker!*    
 *When a command is listed on README.md it is `expected` to work, and we need to make that sure*    
     
-**HOW TO REPORT AN ISSUE (OR TO SUGGEST SOMETHING NEW, ALSO WELCOME)   **
+**HOW TO REPORT AN ISSUE (OR TO SUGGEST SOMETHING NEW, ALSO WELCOME)**
 
 Create a new issue on the **Issue Tracker**    
     
