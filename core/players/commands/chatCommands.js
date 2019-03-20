@@ -174,9 +174,10 @@ function getColorPermId(colorId) {
 				"type": "color",
 			}
 		]],
-		['!chat setDisplayName <name> <...displayName>', function(pl, args, data){
+		['!chat setDisplayName <name> [...displayName]', function(pl, args, data){
 			var cc = new ChatChannel(args.name).init(data);
-			cc.data.displayName = args.displayName.join(' ');
+			
+			cc.data.displayName = (args.displayName.length > 0 ? args.displayName.join(' ') : cc.name);
 			cc.save(data);
 			tellPlayer(pl, '&aSet display name to: '+cc.getName());
 			return true;
@@ -187,6 +188,11 @@ function getColorPermId(colorId) {
 				"datatype": "chatchannel",
 				"exists": true
 			},
+			{
+				"argname": "displayName",
+				"type": "string",
+				"noColor": true
+			}
 		]],
 		['!chat setDesc <name> [...desc]', function(pl, args, data){
 			var cc = new ChatChannel(args.name).init(data);

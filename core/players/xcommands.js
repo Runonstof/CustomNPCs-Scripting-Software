@@ -97,7 +97,7 @@ function parseUsageRgx(command, str=null) {//Converts command usage to Regex, an
 	var argrx = [];
 	var cmdMatch = command.usage
 	.replace(/(\w)\s+(\w)/g, "$1\\s+$2")
-	.replace(/(\w|>|\])\s+(\w|<|\[)/g, "$1$2");//fic whitespace
+	.replace(/(\w|>|\])\s+(\w|<|\[)/g, "$1$2");//fix whitespace
 	var req_regx = /<([.]{3})*([\w]+)>/g;//Required arg regex
 	var opt_regx = /\[([.]{3})*([\w]+)\]/g;//Optional arg recalc
 	var rm = cmdMatch.allMatch(req_regx);
@@ -198,12 +198,18 @@ function executeXCommand(str, player) {
 						for(b in cmd.rules as rule) {
 							
 							if(!"argname" in rule) { continue; }
+							if("as" in rule) {
+								if(rule.as == "string" && typeof arg == 'object') {
+									arg = arg.join(" ");
+								}
+							}
+							
 							if(rule.argname != a) { continue; }
 							var rulename = rule.argname.toString();
 							if('type' in rule) {//Check Arg Type
 								switch(rule.type) {
 									case 'id': {
-										if(arg.replace(/([A-Za-z0-9_])/g, '') != '') {
+										if(arg.replace(/([A-Za-z0-9_\-\.])/g, '') != '') {
 											tellPlayer(player, "&c'"+rulename+"' is not a valid id/name (A-Za-z0-9_)!");
 											return false;
 										}
@@ -220,6 +226,14 @@ function executeXCommand(str, player) {
 											if(arg.toString().length < rule.maxlen) {
 												tellPlayer(player, "&c'"+rulename+"' is too long! (Min. "+rule.minlen+" characters)");
 												return false;
+											}
+										}
+										if("noColor" in rule) {
+											if(rule.noColor) {
+												if(escCcs(arg.toString()) != arg.toString()) {
+													tellPlayer(player, "&c'"+rulename+"' cannot contain color coding!");
+													return false;
+												}
 											}
 										}
 										break;
@@ -290,6 +304,7 @@ function executeXCommand(str, player) {
 								}
 								
 							}
+						
 						}
 					}
 					
