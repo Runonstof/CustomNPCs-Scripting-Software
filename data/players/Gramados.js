@@ -144,10 +144,12 @@ function chat(e) {
 			for(ww in wp as wpl) {
 				if(toldPlayers.indexOf(wpl.getName()) == -1 && ch.data.players.indexOf(wpl.getName()) > -1) {
 					var wchats = [];
+					var wcnames = [];
 					new Player(wpl.getName()).init(data).getChats(data).forEach(function(wchat){
 						wchats.push(wchat.getTag('', '$'));
+						wcnames.push(wchat.name);
 					});
-					var ccpref = '&9&l[***]{*|show_text:'+wchats.join("\n")+'}&r ';
+					var ccpref = '&9&l[***]{run_command:!chat list '+wcnames.join(" ")+'|show_text:'+wchats.join("\n")+'}&r ';
 					executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(ccpref+newmsg, true));
 					toldPlayers.push(wpl.getName());
 				}
