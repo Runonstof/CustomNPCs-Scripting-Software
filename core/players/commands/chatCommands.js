@@ -7,7 +7,7 @@ function ChatChannel(name) {
 		"desc": "",
 	};
 	this.getPermission = function(data) {
-		var perm = new Permission(this.type+'.'+this.name);
+		var perm = new Permission('chatchannel.'+this.name);
 		perm.load(data);
 		if(!perm.exists(data)) { perm.save(data); }
 		
@@ -19,15 +19,16 @@ function ChatChannel(name) {
 		}
 		return this;
 	};
-	this.getColor = function() {
-		return '&'+getColorId(this.data.color);
+	this.getColor = function(cr) {
+		cr = cr||'&';
+		return cr+getColorId(this.data.color);
 	};
 	this.getName = function() {
 		return this.getColor()+this.data.displayName+"&r";
 	};
-	this.getTag = function(prefix) {
-		if(typeof(prefix) == typeof(undefined)) { prefix = ''; }
-		return this.getColor()+"&l[#"+this.data.displayName+prefix+"]&r";
+	this.getTag = function(prefix, cr) {
+		cr = cr||'&';
+		return this.getColor(cr)+cr+"l[#"+this.data.displayName+(prefix||'')+"]"+cr+"r";
 	};
 	this.removePlayers = function(players) {
 		var np = [];
