@@ -81,8 +81,45 @@ function chat(e) {
 	var dpl = new Player(e.player.getName()).init(data);
 	var allwdcolors = dpl.getAllowedColors(data, sb);
 	var esccolors = removeFromArray(_RAWCODES, allwdcolors);
+	var escmsg = escCcs(e.message.toString(), esccolors);
+	var prefcol = dpl.getChatColorPref(sb, data);
 	
-	var newmsg = dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' }')+dpl.getChatColorPref(sb, data)+escCcs(e.message.toString(), esccolors);
+	//Check @, $ and # mentions
+	//@ - Player
+	//$ - Team
+	//# - Chatchannel
+	var notifySounds = [
+		'animania:cluck3',
+	];
+	var players = w.getAllPlayers();
+	var teams = sb.getTeams();
+	
+	var prgx = /@([\w]+)/g;
+	var trgx = /\$([\w]+)/g;
+	
+	var pmatch = escmsg.match(prgx) || [];
+	for(pm in pmatch as pmt) {
+		for(ply in players as plyr) {
+			if(occurrences(plyr.getName().toLowerCase(), pmt.replace(prgx, '$1').toLowerCase()) > 0) {
+				escmsg = escmsg.replace(pmt, '&9&o@'+plyr.getName()+'{suggest_command:/msg '+plyr.getName()+'}'+prefcol);
+			}
+		}
+	}
+	
+	var tmatch = escmsg.match(trgx) || [];
+	for(tm in tmatch as tmt) {
+		for(tmi in teams as team) {
+			if(occurrences(team.getName().toLowerCase(), tmt.replace(trgx, '$1').toLowerCase()) > 0) {
+				escmsg = escmsg.replace(tmt, '&'+getColorId(team.getColor())+'&o$'+team.getName()+prefcol);
+			}
+		}
+	}
+	//var chatchannels = new ChatChannel().getAllDataIds(data);
+	
+	
+	
+	//Concat new message
+	var newmsg = dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' }')+prefcol+escmsg;
 
 	var chats = dpl.getChats(data);
 	if(chats.length > 0) {

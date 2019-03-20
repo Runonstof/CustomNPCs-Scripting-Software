@@ -43,7 +43,7 @@ function Player(name) {
 		}
 		return pref+prefeff;
 	};
-	this.getNameTag = function(sb, prefix, namesuff) {
+	this.getNameTag = function(sb, prefix, namesuff, teamsuff) {
 		var t = sb.getPlayerTeam(this.name);
 		var ccol = '';
 		var ctm = '';
@@ -57,7 +57,7 @@ function Player(name) {
 		if(t != null) {
 			ctm = ccol+'&o'+t.getDisplayName()+' ';
 		}
-	return ccol+'&l['+ccol+ctm+'&r'+ccol+this.name+(namesuff||'')+ccol+'&l'+']'+(prefix||'')+'&r';
+	return ccol+'&l['+ccol+ctm+(teamsuff||'')+'&r'+ccol+this.name+(namesuff||'')+ccol+'&l'+']'+(prefix||'')+'&r';
 	};
 	
 	this.delJob = function(name) {
