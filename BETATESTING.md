@@ -1,4 +1,4 @@
-#HOW TO TEST    
+**HOW TO TEST**    
 We need beta testers to test our system against players.    
 Not only do beta testers need to check if they can't to permitted commands etc.    
 But also think outside the box.    
@@ -6,7 +6,7 @@ But also think outside the box.
 *Issues/Bugreports of commands not listed in README.md will be removed from the Issue Tracker!*    
 *When a command is listed on README.md it is `expected` to work, and we need to make that sure*    
     
-#HOW TO REPORT AN ISSUE (OR TO SUGGEST SOMETHING NEW, ALSO WELCOME)   
+**HOW TO REPORT AN ISSUE (OR TO SUGGEST SOMETHING NEW, ALSO WELCOME)   **
 Create a new issue on the **Issue Tracker**    
     
 **MAKE SURE TO USE THE RIGHT LABEL FOR THE ISSUE IN GITHUB ISSUE TRACKER** *This helps with priority*    
