@@ -26,6 +26,8 @@ function getQuartRotation(dir) {
 	return dir;
 }
 
+
+
 function playerIsOnline(world, player) {
 	var isOnline = false;
 	var pl = world.getAllPlayers();
@@ -37,6 +39,43 @@ function playerIsOnline(world, player) {
 	}
 	return isOnline;
 }
+
+function getPlayerInvFromNbt(pnbt, w) {
+	var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
+	var pinv = pnbt.getList('Inventory', pnbt.getListType('Inventory'));
+	var pitems = [];
+	for(p in pinv as pin) {
+		var pitm = w.createItemFromNbt(API.stringToNbt(pin.toJsonString()));
+		pitems.push(pitm);
+	}
+	
+	return pitems;
+}
+
+function getInvItemCount(pnbt, itemstack, w, ignoreNbt=false) {
+	var icount = 0;
+	var itnbt = itemstack.getItemNbt();
+	itnbt.remove('Count');
+	var pinv = getPlayerInvFromNbt(pnbt, w);
+	for(pi in pinv as pitem) {
+		pinbt = pitem.getItemNbt();
+		var scount = parseInt(pinbt.getByte('Count'));
+		pinbt.remove('Count');
+		if(ignoreNbt) {
+			if(pinbt.getString("id") == itnbt.getString("id")) {
+				icount += scount;
+			}
+		} else {
+			if(pinbt.toJsonString() == itnbt.toJsonString()) {
+				icount += scount;
+			}
+		}
+	}
+
+
+	return icount;
+}
+
 
 function getHandItem(player) {
 	return player.getMainhandItem() || player.getOffhandItem();
