@@ -23,6 +23,30 @@ function DataHandler(type, name) {
 	this.toJson = function(); //Gives back this.data as JSON
 }
 ```
+**EXAMPLE** *For permissions, chatchannels, etc ofcourse*
+Creating a new job if not exists:    
+*This example also counts for `regions`, `permissions`, `chatchannels`, etc!*    
+```js
+var data = world.getStoreddata(); //Any IData object allowed, but I only use world's
+var job = new Job('oil_treater');
+if(!job.exists(data)) {
+	job.save(data);
+}
 
-**LIST OF DATAHANDLER (WITH EXAMPLES)**
- - **[Job](JOBS.md) Object**
+job.data.displayName = "Oil Treater";
+job.save(data);
+
+```
+Same as
+```js
+var data = world.getStoreddata(); //Any IData object allowed, but I only use world's
+var job = new Job('oil_treater').init(data);
+
+job.data.displayName = "Oil Treater";
+job.save(data);
+
+```
+
+**LIST OF DATAHANDLER**
+ - **[Job](datahandlers/JOBS.md) Object**
+ - **[Permission](datahandlers/PERMISSIONS.md) Object**
