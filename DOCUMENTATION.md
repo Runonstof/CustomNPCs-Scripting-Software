@@ -1,4 +1,4 @@
-#Script Documentation
+# Script Documentation
 
 **GLOBAL FUNCTIONS AND VARIABLES**    
 
