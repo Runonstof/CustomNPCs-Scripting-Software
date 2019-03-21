@@ -1,4 +1,3 @@
-
 `Job` object `extends DataHandler`    
 Location: `core\players\commands\jobCommands.js`
 ```js
@@ -21,3 +20,30 @@ function Job(name) {
 	this.getStatusColor = function(IData data) { /***/ }; 
 }
 ```
+
+**EXAMPLES**    
+Creating a new job if not exists:    
+*This example also counts for `regions`, `permissions`, `chatchannels`, etc!*    
+```js
+var data = world.getStoreddata(); //Any IData object allowed, but I only use world's
+var job = new Job('oil_treater');
+if(!job.exists(data)) {
+	job.save(data);
+}
+
+job.data.displayName = "Oil Treater";
+job.save(data);
+
+```
+Same as
+```js
+var data = world.getStoreddata(); //Any IData object allowed, but I only use world's
+var job = new Job('oil_treater').init(data);
+
+job.data.displayName = "Oil Treater";
+job.save(data);
+
+```
+    
+	
+	
