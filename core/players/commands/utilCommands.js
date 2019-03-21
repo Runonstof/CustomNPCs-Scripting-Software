@@ -166,13 +166,7 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 	return newmsg;
 }
 
-function getDropChance(npcnbt, slot) {
-	var dropC = npcnbt.getList('DropChance', 10);
-	var dropChance = parseInt(dropC[slot].getInteger('Integer'));
-	
-	
-	return dropChance;
-}
+
 
 //Converts int to string
 function getAmountCoin(amount) {

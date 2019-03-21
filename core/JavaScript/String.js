@@ -26,6 +26,17 @@ String.prototype.rangeUpper = function(min, max) {
 	}
 	return str;
 };
+String.prototype.rangeLower = function(min, max) {
+	var str = '';
+	for(var i = 0; i < this.length; i++) {
+		var c = this.substring(i, i+1); //curchar
+		if(i >= min && i < max) {
+			c=c.toLowerCase();
+		}
+		str+=c.toString();
+	}
+	return str;
+};
 
 String.prototype.pad = function(character, len) {
 	var n = this.toString();
@@ -54,10 +65,6 @@ String.prototype.cInt = function() {
 	return (isNaN(parseInt(this)) ? null : parseInt(this));
 };
 
-String.prototype.replaceAll = function(search, replacement) {
-    var target = this;
-    return target.replace(new RegExp(search, 'g'), replacement);
-};
 
 String.prototype.append = function(ch, amount) {
 	var new_str = this.toString();

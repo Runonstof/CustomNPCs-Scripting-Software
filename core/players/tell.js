@@ -1,7 +1,6 @@
 function tellPlayer(player, rawtext) {
-	if(typeof(rawtext) == 'string') { var rawtext = strf(rawtext); }
 	
-	return executeCommand(player, "/tellraw "+player.getName()+" "+rawformat(rawtext));
+	return executeCommand(player, "/tellraw "+player.getName()+" "+strf(rawtext));
 }
 
 function storytellPlayer(player, ar) {

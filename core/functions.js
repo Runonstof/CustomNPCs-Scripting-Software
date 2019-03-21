@@ -26,6 +26,13 @@ function getQuartRotation(dir) {
 	return dir;
 }
 
+function getDropChance(npcnbt, slot) {
+	var dropC = npcnbt.getList('DropChance', 10);
+	var dropChance = parseInt(dropC[slot].getInteger('Integer'));
+	
+	
+	return dropChance;
+}
 
 
 function playerIsOnline(world, player) {
@@ -244,7 +251,7 @@ function getColorName(id) {
 }
 
 
-function strf(str, toRaw=false, allowed=null) {
+function strf(str, toRaw=true, allowed=null) {
 	return strrawformat(str, toRaw, allowed);
 }
 var trg = /{[\s]*(?:([\w]+)[\s]*\:[\s]*([\w\W\/]+?)|\*)(?:[\s]*\|[\s]*([\w]+)[\s]*\:[\s]*([\w\W\/]+?))?[\s]*}/;
