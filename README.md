@@ -78,8 +78,8 @@ Most of you wont probably have access to this command
 **ITEM COMMANDS**
 
 Only a few commands yet, but there is gonna be an item edit interface for custom-attributes etc.    
-`!renameItem <...name>` Rename the item in hand, you can use color codes with the `&` character    
-`!renameLore <slot> [...name]` Rename lore of item in your hand, slot starts at `0`    
+`!item rename <...name>` Rename the item in hand, you can use color codes with the `&` character    
+`!item renameLore <slot> [...name]` Rename lore of item in your hand, slot starts at `0`    
 
 ***
 

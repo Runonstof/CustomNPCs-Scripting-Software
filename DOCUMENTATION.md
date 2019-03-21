@@ -18,4 +18,4 @@
 ***    
 
 **CREATING COMMANDS**
-
+[Creating Commands](docs/COMMANDS.md)
