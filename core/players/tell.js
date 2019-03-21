@@ -4,30 +4,9 @@ function tellPlayer(player, rawtext) {
 	return executeCommand(player, "/tellraw "+player.getName()+" "+rawformat(rawtext));
 }
 
-function tellPlayerStr(player, text) {
-	return executeCommand(player, "/tellraw "+player.getName()+" "+text.toString());
-}
-
 function storytellPlayer(player, ar) {
-	for(i in ar) {
+	for(var i in ar as ari) {
 		//print(ai[i].join('==='));
-		tellPlayer(player, ar[i]);
+		tellPlayer(player, ari);
 	}
 }
-
-/*
-function storyte_llPlayer(player, array_rawtext) {
-	var tellStr = '[""';
-	for(i in array_rawtext) {
-		if(tellStr.substr(tellStr.length-1, tellStr.length) != ',' && tellStr.length > 0) {
-			tellStr += ',';
-		}
-		tellStr += rawformat(array_rawtext[i], false).toString();
-		if(i < array_rawtext.length-1) {
-			tellStr += ',{"text":"\n"}';
-		}
-	}
-	tellStr += ']';
-	print(tellStr);
-	return tellPlayerStr(player, tellStr);
-}*/

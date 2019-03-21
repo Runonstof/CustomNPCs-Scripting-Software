@@ -10,9 +10,9 @@ function DataHandler(type, name) {
 	this.name = name;
 	this.data = this.data || {};
 	
-	this.dkeyrgx = new RegExp(this.type+'_([\\w]+)', 'g'); //Regex
+	this.dkeyrgx = new RegExp(this.type+'_([\\w]+)', 'g'); //Regex for matching id in data
 	
-	this.getAllDataIds = function(IData data) { /***/ }; //'Static' method, gets all Data IDs from this type
+	this.getAllDataIds = function(IData data) { /***/ }; //'Static' method, gets all Data IDs from this type as Array
 	
 	this.getDataId = function() { /***/ }; //Get ID to reference in IData
 	this.exists = function(IData data) { /***/ }; //Checks if this exists in IData
@@ -20,7 +20,7 @@ function DataHandler(type, name) {
 	this.load = function(IData data) { /***/ }; //Loads data in this.data
 	this.remove = function(IData data) { /***/ }; //Removes datahandler from IData
 	this.init = function(IData data, Object initdata) { /***/ }; //initdata optional, load object and registers if not exists
-	this.toJson = function(); //Gives back this.data as JSON
+	this.toJson = function(); //Gives back this.data as JSON-string
 }
 ```
 **EXAMPLE** *For permissions, chatchannels, etc ofcourse*
