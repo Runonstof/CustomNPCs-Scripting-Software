@@ -16,8 +16,8 @@ function Job(name) {
 		"companyId": null
 	};
 	
-	this.getPlayers = function(IData data);
-	this.getDisplayName = function(IData data);
-	this.getStatusColor = function(IData data); 
+	this.getPlayers = function(IData data) { /***/ };
+	this.getDisplayName = function(IData data) { /***/ };
+	this.getStatusColor = function(IData data) { /***/ }; 
 }
 ```

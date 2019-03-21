@@ -12,14 +12,14 @@ function DataHandler(type, name) {
 	
 	this.dkeyrgx = new RegExp(this.type+'_([\\w]+)', 'g'); //Regex
 	
-	this.getAllDataIds = function(IData data); //'Static' method
+	this.getAllDataIds = function(IData data) { /***/ }; //'Static' method
 	
-	this.getDataId = function();
-	this.exists = function(IData data);
-	this.save = function(IData data);
-	this.load = function(IData data);
-	this.remove = function(IData data);
-	this.init = function(IData data, Object initdata); //initdata optional and not used mostly
+	this.getDataId = function() { /***/ };
+	this.exists = function(IData data) { /***/ };
+	this.save = function(IData data) { /***/ };
+	this.load = function(IData data) { /***/ };
+	this.remove = function(IData data) { /***/ };
+	this.init = function(IData data, Object initdata) { /***/ }; //initdata optional and not used mostly
 	this.toJson = function();
 }
 ```
