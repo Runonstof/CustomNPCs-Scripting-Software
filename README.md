@@ -13,12 +13,16 @@ Adds:
  - Chat Channels
  - Custom Chat
  
+***
+ 
 **HOW DOES IT WORK?**
 
 `<argument>` Means it is required    
 `[argument]` Means it is optional    
 `<...arguments>` Means you can provide multiple, *but at least provide one*    
 `[...arguments]` Means you can provide multiple, *but is optional*    
+
+***
 
 **FORMATTING TIME**
 
@@ -37,6 +41,8 @@ So 1 year 2 months and 3 second should be written as
 
 Keep in mind that the commands themselves and their arguments like teams and players are case-sensitive!
 
+***
+
 **SYSTEM ADMINISTRATION COMMANDS**
 
 The `permission_id` of for example `!perms removePlayers <permission_id> <...players>` would be `perms.removePlayers`
@@ -54,6 +60,8 @@ Be careful of changing permissioncommand-permissions!
 
 And much more to come
 
+***
+
 **UTILITY COMMANDS**
 
 `!convertNpcLoot <radius>` Convert the old money in NPC dropchances to new money    
@@ -65,12 +73,15 @@ Most of you wont probably have access to this command
 `!listPotions [...matches]` Lists all potion effects (including those added by mods)    
 `!listBiomes [...matches]` Lists all biomes (including those added by mods)    
 
+***
+
 **ITEM COMMANDS**
 
 Only a few commands yet, but there is gonna be an item edit interface for custom-attributes etc.    
 `!renameItem <...name>` Rename the item in hand, you can use color codes with the `&` character    
 `!renameLore <slot> [...name]` Rename lore of item in your hand, slot starts at `0`    
 
+***
 
 **JOB COMMANDS**
 
@@ -90,6 +101,8 @@ Only a few commands yet, but there is gonna be an item edit interface for custom
 
 `!jobs apply <name>` and `!jobs fire <name> <...players>` are in the making    
 
+***
+
 **PLAYER COMMANDS** *Made for regular players*    
 
 `!myIncome` Shows your salary, how much time between salaries and when you will get your next one
@@ -100,12 +113,16 @@ Only a few commands yet, but there is gonna be an item edit interface for custom
 `!listHomes` Lists all your homes    
  - `!myStats` and `!mySkills` planned when skill system is there    
  
+***
+ 
 **PLAYER MANAGEMENT COMMANDS**
 
 `!player setPay <player> <amount>` Sets `<player>`'s base income to `<amount>`    
 `!player setPayTime <player> <time>` Every time that `<time>` has passed, `<player>` receives his base-income. Use time notation    
 `!player setMaxJobs <player> <amount>` Sets the maximum jobs `<player>` can have, set to `-1` for infinite jobs    
 `!player setMaxHomes <player> <amount>` Sets the maximum homes `<player>` can have. (`-1` is infinite)    
+ 
+***
  
 **CHAT CHANNEL COMMANDS**
 
