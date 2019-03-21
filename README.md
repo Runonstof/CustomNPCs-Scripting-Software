@@ -1,8 +1,9 @@
 # Gramados Server Script
 Script for Custom NPCs 1.12.2
 
-**[CLICK HERE](BETATESTING.md) for more info about beta-testing**    
-**API Documention planned**
+**Useful info**    
+[Beta Testing](BETATESTING.md)    
+[Scripting Documentation](DOCUMENTATION.md)    
 
 Adds:
  - Regions
