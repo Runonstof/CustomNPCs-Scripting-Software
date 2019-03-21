@@ -1,6 +1,6 @@
 **CREATING A JOB, PERMISSION, CHAT CHANNEL, ETC**
 
-`DataHandler` object (Region, Job, Permission, ..., objects use these functions also)
+`DataHandler` object (Region, Job, Permission, ..., objects use these functions also)    
 Location: `core\players\xcommands.js`
 ```js
 function DataHandler(type, name) {
@@ -22,7 +22,7 @@ function DataHandler(type, name) {
 }
 ```
 
-`Job` object `extends DataHandler`
+`Job` object `extends DataHandler`    
 Location: `core\players\commands\jobCommands.js`
 ```js
 function Job(name) {
