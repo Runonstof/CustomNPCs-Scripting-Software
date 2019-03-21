@@ -370,7 +370,7 @@ var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries
 				if(amount >= 4 && amount <= 32) {
 					var ents = pl.world.getNearbyEntities(ppos, amount, 2);
 					for(en in ents as ent) {
-						print(ent.getPos().normalize());
+						//print(ent.getPos().normalize());
 						if(ent.getType() == 2) {//Is NPC
 							var entrole = ent.getRole();
 							if(entrole != null) {
@@ -378,19 +378,19 @@ var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries
 									//Loop sellItems
 									var newTrades = [];
 									for(var i = 0; i < 18; i++) {
-										var newTrade = [
+										newTrades.push([
 											entrole.getCurrency1(i),
 											entrole.getCurrency2(i),
 											entrole.getSold(i),
-										];
+										]);
 										
 										entrole.remove(i);
 									}
 									for(var i = 0; i < 18; i++) {
-										print('SLOT: '+i);
+										if(newTrades[i][2].isEmpty()) continue;
+										//print('SLOT: '+i);
 										
-										
-										for(ii in newTrade as nItem) {
+										for(ii in newTrades[i] as nItem) {
 											if(!nItem.isEmpty()) {
 												var nLore = nItem.getLore();
 												if(nLore.length > 0) {
@@ -401,16 +401,17 @@ var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries
 													}
 												}
 											}
-											newTrade[ii] = nItem;
+											newTrades[i][ii] = nItem;
 										}
-										newTrade.forEach(function(nt){
-											print(nt.getItemNbt().toJsonString());
+										newTrades[i].forEach(function(nt){
+											//print(nt.getItemNbt().toJsonString());
 										});
+										
 										entrole.set(
 											i,
-											newTrade[0].isEmpty() ? null : newTrade[0],
-											newTrade[1].isEmpty() ? null : newTrade[1],
-											newTrade[2].isEmpty() ? null : newTrade[2]
+											newTrades[i][0].isEmpty() ? null : newTrades[i][0],
+											newTrades[i][1].isEmpty() ? null : newTrades[i][1],
+											newTrades[i][2]
 										);
 									}
 									
