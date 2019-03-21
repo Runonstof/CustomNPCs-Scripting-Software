@@ -363,12 +363,13 @@ var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries
 			tellPlayer(pl, "&aAffected "+ents.length+" entities.");
 			return true;
 		}, 'convertNpcLoot'],
-		['!convertTrader <amount>', function(pl, args){
-			var amount = parseInt(args.amount) || null;
+		['!convertTrader <radius>', function(pl, args){
+			var radius = parseInt(args.radius) || null;
 			var ppos = pl.getPos();
-			if(amount != null) {
-				if(amount >= 4 && amount <= 32) {
-					var ents = pl.world.getNearbyEntities(ppos, amount, 2);
+			if(radius != null) {
+				if(radius >= 4 && radius <= 32) {
+					var ents = pl.world.getNearbyEntities(ppos, radius, 2);
+					var entcnt = 0; //Affected entity count
 					for(en in ents as ent) {
 						//print(ent.getPos().normalize());
 						if(ent.getType() == 2) {//Is NPC
@@ -387,8 +388,7 @@ var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries
 										entrole.remove(i);
 									}
 									for(var i = 0; i < 18; i++) {
-										if(newTrades[i][2].isEmpty()) continue;
-										//print('SLOT: '+i);
+										//print('SLOT: '+i);amount
 										
 										for(ii in newTrades[i] as nItem) {
 											if(!nItem.isEmpty()) {
@@ -414,19 +414,22 @@ var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries
 											newTrades[i][2]
 										);
 									}
-									
+									//Add affected
+									entcnt++;
 								}
 							}
 						}
 					}
-					if(ents.length == 0) {
-						tellPlayer(pl, "&cNo NPC Traders found in a radius of "+amount+" blocks.");
+					if(entcnt > 0) {
+						tellPlayer(pl, "&aAffected "+entcnt+" NPC Traders in a radius of "+radius+" !")
+					} else {
+						tellPlayer(pl, "&cNo NPC Traders found in a radius of "+radius+" blocks.");
 					}
 				} else {
 					tellPlayer(pl, "&cYou have a minimum of 4 blocks and a maximum of 32 block!");
 				}
 			} else {
-				tellPlayer(pl, "&c<amount> is not a valid number!");
+				tellPlayer(pl, "&c<radius> is not a valid number!");
 			}
 			return false;
 		}, 'convertTrader'],
