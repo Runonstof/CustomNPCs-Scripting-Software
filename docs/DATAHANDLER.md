@@ -25,4 +25,4 @@ function DataHandler(type, name) {
 ```
 
 **LIST OF DATAHANDLER**
- - [Jobs](docs/JOBS.md)
+ - [Jobs](JOBS.md)
