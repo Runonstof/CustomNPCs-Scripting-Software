@@ -1,37 +1,4 @@
 var PERMISSION_REGEX = /permission_([\w.\-]+)/g;
-function getAllPermissionIds(data) {
-	var dk = data.getKeys();
-	var ids = [];
-	for(d in dk as dkey) {
-		if(dkey.cmatch(PERMISSION_REGEX) > 0) {
-			var perm_id = dkey.replace(PERMISSION_REGEX, '$1');
-			ids.push(perm_id);
-		}
-	}
-	
-	return ids;
-}
-
-function getParentPermissionIds(data, permId) {
-	var pIds = [];
-	var idArr = permId.split(".");
-	var tid = this.id;
-	getAllPermissionIds(data).forEach(function(pId){
-		var pIdArr = pId.split(".");
-		var isPar = true;
-		for(i in pIdArr as _p) {
-			if(_p != idArr[i]) {
-				isPar = false;
-			}
-		}
-		
-		if(isPar && pIds.indexOf(pId) == -1 && pId != tid) {
-			pIds.push(pId);
-		}
-	});
-	
-	return pIds;
-};
 
 function Permission(name) {
 	DataHandler.apply(this, ['permission', name]);
@@ -126,7 +93,6 @@ function Permission(name) {
 		return permitted;
 	};
 	
-	return false;
 }
 
 
