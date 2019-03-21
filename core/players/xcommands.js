@@ -9,6 +9,10 @@ import core\players\commands\*.js;
 	yield tick_event;
 @endblock
 
+@block interact_event
+	yield interact_event;
+@endblock
+
 function DataHandler(type, name) {
 	this.type = type;
 	this.name = name;
