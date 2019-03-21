@@ -403,9 +403,9 @@ var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries
 											}
 											newTrades[i][ii] = nItem;
 										}
-										newTrades[i].forEach(function(nt){
+										/*newTrades[i].forEach(function(nt){
 											//print(nt.getItemNbt().toJsonString());
-										});
+										});*/
 										
 										entrole.set(
 											i,
