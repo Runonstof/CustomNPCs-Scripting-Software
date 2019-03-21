@@ -121,7 +121,11 @@ Only a few commands yet, but there is gonna be an item edit interface for custom
 `!player setPayTime <player> <time>` Every time that `<time>` has passed, `<player>` receives his base-income. Use time notation    
 `!player setMaxJobs <player> <amount>` Sets the maximum jobs `<player>` can have, set to `-1` for infinite jobs    
 `!player setMaxHomes <player> <amount>` Sets the maximum homes `<player>` can have. (`-1` is infinite)    
- 
+`!player setChatColor <player> <color>` Sets `<player>`'s chatcolor to `<color>`
+`!player setChatEffect <player> <effect>` Sets `<player>`'s chateffect to `<effect>`
+`!player income <player>` Same as `!myIncome` but shows for other players
+`!player info <player>` Shows playerinfo, needs some more info in it
+
 ***
  
 **CHAT CHANNEL COMMANDS**
