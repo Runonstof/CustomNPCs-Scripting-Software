@@ -311,6 +311,12 @@ function executeXCommand(str, player) {
 										}
 										break;
 									}
+									case 'bool': {
+										if(['true', 'false'].indexOf(arg) == -1) {
+											tellPlayer(player, "&c"+rulename.rangeUpper(0,1)+" must be true or false!");
+											return false;
+										}
+									}
 								}
 								
 							}
