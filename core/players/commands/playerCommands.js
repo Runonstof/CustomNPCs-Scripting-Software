@@ -379,6 +379,9 @@ function Player(name) {
 				"exists": true
 			}
 		]],
+		
+		
+		
 		//PLAYER UTILITY
 		['!myIncome', function(pl, args){
 			var p = new Player(pl.getName());
@@ -404,6 +407,24 @@ function Player(name) {
 			return true;
 			
 		}, 'myIncome'],
+		['!myStats [...matches]', function(pl, args, data){
+			var pskills = getSkills(pl);
+			var maxLvl = 32;
+			for(var p in pskills as pskill) {
+				//print(JSON.stringify(pskill));
+				var skillBar = '&r&l[&r';
+				var barLen = 10;
+				var maxXp = getMaxXp(pskill.level);
+				var progress = Math.floor((pskill.xp/maxXp)*barLen);
+				var proc = Math.round(pskill.xp/maxXp*100);
+				for(var i = 0; i < barLen; i++) {
+					if(i < progress) skillBar += "&a\u2B1B";
+					if(i >= progress) skillBar += "&c\u2B1B";
+				}
+				skillBar += "&r&l]"
+				tellPlayer(pl, "&3&l"+pskill.name+" "+skillBar+" "+proc+"%&e - "+pskill.xp+"/"+maxXp);
+			}
+		}, 'myStats'],
 		['!setHome <name>', function(pl, args){
 			var plo = new Player(pl.getName());
 			var data = pl.world.getStoreddata();

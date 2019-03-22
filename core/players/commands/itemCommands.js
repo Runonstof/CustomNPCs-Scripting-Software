@@ -37,8 +37,8 @@
 			var mItem = pl.getMainhandItem();
 			
 			if(!mItem.isEmpty()) {
-				mItem.setAttribute(args.attribute, parseInt(args.value), parseInt(args.slot));
-				tellPlayer(pl, "&aSet "+args.attribute+" to "+args.value+"!");
+				mItem.setAttribute(args.attribute, parseFloat(args.value/1000), parseInt(args.slot));
+				tellPlayer(pl, "&aSet "+args.attribute+" to "+args.value+"%!");
 				return true;
 			} else {
 				tellPlayer(pl, "&cYou don't have anything in your hand!");
@@ -58,7 +58,8 @@
 			},
 			{
 				"argname": "value",
-				"type": "number"
+				"type": "number",
+				"min": 0,
 			}
 		]],
 		

@@ -247,7 +247,7 @@ function executeXCommand(str, player) {
 									case 'number': {
 										var num = NaN;
 										if(rule.type == 'number') {
-											num = parseInt(arg);
+											num = parseFloat(arg);
 										} else if(rule.type == 'currency') {
 											num = getCoinAmount(arg);
 										} else {
