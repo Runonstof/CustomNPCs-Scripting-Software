@@ -299,12 +299,18 @@ function executeXCommand(str, player) {
 									}
 									case 'coloreffect': {
 										if(objArray(_RAWEFFECTS).indexOf(arg) == -1) {
-											tellPlayer(player, "&cChat effects must be one of the following: "+objArray(_RAWEFFECTS).join(', ')+'!');
+											tellPlayer(player, "&cChat effects must be one of the following: \n"+objArray(_RAWEFFECTS).join("\n"));
 											return false;
 										}
 										break;
 									}
-									
+									case 'attribute': {
+										if(_ITEMATTR.indexOf(arg) == -1) {
+											tellPlayer(player, "&cItem attributes must be one of these: \n"+_ITEMATTR.join("\n"));
+											return false;
+										}
+										break;
+									}
 								}
 								
 							}

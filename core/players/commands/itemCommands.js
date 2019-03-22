@@ -1,6 +1,6 @@
 @block register_commands_event
 	registerXCommands([
-		['!renameLore <slot> [...lore]', function(pl, args){
+		['!item renameLore <slot> [...lore]', function(pl, args){
 			var mItem = pl.getMainhandItem();
 			
 			if(!mItem.isEmpty()) {
@@ -19,8 +19,8 @@
 			}
 			
 			return false;
-		}, 'renameLore'],
-		['!renameItem <...name>', function(pl, args){
+		}, 'item.renameLore'],
+		['!item rename <...name>', function(pl, args){
 			var mItem = pl.getMainhandItem();
 			
 			if(!mItem.isEmpty()) {
@@ -32,6 +32,35 @@
 			}
 			
 			return false;
-		}, 'renameItem'],
+		}, 'item.rename'],
+		['!item setAttr <slot> <attribute> <value>', function(pl, args){
+			var mItem = pl.getMainhandItem();
+			
+			if(!mItem.isEmpty()) {
+				mItem.setAttribute(args.attribute, parseInt(args.value), parseInt(args.slot));
+				tellPlayer(pl, "&aSet "+args.attribute+" to "+args.value+"!");
+				return true;
+			} else {
+				tellPlayer(pl, "&cYou don't have anything in your hand!");
+			}
+			
+			return false;
+		}, 'item.setAttr', [
+			{
+				"argname": "slot",
+				"type": "number",
+				"min": -1,
+				"max": 5,
+			},
+			{
+				"argname": "attribute",
+				"type": "attribute",
+			},
+			{
+				"argname": "value",
+				"type": "number"
+			}
+		]],
+		
 	]);
 @endblock

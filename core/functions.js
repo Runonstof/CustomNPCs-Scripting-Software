@@ -194,6 +194,24 @@ function removeFromArray(arr, vals) {
 	return a;
 }
 
+var _ITEMATTR = [
+	'generic.attackDamage',
+	'generic.followRange',
+	'generic.maxHealth',
+	'generic.followRange',
+	'generic.knockbackResistance',
+	'generic.movementSpeed',
+	'generic.armor',
+	'generic.armorToughness',
+	'generic.attackSpeed',
+	'generic.luck',
+	'generic.attackKnockback',
+	'generic.flyingSpeed',
+	'generic.luck',
+
+];
+
+
 var _RAWCOLORS = {
 	'0': 'black',
 	'1': 'dark_blue',
