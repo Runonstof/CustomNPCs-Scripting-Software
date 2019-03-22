@@ -35,8 +35,23 @@ function getSkills(player) {
 			points: skillData.getSkillPoints(),
 			xp: pl_xp.getValue(),
 			maxXp: skillData.getLevelUpCost(),
+			traits: [],
 			mcSkill: skillData
 		};
+		//Traits iteration
+		for(t in skillData.skill.getUnlockables() as trait){
+			var ftrait = {
+				name: trait.getName(),
+				desc: trait.getDescription()
+				key: trait.getKey(),
+				cost: trait.getCost(),
+				unlocked: skillData.isUnlocked(trait),
+				mcTrait: trait
+			}
+			
+			fskill.traits.push(ftrait);
+		}
+		
 		retSkills.push(fskill);
 	}
 	
