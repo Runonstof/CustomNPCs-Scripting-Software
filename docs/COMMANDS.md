@@ -81,7 +81,7 @@ Key | Values | Description
 `type` | `string` | ...
 `minlen` | `number` | Optional. Checks if string `length >= minlen`
 `maxlen` | `number` | Optional. Checks if string `length <= maxlen`
-`noColor` | `true|false` | Optional. If color coding is allowed in this argument
+`noColor` | `true\|false` | Optional. If color coding is allowed in this argument
 
 
 **Type:** currency, time, number`    
@@ -89,7 +89,7 @@ Key | Values | Description
 Key | Values | Description
 --- | --- | ---
 `argname` | * | ...
-`type` | `currency|time|number` | When type is one of these
+`type` | `currency\|time\|number` | When type is one of these
 `min` | `number` | Optional. Checks if `arg >= min`
 `max` | `number` | Optional. Checks if `arg <= max`
 
@@ -100,8 +100,8 @@ Key | Values | Description
 --- | --- | ---
 `argname` | * | ...
 `type` | `datahandler` | When type is datahandler
-`datatype` | `chatchannel|permission|job|...` | All types used by `DataHandler`
-`exists` | `true|false` | Optional. When true, datahandler has to exists, when false, datahandler must not exists
+`datatype` | `chatchannel\|permission\|job\|...` | All types used by `DataHandler`
+`exists` | `true\|false` | Optional. When true, datahandler has to exists, when false, datahandler must not exists
 
 
 **Type:** color, coloreffect   
@@ -109,5 +109,5 @@ Key | Values | Description
 Key | Values | Description
 --- | --- | ---
 `argname` | * | ...
-`type` | `color|coloreffect` | When color, checks if arg is aqua, blue, etc..., when coloreffect, checks for bold, italic, etc....
+`type` | `color\|coloreffect` | When color, checks if arg is aqua, blue, etc..., when coloreffect, checks for bold, italic, etc....
 
