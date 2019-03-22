@@ -29,10 +29,10 @@ function Player(name) {
 		if(t != null) {
 			var td = new Team(t.getName()).init(data);
 			if(td.data.chatcolor != null) {
-				pref = '&'+getColorId(t.data.chatcolor);
+				pref = '&'+getColorId(td.data.chatcolor);
 			}
 			if(td.data.chateffect != null) {
-				prefeff = '&'+getColorId(t.data.chateffect);
+				prefeff = '&'+getColorId(td.data.chateffect);
 			}
 		}
 		if(this.data.chatcolor != null) {
@@ -315,6 +315,20 @@ function Player(name) {
 				"type": "color"
 			}
 		]],
+		['!player resetChatColor <player>', function(pl, args, data){
+			var plo = new Player(args.player).init(data);
+			plo.data.chatcolor = null;
+			plo.save(data);
+			tellPlayer(pl, "&aReset chatcolor of player "+plo.name+"!");
+			return true;
+		}, 'player.resetChatColor', [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true
+			},
+		]],
 		['!player setChatEffect <player> <effect>', function(pl, args, data){
 			var plo = new Player(args.player).init(data);
 			plo.data.chatcolor = args.effect;
@@ -332,6 +346,20 @@ function Player(name) {
 				"argname": "effect",
 				"type": "coloreffect"
 			}
+		]],
+		['!player resetChatEffect <player>', function(pl, args, data){
+			var plo = new Player(args.player).init(data);
+			plo.data.chateffect = null;
+			plo.save(data);
+			tellPlayer(pl, "&aReset chateffect of player "+plo.name+"!");
+			return true;
+		}, 'player.resetChatEffect', [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true
+			},
 		]],
 		['!player income <player>', function(pl, args, data){
 			var p = new Player(args.player).init(data);
@@ -412,10 +440,11 @@ function Player(name) {
 			var maxLvl = 32;
 			tellPlayer(pl, "&l[=======] &6&lGramados Stats&r &l[=======]");
 			for(var p in pskills as pskill) {
-				if(arrayOccurs(pskill.name)
-				var proc = Math.round(pskill.xp/pskill.maxXp*100);
-				skillBar = progressBar(pskill.xp, pskill.maxXp, 10);
-				tellPlayer(pl, "&3&l"+pskill.name+" &r("+pskill.level+") "+skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp);
+				if(arrayOccurs(pskill.name, args.matches) || args.matches.length == 0) {
+					var proc = Math.round(pskill.xp/pskill.maxXp*100);
+					skillBar = progressBar(pskill.xp, pskill.maxXp, 10);
+					tellPlayer(pl, "&3&l"+pskill.name+" &r("+pskill.level+") "+skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp);
+				}
 			}
 			
 			return true;
