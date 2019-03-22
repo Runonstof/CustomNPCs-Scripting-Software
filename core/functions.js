@@ -35,9 +35,7 @@ function getDropChance(npcnbt, slot) {
 }
 
 
-function progressBar(value, max, length, fillColor, leftColor){
-	if(fillColor == null) { fillColor = "&a" }
-	if(leftColor == null) { leftColor = "&c" }
+function progressBar(value, max, length, fillColor="&a", leftColor="&c"){
 	var skillBar = '&r&l[&r';
 	var progress = Math.floor((value/max)*length);
 	var proc = Math.round(value/max*100);
