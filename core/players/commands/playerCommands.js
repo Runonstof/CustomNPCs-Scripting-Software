@@ -411,18 +411,9 @@ function Player(name) {
 			var pskills = getSkills(pl);
 			var maxLvl = 32;
 			for(var p in pskills as pskill) {
-				//print(JSON.stringify(pskill));
-				var skillBar = '&r&l[&r';
-				var barLen = 10;
-				var maxXp = getMaxXp(pskill.level);
-				var progress = Math.floor((pskill.xp/maxXp)*barLen);
-				var proc = Math.round(pskill.xp/maxXp*100);
-				for(var i = 0; i < barLen; i++) {
-					if(i < progress) skillBar += "&a\u2B1B";
-					if(i >= progress) skillBar += "&c\u2B1B";
-				}
-				skillBar += "&r&l]"
-				tellPlayer(pl, "&3&l"+pskill.name+" "+skillBar+" "+proc+"%&e - "+pskill.xp+"/"+maxXp);
+				var proc = Math.round(pskill.xp/pskill.maxXp*100);
+				skillBar = progressBar(pskill.xp, pskill.maxXp, 10);
+				tellPlayer(pl, "&3&l"+pskill.name+" "+skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp);
 			}
 		}, 'myStats'],
 		['!setHome <name>', function(pl, args){

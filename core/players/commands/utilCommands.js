@@ -211,6 +211,8 @@ function getCoinAmount(str) {
 
 var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries');
 
+var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.ReskillableRegistries');
+
 
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
@@ -308,6 +310,18 @@ var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries
 				}
 			}
 		}, 'listEntities'],
+		['!listSkills [...matches]', function(pl, args){
+			var SKILLS = ReskillableRegistry.SKILLS.getValues();
+			tellPlayer(pl, "&l[=======] &r&aAll Registered Skills&r &l[=======]");
+			for(i in SKILLS as skill) {
+				var bname = ReskillableRegistry.SKILLS.getKey(skill);
+				var bid = ReskillableRegistry.SKILLS.getID(skill);
+				var obj = skill.getKey().replace(/\w+\.(\w+)/g, '$1_xp');
+				if(args.matches.length == 0 || arrayOccurs(bname, args.matches) > 0) {
+					tellPlayer(pl, "&e - &b"+bname+"&r (ID: "+bid+", Objective: "+obj+")");
+				}
+			}
+		}, 'listSkills'],
 		['!tellraw <player> <...message>', function(pl, args){
 			var msg = args.message.join(' ');
 			executeCommand(pl, '/tellraw '+args.player+' '+strf(msg, true));
