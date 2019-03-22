@@ -17,5 +17,5 @@
 
 ***    
 
-**CREATING COMMANDS**
+**CREATING COMMANDS**    
 [Creating Commands](docs/COMMANDS.md)
