@@ -10,6 +10,8 @@ function getSkills(player) {
 	var retSkills = [];
 	var sb = player.world.getScoreboard();
 	
+	var plo = new Player(player.getName()).init(data);
+	
 	for(s in skillDataList as skillData) {
 		var sxp = skillData.skill.getKey().replace(/\w+\.(\w+)/g, '$1_xp');//id.name to name_xp
 		

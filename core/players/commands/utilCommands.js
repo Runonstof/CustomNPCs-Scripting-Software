@@ -217,12 +217,6 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
-		['!debug', function(pl, args, data){
-			var w = pl.world;
-			var mcw = w.getMCWorld();
-			//print(dump(mcw));
-			mcw.logInfo('This is an info message by Runonstof');
-		}, 'debug', []],
 		['!fakeleave [...players]', function(pl, args){
 			var pcol = '&f';
 			var sb = pl.world.getScoreboard();
@@ -255,14 +249,11 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 				executeCommand(pl, '/tellraw @a '+strf(pcol+sp+' &r&ejoined the game', true));
 			}
 		}, 'fakejoin'],
-		['!entity makeInvulnerable', function(pl, args, data){
-			
-		}, 'entity.makeInvulnerable'],
 		['!version', function(pl, args){
 			tellPlayer(pl, '&l[=======] &6&lRun\'s Server Software&r &l[=======]');
 			tellPlayer(pl, '&e&lGramados Version: &c&l'+SCRIPT_VERSION);
 			tellPlayer(pl, '&e&lSubscription: &9&lOriginal Edition');
-			tellPlayer(pl, '&e&lProgrammed by: &r&lRunonstof');
+			tellPlayer(pl, '&e&lProgrammed by: &r&lRunonstof&e and &r&lslava_110');
 			tellPlayer(pl, '&e&lMade by: &r&lTheOddlySeagull&r&e and &r&lRunonstof');
 			tellPlayer(pl, '&6Contact Runonstof for further questions.');
 		}, 'version'],

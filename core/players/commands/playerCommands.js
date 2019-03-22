@@ -410,11 +410,15 @@ function Player(name) {
 		['!myStats [...matches]', function(pl, args, data){
 			var pskills = getSkills(pl);
 			var maxLvl = 32;
+			tellPlayer(pl, "&l[=======] &6&lGramados Stats&r &l[=======]");
 			for(var p in pskills as pskill) {
+				if(arrayOccurs(pskill.name)
 				var proc = Math.round(pskill.xp/pskill.maxXp*100);
 				skillBar = progressBar(pskill.xp, pskill.maxXp, 10);
-				tellPlayer(pl, "&3&l"+pskill.name+" "+skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp);
+				tellPlayer(pl, "&3&l"+pskill.name+" &r("+pskill.level+") "+skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp);
 			}
+			
+			return true;
 		}, 'myStats'],
 		['!setHome <name>', function(pl, args){
 			var plo = new Player(pl.getName());

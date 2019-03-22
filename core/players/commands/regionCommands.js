@@ -27,17 +27,21 @@ function Region(name) {
 			var minx = Math.min(pos.xyz1[0], pos.xyz2[0]);
 			var miny = Math.min(pos.xyz1[1], pos.xyz2[1]);
 			var minz = Math.min(pos.xyz1[2], pos.xyz2[2]);
+			
 			var maxx = Math.max(pos.xyz1[0], pos.xyz2[0]);
 			var maxy = Math.max(pos.xyz1[1], pos.xyz2[1]);
 			var maxz = Math.max(pos.xyz1[2], pos.xyz2[2]);
+			
 			var x = xyz[0];
 			var y = xyz[1];
 			var z = xyz[2];
 			
 			if(x >= minx
 			&& x <= maxx
-			&& y >= minx
-			&& y <= maxx
+			
+			&& y >= miny
+			&& y <= maxy
+			
 			&& z >= minz
 			&& z <= maxz) {
 				return true;
