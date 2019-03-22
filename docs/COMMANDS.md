@@ -71,6 +71,7 @@ Key | Values | Description
 `as` | `string` | Optional. If argument is an array (`<...arg>` and `[...arg]`), check for each value
 `type` | `id\|string\|currency\|time\|number\|datahandler\|color\|coloreffect` | What type argument must be
 
+
 *Extra rules for specific types*    
 **Type:** string    
 
