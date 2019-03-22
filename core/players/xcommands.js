@@ -316,6 +316,7 @@ function executeXCommand(str, player) {
 											tellPlayer(player, "&c"+rulename.rangeUpper(0,1)+" must be true or false!");
 											return false;
 										}
+										break;
 									}
 								}
 								
