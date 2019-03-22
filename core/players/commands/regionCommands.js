@@ -5,7 +5,6 @@ function Region(name) {
 		"displayName": this.name,
 		"positions": [],
 		"owner": null,
-		"height": 0,
 		"rentStartTime": 0,
 		"rentCredit": 0,
 		"forSale": false,
@@ -14,7 +13,39 @@ function Region(name) {
 		"trusted": [],
 	};
 	
-	
+	this.addPos = function(xyz1, xyz2) {
+		var newPos = {
+			xyz1: xyz1,
+			xyz2: xyz2,
+		};
+		this.data.positions.push(newPos);
+		
+		return this;
+	};
+	this.hasCoord = function(xyz) { //Check if xyz is in region
+		for(var i in this.data.positions as pos) {
+			var minx = Math.min(pos.xyz1[0], pos.xyz2[0]);
+			var miny = Math.min(pos.xyz1[1], pos.xyz2[1]);
+			var minz = Math.min(pos.xyz1[2], pos.xyz2[2]);
+			var maxx = Math.max(pos.xyz1[0], pos.xyz2[0]);
+			var maxy = Math.max(pos.xyz1[1], pos.xyz2[1]);
+			var maxz = Math.max(pos.xyz1[2], pos.xyz2[2]);
+			var x = xyz[0];
+			var y = xyz[1];
+			var z = xyz[2];
+			
+			if(x >= minx
+			&& x <= maxx
+			&& y >= minx
+			&& y <= maxx
+			&& z >= minz
+			&& z <= maxz) {
+				return true;
+			}
+		}
+		
+		return false;
+	};
 }
 
 @block register_commands_event
@@ -55,29 +86,7 @@ function Region(name) {
 			
 			return false;
 		}, 'region.list'],
-		['!region info <region_name>', function(pl, args){
-			var data = pl.world.getStoreddata();
-			var region = new Region(args.region_name);
-			if(region.load(data)) {
-				tellPlayer(pl, "&l[=======]&r &6&lGramados Region Info&r &l[=======]");
-				tellPlayer(pl, "&eRegion name: &b"+region.name);
-				tellPlayer(pl, "&eDisplay name: &r"+region.data.displayName);
-				var rown = (region.data.owner == null ? '&6&lGramados' : region.data.owner);
-				tellPlayer(pl, "&eOwner: &6"+rown);
-				tellPlayer(pl, "&l[=======] &e&lRegion Property Info &r&l[=======]");
-				tellPlayer(pl, "&eSale Price (Economy Value): &6"+getAmountCoin(region.data.salePrice));
-				var rti = region.data.rentTime > -1 ? getTimeString(region.data.rentTime) : "-1 (BUY)";
-				
-				tellPlayer(pl, "&eRent Time: &6&o"+rti);
-				var fs = region.data.forSale;
-				tellPlayer(pl, "&eFor Sale: &"+(fs?'a':'c')+fs.toString());
-				
-			} else {
-				tellPlayer(pl, "&cRegion '"+region.name+"' does not exists!");
-			}
-			
-			return false;
-		}, 'region.info'],
+		
 
 	]);
 @endblock
