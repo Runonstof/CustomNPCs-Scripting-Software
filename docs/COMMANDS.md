@@ -85,6 +85,7 @@ Key | Values | Description
 
 
 **Type:** currency, time, number`    
+
 Key | Values | Description
 --- | --- | ---
 `argname` | * | ...
@@ -92,7 +93,9 @@ Key | Values | Description
 `min` | `number` | Optional. Checks if `arg >= min`
 `max` | `number` | Optional. Checks if `arg <= max`
 
+
 **Type:** datahandler    
+
 Key | Values | Description
 --- | --- | ---
 `argname` | * | ...
@@ -100,8 +103,11 @@ Key | Values | Description
 `datatype` | `chatchannel|permission|job|...` | All types used by `DataHandler`
 `exists` | `true|false` | Optional. When true, datahandler has to exists, when false, datahandler must not exists
 
-**Type:** color, coloreffect    
+
+**Type:** color, coloreffect   
+ 
 Key | Values | Description
 --- | --- | ---
 `argname` | * | ...
 `type` | `color|coloreffect` | When color, checks if arg is aqua, blue, etc..., when coloreffect, checks for bold, italic, etc....
+
