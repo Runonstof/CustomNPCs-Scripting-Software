@@ -35,6 +35,17 @@ function getDropChance(npcnbt, slot) {
 }
 
 
+function progressBar(value, max, length, fillColor="&a", leftColor="&c"){
+	var skillBar = '&r&l[&r';
+	var progress = Math.floor((value/max)*length);
+	var proc = Math.round(value/max*100);
+	for(var i = 0; i < length; i++) {
+		if(i < progress) skillBar += "&a\u2B1B";
+		if(i >= progress) skillBar += "&c\u2B1B";
+	}
+	return skillBar += "&r&l]";
+}
+
 function playerIsOnline(world, player) {
 	var isOnline = false;
 	var pl = world.getAllPlayers();
