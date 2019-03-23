@@ -8,6 +8,13 @@ import core\players\moreEvents.js;
 import packages\CompatSkills\compatskills.js;
 
 
+var CHAT_EMOTES = {
+	"check": "\u2714",
+	"heart": "\u2764",
+	"cross": "\u2715",
+	"sun": "\u2739",
+};
+
 function init(e) {
 	yield init_event;
 	var w = e.player.world;
@@ -103,7 +110,8 @@ function chat(e) {
 	for(pm in pmatch as pmt) {
 		for(ply in players as plyr) {
 			if(occurrences(plyr.getName().toLowerCase(), pmt.replace(prgx, '$1').toLowerCase()) > 0) {
-				escmsg = escmsg.replace(pmt, '&9&o@'+plyr.getName()+'{suggest_command:/msg '+plyr.getName()+'}'+prefcol);
+				var pmpl = new Player(plyr.getName()); //Dont have to init, only using scoreboard
+				escmsg = escmsg.replace(pmt, '&9&o@'+plyr.getName()+'{suggest_command:/msg '+plyr.getName()+' }'+prefcol);
 			}
 		}
 	}
@@ -132,6 +140,10 @@ function chat(e) {
 		}
 	}
 	
+	//Chat emotes
+	for(var ce in CHAT_EMOTES as chatemote) {
+		escmsg = escmsg.replace(new RegExp(':'+ce+':', 'g'), chatemote);
+	}
 	
 	//Concat new message
 	var newmsg = dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' }')+prefcol+escmsg;
