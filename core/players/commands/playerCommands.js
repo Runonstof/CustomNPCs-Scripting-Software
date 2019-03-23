@@ -1,5 +1,7 @@
 function Player(name) {
-	DataHandler.apply(this, ['player', name]);
+	//Koekjes
+	extends function DataHandler('player', name);
+	
 	this.data = {
 		"lastPayed": 0,
 		"pay": getCoinAmount('5g'),
@@ -439,11 +441,12 @@ function Player(name) {
 			var pskills = getSkills(pl);
 			var maxLvl = 32;
 			tellPlayer(pl, "&l[=======] &6&lGramados Stats&r &l[=======]");
+			var lmatches = arrayTransform(args.matches, function(arr_el){return arr_el.toLowerCase();});
 			for(var p in pskills as pskill) {
-				if(arrayOccurs(pskill.name, args.matches) || args.matches.length == 0) {
+				if(arrayOccurs(pskill.name.toLowerCase(), lmatches) || args.matches.length == 0) {
 					var proc = Math.round(pskill.xp/pskill.maxXp*100);
 					skillBar = progressBar(pskill.xp, pskill.maxXp, 10);
-					tellPlayer(pl, "&3&l"+pskill.name+" &r("+pskill.level+") "+skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp);
+					tellPlayer(pl, "&e&l"+pskill.level+" &3&l"+pskill.name+" "+(pskill.level < maxLvl ? (skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp) : "&r&a&lMAX LEVEL&r"));
 				}
 			}
 			

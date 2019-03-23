@@ -72,6 +72,26 @@ function DataHandler(type, name) {
 	};
 }
 
+function CommandHandler(type, cmdtree) {
+	this.type = type;
+	this.cmdtree = cmdtree||type;
+	this.generate = function() {
+		//add commands
+		registerXCommands([
+			["!"+this.cmdtree+" create <name> [...displayName]", function(pl, args, data){
+				
+			}, this.cmdtree+".create", [
+				{
+					"argname": "name",
+					"type": "datahandler",
+					"datatype": this.type,
+					"exists": false
+				}
+			]],
+		]);
+	}
+}
+
 function registerXCommand(commandMatch, callback, perm, rules=[]) {
 	_COMMANDS.push({
 		usage: commandMatch,

@@ -12,7 +12,9 @@ function Region(name) {
 		"rentTime": -1,
 		"trusted": [],
 	};
-	
+	this.getPermission = function() {
+		return new Permission('region.'+this.name);
+	};
 	this.addPos = function(xyz1, xyz2) {
 		var newPos = {
 			xyz1: xyz1,
@@ -56,23 +58,20 @@ function Region(name) {
 	//REGISTER REGION COMMANDS
 	registerXCommands([
 		//['', function(pl, args){}, ''],
-		['!region add <name> [...display_name]', function(pl, args){
+		['!region add <name> [...display_name]', function(pl, args, data){
 			var region = new Region(args.name);
 			var data = pl.world.getStoreddata();
-			if(!region.exists(data)) {
-				var dname = args.display_name.join(" ");
-				if(dname != "") {
-					region.data.displayName = dname;
-				}
-				region.save(data);
-				tellPlayer(pl, "&aAdded region '"+args.name+"'!");
-				return true;
-			} else {
-				tellPlayer(pl, "&cRegion '"+args.name+"' already exists!");
+			if(args.display_name.length > 0) { region.data.displayName = args.display_name.join(" "); }
+			region.save(data);
+			return true;
+		}, 'region.add', [
+			{
+				"argname": "name",
+				"type": "datahandler",
+				"datatype": "region",
+				"exists": false
 			}
-			
-			return false;
-		}, 'region.add'],
+		]],
 		['!region list [...matches]', function(pl, args){
 			var data = pl.world.getStoreddata();
 			var dkeys = data.getKeys();
@@ -82,7 +81,7 @@ function Region(name) {
 				if(dkey.cmatch(/region_(\w)/g) > 0) {
 					var region = new Region(dkey.replace(/region_(\w)/g, '$1'));
 					region.load(data);
-					if(args.matches.length == 0 || arrayOccurs(region.name, args.matches) > 0) {
+					if(args.matches.length == 0 || arrayOccurs(region.name.toLowerCase(), args.matches) > 0) {
 						tellPlayer(pl, "&e - &b"+region.name);
 					}
 				}

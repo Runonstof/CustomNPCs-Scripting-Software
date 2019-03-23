@@ -217,6 +217,9 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
+		['!debug', function(pl, args){
+			
+		}, 'debug'],
 		['!fakeleave [...players]', function(pl, args){
 			var pcol = '&f';
 			var sb = pl.world.getScoreboard();

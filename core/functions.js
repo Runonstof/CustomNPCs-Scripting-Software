@@ -135,6 +135,14 @@ function occurrences(string, subString, allowOverlapping=false) {
     return n;
 }
 
+function arrayTransform(arr, elfn) {
+	var newa = [];
+	for(a in arr as arri) {
+		newa.push(elfn(arri, a, arr));
+	}
+	return newa;
+}
+
 function arrayTakeRange(arr, start, end=null) {
 	if(end == null) { end = arr.length; }
 	var a = [];
