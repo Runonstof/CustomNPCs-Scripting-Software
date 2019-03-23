@@ -2,6 +2,7 @@
 
 function fnTweak($scr) {
 	//Better Functions
+	$exRegex = $GLOBALS['config']['syntaxRegex']['extendFnTweak'];
 	$fnRegex = $GLOBALS['config']['syntaxRegex']['functionTweak'];
 	$argRegex = $GLOBALS['config']['syntaxRegex']['functionArgs'];
 	$fns = [];
@@ -32,9 +33,11 @@ function fnTweak($scr) {
 		}
 		
 		$scr = str_replace($fn_construct, $fn_replace, $scr);
-		
-		
 	}
+	
+	$exst = [];
+	
+	$scr = preg_replace($exRegex, "$1.apply(this, [$2]);", $scr);
 	
 	return $scr;
 }
