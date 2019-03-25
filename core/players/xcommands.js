@@ -97,7 +97,8 @@ function registerXCommand(commandMatch, callback, perm, rules=[]) {
 		usage: commandMatch,
 		callback: callback,
 		perm: perm,
-		rules: rules
+		rules: rules,
+		enabled: true
 	});
 }
 
@@ -110,6 +111,7 @@ function registerXCommands(cmds) {
 		registerXCommand(cmds[c][0], cmds[c][1], cmds[c][2], cmds[c][3] || []);
 	}
 }
+
 
 function parseUsageRgx(command, str=null) {//Converts command usage to Regex, and gathers info about command
 	//!perms\s+manage\s+add((?:\s+[\w]+))((?:\s+[\w]+)*)
@@ -395,3 +397,4 @@ function executeXCommand(str, player) {
 
 //Register commands
 yield register_commands_event;
+

@@ -1,20 +1,24 @@
 function Region(name) {
-	DataHandler.apply(this, ['region', name]);
+	extends function DataHandler('region', name);
 	
 	this.data = {
 		"displayName": this.name,
 		"positions": [],
 		"owner": null,
 		"rentStartTime": 0,
+		"maxRentCredit": -1,
 		"rentCredit": 0,
 		"forSale": false,
 		"salePrice": 0,
 		"rentTime": -1,
 		"trusted": [],
 	};
-	this.getPermission = function() {
+	this.getPermission = function() { //Permission for admin-override
 		return new Permission('region.'+this.name);
 	};
+	this.canInteract = function(player) {
+		
+	}
 	this.addPos = function(xyz1, xyz2) {
 		var newPos = {
 			xyz1: xyz1,
@@ -57,10 +61,9 @@ function Region(name) {
 @block register_commands_event
 	//REGISTER REGION COMMANDS
 	registerXCommands([
-		//['', function(pl, args){}, ''],
+		//['', function(pl, args){}, '', []],
 		['!region add <name> [...display_name]', function(pl, args, data){
 			var region = new Region(args.name);
-			var data = pl.world.getStoreddata();
 			if(args.display_name.length > 0) { region.data.displayName = args.display_name.join(" "); }
 			region.save(data);
 			return true;
@@ -72,8 +75,7 @@ function Region(name) {
 				"exists": false
 			}
 		]],
-		['!region list [...matches]', function(pl, args){
-			var data = pl.world.getStoreddata();
+		['!region list [...matches]', function(pl, args, data){
 			var dkeys = data.getKeys();
 			
 			tellPlayer(pl, "&l[=======] &6&lGramados Regions&r &l[=======]");
@@ -87,9 +89,21 @@ function Region(name) {
 				}
 			}
 			
-			return false;
+			return true;
 		}, 'region.list'],
+		['!region remove <name>', function(pl, args, data){
+			var region = new Region(args.name);
+			region.remove(data);
+			
+			return true;
+		}, 'region.remove', [
+			{
+				"argname": "name",
+				"type": "datahandler",
+				"datatype": "region",
+				"exists": true
+			}
+		]],
 		
-
 	]);
 @endblock

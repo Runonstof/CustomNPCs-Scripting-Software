@@ -1,17 +1,14 @@
 function ChatChannel(name) {
-	DataHandler.apply(this, ['chatchannel', name]);
+	extends function DataHandler('chatchannel', name);
+	
 	this.data = {
 		"displayName": name,
 		"players": [],
 		"color": "blue",
 		"desc": "",
 	};
-	this.getPermission = function(data) {
-		var perm = new Permission('chatchannel.'+this.name);
-		perm.load(data);
-		if(!perm.exists(data)) { perm.save(data); }
-		
-		return perm;
+	this.getPermission = function() {
+		return new Permission('chatchannel.'+this.name);
 	};
 	this.addPlayers = function(players){
 		for(p in players as player) {

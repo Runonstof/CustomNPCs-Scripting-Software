@@ -1,5 +1,4 @@
 function Player(name) {
-	//Koekjes
 	extends function DataHandler('player', name);
 	
 	this.data = {
@@ -10,7 +9,7 @@ function Player(name) {
 		"maxHomes": 1,
 		"homes": {},
 		"jobs": {},
-		"talkchat": null,
+		"inventories": [],
 		"chatcolor": null,
 		"chateffect": null,
 		"color": null,
@@ -45,21 +44,22 @@ function Player(name) {
 		}
 		return pref+prefeff;
 	};
-	this.getNameTag = function(sb, prefix, namesuff, teamsuff) {
+	this.getNameTag = function(sb, prefix, namesuff, teamsuff, ccChar) {
 		var t = sb.getPlayerTeam(this.name);
+		var dc = ccChar||'&';
 		var ccol = '';
 		var ctm = '';
 		if(this.data.color != null) {
 			var cId = getColorId(this.data.color);
-			ccol = '&'+cId;
+			ccol = dc+cId;
 		} else if(t != null) {
-			ccol = '&'+getColorId(t.getColor());
+			ccol = dc+getColorId(t.getColor());
 		}
 		
 		if(t != null) {
-			ctm = ccol+'&o'+t.getDisplayName()+' ';
+			ctm = ccol+dc+'o'+t.getDisplayName()+' ';
 		}
-	return ccol+'&l['+ccol+ctm+(teamsuff||'')+'&r'+ccol+this.name+(namesuff||'')+ccol+'&l'+']'+(prefix||'')+'&r';
+	return ccol+dc+'l['+ccol+ctm+(teamsuff||'')+dc+'r'+ccol+this.name+(namesuff||'')+ccol+dc+'l'+']'+(prefix||'')+dc+'r';
 	};
 	
 	this.delJob = function(name) {

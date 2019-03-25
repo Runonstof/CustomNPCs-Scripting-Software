@@ -1,7 +1,8 @@
 var PERMISSION_REGEX = /permission_([\w.\-]+)/g;
 
 function Permission(name) {
-	DataHandler.apply(this, ['permission', name]);
+	extends function DataHandler('permission', name);
+	
 	this.data = {
 		"enabled": true,
 		"teams": [
@@ -195,7 +196,7 @@ function Permission(name) {
 		['!perms list [...matches]', function(pl, args){
 			var w = pl.world;
 			var data = w.getStoreddata();
-			var ids = getAllPermissionIds(data);
+			var ids = new Permission().getAllDataIds(data);
 			if(ids.length > 0) {
 				tellPlayer(pl, "&l<-====- &6&lGramados Permission Ids&r&l -====->");
 				for(i in ids as id) {
