@@ -50,7 +50,6 @@ function interact(event){
 			
 			//Adding to profit variable how much does it cost
 			profit += getCoinAmount(trader.getSold(i).getLore()[0].replace(/\s+/g, '')) * trader.getSold(i).getStackSize() * mult;
-			pl.message("Income per ["+i+"] trade " + profit);
 			if(!trader.getCurrency1(i).isEmpty())
 				if(bp) {
 					//same as below but for backpack items array
