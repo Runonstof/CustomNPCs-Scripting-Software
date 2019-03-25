@@ -2,6 +2,11 @@ import core\JavaScript\*.js;
 
 var ASSET_MOD_ID = "adventureassets";
 
+//Java import
+var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
+var UItem = Java.type("brad16840.common.UniqueItem");
+var UItemInv = Java.type('brad16840.common.UniqueItemInventory');
+
 function objMerge(obj1,obj2){
     var obj3 = {};
     for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
@@ -58,11 +63,21 @@ function playerIsOnline(world, player) {
 	return isOnline;
 }
 
+//===================ItemStack Array Utils===================
+
+//Used to get backpack IInventory (to get/set items array you can use `getBackpackInv(pl, items).items` )
+function getBackpackInv(pl, item){
+	//If backpack item wasn't been opened yet
+	if(UItem.hasIdentifier(item.getMCItemStack()))
+		return UItemInv.getInventory(pl.getMCEntity(), UItem.getIdentifier(item.getMCItemStack()));
+	return;
+}
+
 function getPlayerInvFromNbt(pnbt, w) {
-	var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
 	var pinv = pnbt.getList('Inventory', pnbt.getListType('Inventory'));
 	var pitems = [];
-	for(p in pinv as pin) {
+	for(p in pinv) {
+var pin = pinv[p];
 		var pitm = w.createItemFromNbt(API.stringToNbt(pin.toJsonString()));
 		pitems.push(pitm);
 	}
@@ -70,34 +85,108 @@ function getPlayerInvFromNbt(pnbt, w) {
 	return pitems;
 }
 
-function getInvItemCount(pnbt, itemstack, w, ignoreNbt=false) {
-	var icount = 0;
-	var itnbt = itemstack.getItemNbt();
-	itnbt.remove('Count');
-	var pinv = getPlayerInvFromNbt(pnbt, w);
-	for(pi in pinv as pitem) {
-		pinbt = pitem.getItemNbt();
-		var scount = parseInt(pinbt.getByte('Count'));
-		pinbt.remove('Count');
-		if(ignoreNbt) {
-			if(pinbt.getString("id") == itnbt.getString("id")) {
-				icount += scount;
-			}
-		} else {
-			if(pinbt.toJsonString() == itnbt.toJsonString()) {
-				icount += scount;
-			}
+function getInvItemCount(pnbt, itemstack, w, ignoreNbt) {
+	if(typeof(ignoreNbt) == typeof(undefined)) { ignoreNbt = false; }
+	return getArrItemCount(getPlayerInvFromNbt(pnbt, w), itemstack, ignoreNbt);
+}
+
+function isItemEqual(stack, other, ignoreNbt){
+	if(typeof(ignoreNbt) == typeof(undefined)) { ignoreNbt = false; }
+	if (!other || other.isEmpty()) {
+		return false;
+	}
+	
+	stackNbt = stack.getItemNbt();
+	stackNbt.remove('Count');
+	otherNbt = other.getItemNbt();
+	otherNbt.remove('Count');
+	
+	if(ignoreNbt) {
+		if(stackNbt.getString("id") == otherNbt.getString("id")) {
+			return true;
+		}
+	} else {
+		if(stackNbt.toJsonString() == otherNbt.toJsonString()) {
+			return true;
 		}
 	}
+	
+	return false;
+}
 
+//How much items in array
+function getArrItemCount(array, itemstack, ignoreNbt) {
+	if(typeof(ignoreNbt) == typeof(undefined)) { ignoreNbt = false; }
+	var icount = 0;
+	for(pi in array) {
+var pitem = array[pi];
+		pinbt = pitem.getItemNbt();
+		var scount = parseInt(pinbt.getByte('Count'));
+		if(isItemEqual(itemstack, pitem, ignoreNbt))
+			icount += scount;
+	}
 
 	return icount;
+}
+
+//Remove certain amount of ItemStack item from ItemStack[] array
+function arrayItemRemove(array, item, amount){
+	var count = getArrItemCount(array, item);
+	if (amount > count) {
+		return false;
+	}
+	if (count == amount) {
+		return arrayAllItemsRemove(array, item);
+	} else {
+		for (var i = 0; i < array.length; ++i) {
+			if (!array[i] || !isItemEqual(item, array[i])) continue;
+			if (amount >= array[i].getStackSize()) {
+				//EmptyItemStack
+				array[i] = API.getIItemStack(Java.type('net.minecraft.item.ItemStack').field_190927_a);
+				amount -= array[i].getStackSize();
+				continue;
+			}
+			array[i].setStackSize(array[i].getStackSize() - amount);
+			break;
+		}
+	}
+	return array;
+}
+
+//Remove all items like ItemStack item from ItemStack[] array
+function arrayAllItemsRemove(array, item){
+	for (var i = 0; i < array.length; ++i) {
+		if (!array[i] || !isItemEqual(item, array[i])) continue;
+		//EmptyItemStack
+		array[i] = API.getIItemStack(Java.type('net.minecraft.item.ItemStack').field_190927_a);
+	}
+	return array;
+}
+
+//Convert MCItemStack[] to IItemStack[]
+function getIItemStackArray(array){
+	var newArr = [];
+	for (var i = 0; i < array.length; ++i) {
+		newArr[i] = API.getIItemStack(array[i]);
+	}
+	return newArr;
+}
+
+//Convert IItemStack[] to MCItemStack[]
+function getMCItemStackArray(array){
+	var newArr = [];
+	for (var i = 0; i < array.length; ++i) {
+		newArr[i] = array[i].getMCItemStack();
+	}
+	return newArr;
 }
 
 
 function getHandItem(player) {
 	return player.getMainhandItem() || player.getOffhandItem();
 }
+//===========================================================
+
 function uniqid() {
 	var id = '';
 	for(var i = 0; i <= 3; i++) {
