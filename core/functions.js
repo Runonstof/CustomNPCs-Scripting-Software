@@ -106,18 +106,22 @@ function uniqid() {
 	return id;
 }
 
-function arrayOccurs(string, subArray, allowOverlapping=false) {
+function arrayOccurs(string, subArray, allowOverlapping=false, caseSensitive=true) {
 	var occ = 0;
 	for(i in subArray as sel) {
-		occ += occurrences(string, sel, allowOverlapping);
+		occ += occurrences(string, sel, allowOverlapping, caseSensitive);
 	}
 	
 	return occ;
 }
 
-function occurrences(string, subString, allowOverlapping=false) {
-    string += "";
-    subString += "";
+function occurrences(string, subString, allowOverlapping=false, caseSensitive=true) {
+    string = string.toString()
+    subString = subString.toString()
+	
+	if(!caseSensitive) {
+		
+	}
 	
     if (subString.length <= 0) return (string.length + 1);
 
