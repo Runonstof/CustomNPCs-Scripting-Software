@@ -323,23 +323,28 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		}, 'tellraw'],
 		['!setMagAmmo <amount>', function(pl, args){
 			var mItem = pl.getMainhandItem();
-			var am = parseInt(args.amount) || 0;
 			if(!mItem.isEmpty()) {
 				var mnbt = mItem.getNbt();
 				if(mnbt.has('Ammo')) {
-					mnbt.setInteger('Ammo', am);
+					mnbt.setInteger('Ammo', args.amount);
 					//Item.setNbt(mnbt);
-					tellPlayer(pl, "&aSet ammo to "+am+"!");
+					tellPlayer(pl, "&aSet ammo to "+args.amount+"!");
 					return true;
 				}
 			}
 			tellPlayer(pl, "&cYou don't have an magazine in your hand!");
 			
 			return false;
-		}, 'setMagAmmo'],
+		}, 'setMagAmmo', [
+			{
+				"argname": "amount",
+				"type": "number",
+				"min": 0
+			}
+		]],
 		['!convertNpcLoot <radius>', function(pl, args){
 			var w = pl.world;
-			var ents = w.getNearbyEntities(pl.getPos(), parseInt(args.radius) || 4, 2);
+			var ents = w.getNearbyEntities(pl.getPos(), args.radius, 2);
 			for(ee in ents as ent) {
 				if(ent.getType() == 2) {//Is NPC
 					var entnbt = ent.getEntityNbt();
@@ -364,77 +369,80 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			}
 			tellPlayer(pl, "&aAffected "+ents.length+" entities.");
 			return true;
-		}, 'convertNpcLoot'],
+		}, 'convertNpcLoot', [
+			{
+				"argname": "radius",
+				"type": "number"
+			}
+		]],
 		['!convertTrader <radius>', function(pl, args){
 			var radius = parseInt(args.radius) || null;
 			var ppos = pl.getPos();
-			if(radius != null) {
-				if(radius >= 4 && radius <= 32) {
-					var ents = pl.world.getNearbyEntities(ppos, radius, 2);
-					var entcnt = 0; //Affected entity count
-					for(en in ents as ent) {
-						//print(ent.getPos().normalize());
-						if(ent.getType() == 2) {//Is NPC
-							var entrole = ent.getRole();
-							if(entrole != null) {
-								if(entrole.getType() == 1) {//Is Trader
-									//Loop sellItems
-									var newTrades = [];
-									for(var i = 0; i < 18; i++) {
-										newTrades.push([
-											entrole.getCurrency1(i),
-											entrole.getCurrency2(i),
-											entrole.getSold(i),
-										]);
-										
-										entrole.remove(i);
-									}
-									for(var i = 0; i < 18; i++) {
-										//print('SLOT: '+i);amount
-										
-										for(ii in newTrades[i] as nItem) {
-											if(!nItem.isEmpty()) {
-												var nLore = nItem.getLore();
-												if(nLore.length > 0) {
-													var nAmount = getCoinAmount(nLore[0].replace(/\s+/g, ''));
-													if(nAmount > 0) {
-														nItem.setCustomName(ccs('&2&lMoney&r'));
-														nItem.setLore([ccs('&e'+getAmountCoin(nAmount))]);
-													}
-												}
+			var ents = pl.world.getNearbyEntities(ppos, radius, 2);
+			var entcnt = 0; //Affected entity count
+			for(en in ents as ent) {
+				//print(ent.getPos().normalize());
+				if(ent.getType() == 2) {//Is NPC
+					var entrole = ent.getRole();
+					if(entrole != null) {
+						if(entrole.getType() == 1) {//Is Trader
+							//Loop sellItems
+							var newTrades = [];
+							for(var i = 0; i < 18; i++) {
+								newTrades.push([
+									entrole.getCurrency1(i),
+									entrole.getCurrency2(i),
+									entrole.getSold(i),
+								]);
+								
+								entrole.remove(i);
+							}
+							for(var i = 0; i < 18; i++) {
+								//print('SLOT: '+i);amount
+								
+								for(ii in newTrades[i] as nItem) {
+									if(!nItem.isEmpty()) {
+										var nLore = nItem.getLore();
+										if(nLore.length > 0) {
+											var nAmount = getCoinAmount(nLore[0].replace(/\s+/g, ''));
+											if(nAmount > 0) {
+												nItem.setCustomName(ccs('&2&lMoney&r'));
+												nItem.setLore([ccs('&e'+getAmountCoin(nAmount))]);
 											}
-											newTrades[i][ii] = nItem;
 										}
-										/*newTrades[i].forEach(function(nt){
+									}
+									newTrades[i][ii] = nItem;
+								}
+								/*newTrades[i].forEach(function(nt){
 											//print(nt.getItemNbt().toJsonString());
 										});*/
-										
-										entrole.set(
-											i,
-											newTrades[i][0].isEmpty() ? null : newTrades[i][0],
-											newTrades[i][1].isEmpty() ? null : newTrades[i][1],
-											newTrades[i][2]
-										);
-									}
-									//Add affected
-									entcnt++;
-								}
+								
+								entrole.set(
+									i,
+									newTrades[i][0].isEmpty() ? null : newTrades[i][0],
+									newTrades[i][1].isEmpty() ? null : newTrades[i][1],
+									newTrades[i][2]
+								);
 							}
+							//Add affected
+							entcnt++;
 						}
 					}
-					if(entcnt > 0) {
-						tellPlayer(pl, "&aAffected "+entcnt+" NPC Traders in a radius of "+radius+" !")
-					} else {
-						tellPlayer(pl, "&cNo NPC Traders found in a radius of "+radius+" blocks.");
-					}
-				} else {
-					tellPlayer(pl, "&cYou have a minimum of 4 blocks and a maximum of 32 block!");
 				}
-			} else {
-				tellPlayer(pl, "&c<radius> is not a valid number!");
 			}
-			return false;
-		}, 'convertTrader'],
+			if(entcnt > 0) {
+				tellPlayer(pl, "&aAffected "+entcnt+" NPC Traders in a radius of "+radius+" !")
+			} else {
+				tellPlayer(pl, "&cNo NPC Traders found in a radius of "+radius+" blocks.");
+			}
+		}, 'convertTrader', [
+			{
+				"argname": "radius",
+				"type": "number",
+				"min": 4,
+				"max": 32
+			}
+		]],
 		['!convertMoney', function(pl, args){
 			var mItem = pl.getMainhandItem();
 			if(!mItem.isEmpty()) {
@@ -477,9 +485,13 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			
 			tellPlayer(pl, "&aGave "+getAmountCoin(am)+" to players: '"+args.players.join(', ')+"'");
 			
-			return true;
-			
-		}, 'giveMoney'],
+		}, 'giveMoney', [
+			{
+				"argname": "amount",
+				"type": "currency",
+				"min": 0
+			}
+		]],
 		['!sayas <player> <...message>', function(pl, args, data){
 			var w = pl.world;
 			var ap = args.player;

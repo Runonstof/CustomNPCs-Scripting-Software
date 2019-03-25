@@ -244,61 +244,87 @@ function Player(name) {
 	//REGISTER PLAYER COMMANDS
 	registerXCommands([
 		//PLAYER MANAGE
-		['!player setPay <player> <amount>', function(pl, args){
+		['!player setPay <player> <amount>', function(pl, args, data){
 			var am = getCoinAmount(args.amount);
-			var p = new Player(args.player);
-			var data = pl.world.getStoreddata();
+			var p = new Player(args.player).init(data);
 			
-			if(p.load(data)) {
-				p.data.pay = am;
-				p.save(data);
-			}
+			p.data.pay = am;
+			p.save(data);
 			tellPlayer(pl, "&aSet pay amount of player '"+p.name+"' to "+getAmountCoin(am)+'!');
 		
 			return true;
 		}, 'player.setPay', [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true
+			},
 			{
 				"argname": "amount",
 				"type": "currency",
 				"min": 0
 			}
 		]],
-		['!player setPayTime <player> <time>', function(pl, args){
+		['!player setPayTime <player> <time>', function(pl, args, data){
 			var am = getStringTime(args.time);
-			var p = new Player(args.player);
-			var data = pl.world.getStoreddata();
-			
-			p.load(data);
+			var p = new Player(args.player).init(data);
 			p.data.payTime = am;
 			p.save(data);
 			tellPlayer(pl, "&aSet pay time of player '"+p.name+"' to "+getTimeString(am)+'!');
 		
 			return true;
-		}, 'player.setPayTime'],
-		['!player setMaxJobs <player> <amount>', function(pl, args){
-			var p = new Player(args.player);
-			var data = pl.world.getStoreddata();
-			
-			p.load(data);
+		}, 'player.setPayTime', [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true
+			},
+			{
+				"argname": "time",
+				"type": "time"
+			}
+		]],
+		['!player setMaxJobs <player> <amount>', function(pl, args, data){
+			var p = new Player(args.player).init(data);
 			p.data.maxJobs = parseInt(args.amount) || 1;
 			p.save(data);
 			
 			tellPlayer(pl, "&aSet maxhomes of player '"+p.name+"' to "+(parseInt(args.amount) || 1)+'!');
 			return true;
 		
-		}, 'player.setMaxJobs'],		
-		['!player setMaxHomes <player> <amount>', function(pl, args){
-			var p = new Player(args.player);
-			var data = pl.world.getStoreddata();
-			
-			p.load(data);
+		}, 'player.setMaxJobs', [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true
+			},
+			{
+				"argname": "amount",
+				"type": "number"
+			}
+		]],		
+		['!player setMaxHomes <player> <amount>', function(pl, args, data){
+			var p = new Player(args.player).init(data);
 			p.data.maxHomes = parseInt(args.amount) || 1;
 			p.save(data);
-			
 			tellPlayer(pl, "&aSet maxhomes of player '"+p.name+"' to "+(parseInt(args.amount) || 1)+'!');
 			return true;
 		
-		}, 'player.setMaxHomes'],
+		}, 'player.setMaxHomes', [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true
+			},
+			{
+				"argname": "amount",
+				"type": "number"
+			}
+		]],
 		['!player setChatColor <player> <color>', function(pl, args, data){
 			var plo = new Player(args.player).init(data);
 			plo.data.chatcolor = args.color;

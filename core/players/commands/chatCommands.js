@@ -119,7 +119,7 @@ function getColorPermId(colorId) {
 				"argname": "name",
 				"type": "datahandler",
 				"datatype": "chatchannel",
-				"exists": false,
+				"exists": false
 			}
 		]],
 		['!chat remove <name>', function(pl, args){
