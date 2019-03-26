@@ -503,5 +503,65 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			return true;
 			
 		}, 'sayas'],
+		//Inventory load/save
+		['!inv save <name>', function(pl, args, data){
+			var apo = new Player(pl.getName());
+			apo.load(data);
+
+			var inv = pl.getMCEntity().field_71071_by;
+			var inventory = [];
+			for (var i = 0; i < inv.field_70462_a.length; i++) {
+				inventory.push(API.getIItemStack(inv.field_70462_a.get(i)).getItemNbt().toJsonString());
+			}
+			
+			apo.data.inventories.push([args.name, inventory]);
+			apo.save(data);
+			tellPlayer(pl, "&aInventory saved as '"+args.name+"'");
+
+			return true;
+			
+		}, 'inv.save'],
+		['!inv load <name>', function(pl, args, data){
+			var w = pl.world;
+			var apo = new Player(pl.getName());
+			apo.load(data);
+
+			var inventory = apo.getInventory(args.name);
+			if(!inventory){
+				tellPlayer(pl, "&cInventory '"+args.name+"' not found");
+				return false;
+			}
+
+			var inv = pl.getMCEntity().field_71071_by;
+			inv.func_174888_l(); //Clear
+		
+			for (var i = 0; i < inventory.length; i++) {
+				if(inventory[i] && API.stringToNbt(inventory[i]).getString("id")!="minecraft:air")
+				inv.field_70462_a.set(i, w.createItemFromNbt(API.stringToNbt(inventory[i])).getMCItemStack());
+			}
+			
+			inv.func_70296_d(); //Mark dirty
+			pl.getMCEntity().field_71069_bz.func_75142_b(); //Detect and send changes
+
+			tellPlayer(pl, "&aInventory '"+args.name+"' succefully loaded");
+			return true;
+			
+		}, 'inv.load'],
+		['!inv remove <name>', function(pl, args, data){
+			var w = pl.world;
+			var apo = new Player(pl.getName());
+			apo.load(data);
+
+			var inventory = apo.getInventory(args.name);
+			if(!inventory){
+				tellPlayer(pl, "&cInventory '"+args.name+"' not found");
+				return false;
+			}
+			apo.removeInventory(args.name);
+			apo.save(data);
+			tellPlayer(pl, "&aInventory '"+args.name+"' succefully removed");
+			return true;
+			
+		}, 'inv.save']
 	]);
 @endblock
