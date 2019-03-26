@@ -16,9 +16,11 @@ function Region(name) {
 	this.getPermission = function() { //Permission for admin-override
 		return new Permission('region.'+this.name);
 	};
-	this.canInteract = function(player) {
+	/*IPlayer player, IData data*/
+	this.canInteract = function(player, data) {
 		
 	}
+	/*Array xyz1, Array xyz2*/
 	this.addPos = function(xyz1, xyz2) {
 		var newPos = {
 			xyz1: xyz1,
@@ -28,6 +30,7 @@ function Region(name) {
 		
 		return this;
 	};
+	/*Array xyz*/
 	this.hasCoord = function(xyz) { //Check if xyz is in region
 		for(var i in this.data.positions as pos) {
 			var minx = Math.min(pos.xyz1[0], pos.xyz2[0]);
@@ -94,7 +97,7 @@ function Region(name) {
 		['!region remove <name>', function(pl, args, data){
 			var region = new Region(args.name);
 			region.remove(data);
-			
+			tellPlayer(pl, "&aRemoved "+region.name+"!");
 			return true;
 		}, 'region.remove', [
 			{

@@ -144,8 +144,15 @@ function getColorPermId(colorId) {
 				var cc = new ChatChannel(cid);
 				if(args.matches.length == 0 || arrayOccurs(cid, args.matches) > 0) {
 					if(cc.load(data) && cc.getPermission(data).permits(pl.getName(), pl.world.getScoreboard(), data)) {
+						var onlinePlayers = [];
+						for(var cpli in cc.data.players as cpl) {
+							if(playerIsOnline(pl.world, cpl)) {
+								onlinePlayers.push(cpl);
+							}
+						}
+						var ontxt = "&r&e"+onlinePlayers.length+"/"+cc.data.players.length+" Online{*|show_text:"+onlinePlayers.join("\n")+"}&r";
 						var opttxt = (cc.data.players.indexOf(pl.getName()) > -1 ? "&c&nLeave{run_command:!chat leave "+cc.name+"}&r":"&a&nJoin{run_command:!chat join "+cc.name+"}&r");
-						tellPlayer(pl, cc.getTag()+"&r ("+cc.name+") "+opttxt);
+						tellPlayer(pl, cc.getTag()+"&r ("+cc.name+") "+opttxt+" "+ontxt);
 					}
 				}
 			}
