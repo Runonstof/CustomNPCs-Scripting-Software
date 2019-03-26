@@ -17,23 +17,20 @@ function Team(name) {
 			var sb = w.getScoreboard();
 			var t = new Team(args.team_name);
 			var data = w.getStoreddata();
-			if(t.teamExists(sb)) {
-				if(args.color != null) {
-					args.color = args.color.toLowerCase();
-				}
-				var acols = objArray(_RAWCOLORS);
-				if(acols.indexOf(args.color) > -1) {
-					t.data.chatcolor = args.color;
-					t.save(data);
-					tellPlayer(pl, "&aSet chatcolor for team ");
-				} else {
-					tellPlayer(pl, "&c'"+args.color+"' is not a valid value. Use one of the following: &o"+acols.join(', '));
-				}
-				
-			} else {
-				tellPlayer(pl, "&cTeam '"+args.teamname+"' does not exist!");
-				t.remove(data);
+			t.data.chatcolor = args.color;
+			t.save(data);
+			tellPlayer(pl, "&aSet chatcolor for team ");
+		}, 'teams.set.chatcolor', [
+			{
+				"argname": "color",
+				"type": "color"
+			},
+			{
+				"argname": "team_name",
+				"type": "datahandler",
+				"datatype": "team",
+				"exists": true
 			}
-		}, 'teams.set.chatcolor']
+		]]
 	]);
 @endblock

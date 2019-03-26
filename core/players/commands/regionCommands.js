@@ -1,3 +1,4 @@
+
 function Region(name) {
 	extends function DataHandler('region', name);
 	
@@ -109,4 +110,5 @@ function Region(name) {
 		]],
 		
 	]);
+
 @endblock

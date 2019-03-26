@@ -103,31 +103,35 @@ function Permission(name) {
 		['!perms setEnabled <permission_id> <value>', function(pl, args){
 			var perm = new Permission(args.permission_id);
 			var data = pl.world.getStoreddata();
-			if(perm.exists(data)) {
-				if(args.value == 'true' || args.value == 'false') {
-					perm.data.enabled = (args.value == 'true');
-					perm.save(data);
-					tellPlayer(pl, "&a"+(args.value == 'true' ? 'Enabled' : 'Disabled')+" permission '"+args.permission_id+"'!");
-				} else {
-					tellPlayer(pl, "&c<value> must be &ntrue&r&c or &nfalse&r&c!");
-				}
-			} else {
-				tellPlayer(pl, "&c"+args.permission_id+" does not exists!");
+			perm.data.enabled = (args.value == 'true');
+			perm.save(data);
+			tellPlayer(pl, "&a"+(args.value == 'true' ? 'Enabled' : 'Disabled')+" permission '"+args.permission_id+"'!");
+		}, 'perms.setEnabled', [
+			{
+				"argname": "value",
+				"type": "bool"
+			},
+			{
+				"argname": "permission_id",
+				"type": "datahandler",
+				"datatype": "permission",
+				"exists": true,
 			}
-		}, 'perms.setEnabled'],
+		]],
 		['!perms addTeams <permission_id> <...teams>', function(pl, args){
 			var w = pl.world;
 			var data = w.getStoreddata();
 			var p = new Permission(args.permission_id);
-			if(p.load(data)) {
-				p.addTeams(args.teams).save(data);
-				tellPlayer(pl, "&aAdded teams \""+args.teams.join(", ")+"\" to "+p.name+"!");
-				return true;
-			} else {
-				tellPlayer(pl, "&c"+args.permission_id+" does not exists!");
+			p.addTeams(args.teams).save(data);
+			tellPlayer(pl, "&aAdded teams \""+args.teams.join(", ")+"\" to "+p.name+"!");
+		}, 'perms.addTeams', [
+			{
+				"argname": "permission_id",
+				"type": "datahandler",
+				"datatype": "permission",
+				"exists": true,
 			}
-			return false;
-		}, 'perms.addTeams'],
+		]],
 		['!perms removeTeams <permission_id> <...teams>', function(pl, args){
 			var w = pl.world;
 			var data = w.getStoreddata();
@@ -140,59 +144,74 @@ function Permission(name) {
 				tellPlayer(pl, "&c"+args.permission_id+" does not exists!");
 			}
 			return false;
-		}, 'perms.removeTeams'],
+		}, 'perms.removeTeams', [
+			{
+				"argname": "permission_id",
+				"type": "datahandler",
+				"datatype": "permission",
+				"exists": true,
+			}
+		]],
 		['!perms addPlayers <permission_id> <...players>', function(pl, args){
 			var w = pl.world;
 			var data = w.getStoreddata();
 			var p = new Permission(args.permission_id);
-			if(p.load(data)) {
-				p.addPlayers(args.players).save(data);
-				tellPlayer(pl, "&aAdded players \""+args.players.join(", ")+"\" to "+p.name+"!");
-				return true;
-			} else {
-				tellPlayer(pl, "&c"+args.permission_id+" does not exists!");
+			p.addPlayers(args.players).save(data);
+			tellPlayer(pl, "&aAdded players \""+args.players.join(", ")+"\" to "+p.name+"!");
+		}, 'perms.addPlayers', [
+			{
+				"argname": "permission_id",
+				"type": "datahandler",
+				"datatype": "permission",
+				"exists": true,
 			}
-			return false;
-		}, 'perms.addPlayers'],
+		]],
 		['!perms removePlayers <permission_id> <...players>', function(pl, args){
 			var w = pl.world;
 			var data = w.getStoreddata();
 			var p = new Permission(args.permission_id);
-			if(p.load(data)) {
-				p.removePlayers(args.players).save(data);
-				tellPlayer(pl, "&aRemoved players \""+args.players.join(", ")+"\" to "+p.name+"!");
-				return true;
-			} else {
-				tellPlayer(pl, "&c"+args.permission_id+" does not exists!");
+			p.removePlayers(args.players).save(data);
+			tellPlayer(pl, "&aRemoved players \""+args.players.join(", ")+"\" to "+p.name+"!");
+		}, 'perms.removePlayers', [
+			{
+				"argname": "permission_id",
+				"type": "datahandler",
+				"datatype": "permission",
+				"exists": true,
 			}
-			return false;
-		}, 'perms.removePlayers'],
+		]],
 		['!perms remove <permission_id>', function(pl, args){
 			var data = pl.world.getStoreddata();
 			var p = new Permission(args.permission_id);
-			if(p.load(data)) {
-				if(p.remove(data)) {
-					tellPlayer(pl, "&aRemoved "+p.name+"!");
-					return true;
-				} else {
-					tellPlayer(pl, "&cCould not remove "+p.name+"!");
-					return false;
-				}
+			if(p.remove(data)) {
+				tellPlayer(pl, "&aRemoved "+p.name+"!");
+				return true;
+			} else {
+				tellPlayer(pl, "&cCould not remove "+p.name+"!");
+				return false;
 			}
-		}, "perms.remove"],
+		}, "perms.remove", [
+			{
+				"argname": "permission_id",
+				"type": "datahandler",
+				"datatype": "permission",
+				"exists": true,
+			}
+		]],
 		['!perms add <permission_id>', function(pl, args){
 			var w = pl.world;
 			var data = w.getStoreddata();
 			var p = new Permission(args.permission_id);
-			if(!p.exists(data)) {
-				tellPlayer(pl, "&aSaved new permission "+p.name);
-				p.save(data);
-			} else {
-				tellPlayer(pl, "&cPermission already exists!");
+			tellPlayer(pl, "&aSaved new permission "+p.name);
+			p.save(data);
+		}, 'perms.add', [
+			{
+				"argname": "permission_id",
+				"type": "datahandler",
+				"datatype": "permission",
+				"exists": false,
 			}
-			
-			return true;
-		}, 'perms.add'],
+		]],
 		['!perms list [...matches]', function(pl, args){
 			var w = pl.world;
 			var data = w.getStoreddata();
@@ -232,6 +251,13 @@ function Permission(name) {
 			} else {
 				tellPlayer(pl, "&cCould not find any info for "+args.permission_id);
 			}
-		}, 'perms.info']
+		}, 'perms.info', [
+			{
+				"argname": "permission_id",
+				"type": "datahandler",
+				"datatype": "permission",
+				"exists": true,
+			}
+		]]
 	]);
 @endblock
