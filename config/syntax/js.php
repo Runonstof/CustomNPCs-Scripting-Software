@@ -32,7 +32,7 @@ $GLOBALS['config']['syntaxRegex'] = [
 	'forLoopTweak' => "/for\s*\(\s*(?:var\s+)?(\w+)\s+in\s+([\w.()\[\]\"\',+\-\/*\s]+)\s+as\s+(\w+)\s*\)\s*{/",
 	'varTransform' => "//",
 	'functionArgs' => "/([\w]+)(?:[\s]*=[\s]*([\[\]\{\}\w\'\" ().\s:&^\/]+))?/",
-	'extendFnTweak' => "/extends\s+function\s+([\w]+)\s*\(\s*([\w\W]+?)\s*\)\s*;/",
+	'extendFnTweak' => "/extends\s+function\s+([\w]+)\s*(?:\(\s*([\w\W]*?)\s*\)\s*)?;/",
 ];
 
 
