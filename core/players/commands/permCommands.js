@@ -1,5 +1,7 @@
 var PERMISSION_REGEX = /permission_([\w.\-]+)/g;
 
+import core\players\Permittable.js;
+
 function Permission(name) {
 	extends function DataHandler('permission', name);
 	
@@ -95,6 +97,8 @@ function Permission(name) {
 	};
 	
 }
+
+
 
 
 @block register_commands_event

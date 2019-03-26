@@ -1,14 +1,12 @@
 function ChatChannel(name) {
 	extends function DataHandler('chatchannel', name);
+	extends function Permittable; //add getPermission etc
 	
 	this.data = {
 		"displayName": name,
 		"players": [],
 		"color": "blue",
 		"desc": "",
-	};
-	this.getPermission = function() {
-		return new Permission('chatchannel.'+this.name);
 	};
 	this.addPlayers = function(players){
 		for(p in players as player) {

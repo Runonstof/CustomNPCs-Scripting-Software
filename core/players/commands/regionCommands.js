@@ -1,7 +1,7 @@
 
 function Region(name) {
 	extends function DataHandler('region', name);
-	
+	extends function Permittable;
 	this.data = {
 		"displayName": this.name,
 		"positions": [],
@@ -19,6 +19,9 @@ function Region(name) {
 	};
 	/*IPlayer player, IData data*/
 	this.canInteract = function(player, data) {
+		var w = player.world;
+		var sb = w.getScoreboard();
+		var perm = this.getPermission().init(data);
 		
 	}
 	/*Array xyz1, Array xyz2*/
