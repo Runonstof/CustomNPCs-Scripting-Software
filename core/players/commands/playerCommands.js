@@ -160,6 +160,21 @@ function Player(name) {
 	this.can = function(perm) {
 		
 	};
+
+
+	this.getInventory = function(name){
+		for(invName in this.data.inventories as inv){
+			if(inv[0] == name) return inv[1];
+		}
+		return;
+	};
+	this.removeInventory = function(name){
+		for(invName in this.data.inventories){
+			this.data.inventories.splice(invName, 1);
+			return true;
+		}
+		return false;
+	};
 }
 
 @block init_event
