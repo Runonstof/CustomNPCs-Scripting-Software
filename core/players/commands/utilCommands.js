@@ -218,7 +218,11 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
 		['!debug', function(pl, args){
-			
+			var LogM = Java.type("org.apache.logging.log4j.LogManager");
+			var Logger = LogM.getLogger("Gramados");
+			Logger.info("This is a message in your console Seagull :)");
+			//
+			tellPlayer(pl, "Logged");
 		}, 'debug'],
 		['!fakeleave [...players]', function(pl, args){
 			var pcol = '&f';
@@ -321,6 +325,11 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			executeCommand(pl, '/tellraw '+args.player+' '+strf(msg, true));
 			return true;
 		}, 'tellraw'],
+		['!tellaction <player> <...message>', function(pl, args, data){
+			var msg = args.message.join(' ');
+			executeCommand(pl, "/title "+pl.getName()+" actionbar "+strf(msg));
+			return true;
+		}, 'tellaction'],
 		['!setMagAmmo <amount>', function(pl, args){
 			var mItem = pl.getMainhandItem();
 			if(!mItem.isEmpty()) {

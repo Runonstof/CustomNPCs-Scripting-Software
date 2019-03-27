@@ -59,7 +59,7 @@ function Player(name) {
 		if(t != null) {
 			ctm = ccol+dc+'o'+t.getDisplayName()+' ';
 		}
-	return ccol+dc+'l['+ccol+ctm+(teamsuff||'')+dc+'r'+ccol+this.name+(namesuff||'')+ccol+dc+'l'+']'+(prefix||'')+dc+'r';
+		return ccol+dc+'l['+ccol+ctm+(teamsuff||'')+dc+'r'+ccol+this.name+(namesuff||'')+ccol+dc+'l'+']'+(prefix||'')+dc+'r';
 	};
 	
 	this.delJob = function(name) {
@@ -156,9 +156,6 @@ function Player(name) {
 	
 		
 		return ac;
-	};
-	this.can = function(perm) {
-		
 	};
 
 
@@ -259,6 +256,38 @@ function Player(name) {
 	//REGISTER PLAYER COMMANDS
 	registerXCommands([
 		//PLAYER MANAGE
+		['!player perms <player> [...matches]', function(pl, args, data){
+			var permids = new Permission().getAllDataIds(data);
+			
+			var w = pl.world;
+			var sb = w.getScoreboard();
+			var tm = sb.getPlayerTeam(args.player);
+			tellPlayer(pl, "&l[=======] &6&lGramados Player Perms&r &l[=======]");
+			tellPlayer(pl, "&ePermissions for player: "+args.player);
+			var shownperms = 0;
+			for(p in permids as pid) {
+				if(args.matches.length == 0 || arrayOccurs(pid, args.matches, false, false) > 0) {
+					var perm = new Permission(pid).init(data);
+					if(perm.permits(args.player, sb, data)) {
+						tellPlayer(pl, "&6 - Has permission: &b&l"+perm.name+"&r (&ePerm Info{run_command:!perms info "+perm.name+"}&r)");
+						if(perm.data.players.indexOf(args.player) > -1) {
+							tellPlayer(pl, "&e    - By player&r (&c - Revoke Perm{run_command:!perms removePlayers "+perm.name+" "+args.player+"}&r)");
+						}
+						if(tm != null) {
+							if(perm.data.teams.indexOf(tm.getName()) > -1) {
+								var tcol = '&'+getColorId(tm.getColor());
+								tellPlayer(pl, "&e    - By team "+tcol+"&o"+tm.getName()+"&r (&c - Revoke Team Perm{run_command:!perms removeTeams "+perm.name+" "+tm.getName()+"}&r)");
+							}
+						}
+						shownperms++;
+					}
+				}
+				
+			}
+			if(shownperms == 0) {
+				tellPlayer(pl, "&cNo permissions found for player "+args.player);
+			}
+		}, 'player.perms'],
 		['!player setPay <player> <amount>', function(pl, args, data){
 			var am = getCoinAmount(args.amount);
 			var p = new Player(args.player).init(data);

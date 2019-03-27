@@ -1,4 +1,5 @@
 var _COMMANDS = [];
+var _DATAHANDLERS = {};
 import core\players\commands\*.js;
 
 @block init_event
@@ -13,6 +14,14 @@ import core\players\commands\*.js;
 	yield interact_event;
 @endblock
 
+@block broken_event
+	yield broken_event;
+@endblock
+
+@block attack_event
+	yield attack_event;
+@endblock
+
 function DataHandler(type, name) {
 	this.type = type;
 	this.name = name;
@@ -22,7 +31,7 @@ function DataHandler(type, name) {
 	this.saveFns = this.saveFns || [];
 	this.createFns = this.createFns || [];
 	
-	this.dkeyrgx = new RegExp(this.type+'_([\\w]+)', 'g');
+	this.dkeyrgx = new RegExp(this.type+'_([\\w.\-]+)', 'g');
 	
 	//Gets all data IDS
 	this.getAllDataIds = function(data) {
@@ -36,7 +45,6 @@ function DataHandler(type, name) {
 		
 		return ids;
 	};
-	
 	this.getDataId = function() {
 		return this.type+'_'+this.name;
 	}
@@ -68,14 +76,11 @@ function DataHandler(type, name) {
 		return false;
 	};
 	this.remove = function(data) {
-		for(var i in this.removeFns as removeFn) {
+		for(var rf in this.removeFns as removeFn) {
 			removeFn(this, data);
 		}
-		if(this.exists(data)) {
-			data.remove(this.getDataId());
-			return true;
-		}
-		return false;
+		data.remove(this.getDataId());
+		return this;
 	};
 	this.onRemove = function(fn) { //When removed
 		this.removeFns.push(fn);
@@ -86,11 +91,11 @@ function DataHandler(type, name) {
 		return this;
 	};
 	this.onSave = function(fn) { //Everytime when gets saved
-		this.removeFns.push(fn);
+		this.saveFns.push(fn);
 		return this;
 	};
 	this.onCreate = function(fn) { //When gets saved but did not exists before (newly created)
-		this.removeFns.push(fn);
+		this.createFns.push(fn);
 		return this;
 	};
 	this.init = function(data, initdata) {
@@ -107,33 +112,22 @@ function DataHandler(type, name) {
 	};
 }
 
-function CommandHandler(type, cmdtree) {
-	this.type = type;
-	this.cmdtree = cmdtree||type;
-	this.generate = function() {
-		//add commands
-		registerXCommands([
-			["!"+this.cmdtree+" create <name> [...displayName]", function(pl, args, data){
-				
-			}, this.cmdtree+".create", [
-				{
-					"argname": "name",
-					"type": "datahandler",
-					"datatype": this.type,
-					"exists": false
-				}
-			]],
-		]);
-	}
+function registerDataHandler(alias, dataHandlerFn) {
+	_DATAHANDLERS[alias] = dataHandlerFn;
 }
 
-function registerXCommand(commandMatch, callback, perm, rules=[]) {
+function getDataHandler(alias) {
+	return _DATAHANDLERS[alias];
+}
+
+function registerXCommand(commandMatch, callback, perm, rules=[], payload={}) {
 	_COMMANDS.push({
 		usage: commandMatch,
 		callback: callback,
 		perm: perm,
 		rules: rules,
-		enabled: true
+		enabled: true,
+		payload: payload,
 	});
 }
 
@@ -143,7 +137,74 @@ function getCommandNoArg(cmdstr) {
 
 function registerXCommands(cmds) {
 	for(c in cmds) {
-		registerXCommand(cmds[c][0], cmds[c][1], cmds[c][2], cmds[c][3] || []);
+		registerXCommand(cmds[c][0], cmds[c][1], cmds[c][2], cmds[c][3] || [], cmds[c][4] || {});
+	}
+}
+
+function CommandFactory(datahandler, cmdtree){
+	this.type = datahandler;
+	this.cmdtree = cmdtree||datahandler;
+	this.settables = [
+	
+	];
+	
+	this.addSettable = function(key, rules, dataKey){
+		this.settables.push([key, rules||[], dataKey||key ]);
+	}
+	
+	this.generate = function(){
+		var cmds = [
+			['!'+this.cmdtree+' create <name>', function(pl, args, data, cmddata){
+				var dht = getDataHandler(cmddata.datatype);
+				var dh = new dht(args.name);
+				dh.save(data);
+				tellPlayer(pl, "&aCreated "+dh.type+" '"+dh.name+"'!");
+				return true;
+			}, this.type+'.create', [
+				{
+					"argname": "name",
+					"type": "datahandler",
+					"datatype": this.type,
+					"exists": false,
+				}
+			], {
+				"datatype": this.type
+			}],
+			['!'+this.cmdtree+' remove <name>', function(pl, args, data, cmddata){
+				var dht = getDataHandler(cmddata.datatype);
+				var dh = new dht(args.name);
+				dh.remove(data);
+				tellPlayer(pl, "&aRemoved "+dh.type+" '"+dh.name+"'!");
+				return true;
+			}, this.type+'.remove', [
+				{
+					"argname": "name",
+					"type": "datahandler",
+					"datatype": this.type,
+					"exists": true,
+				}
+			], {
+				"datatype": this.type
+			}],
+			['!'+this.cmdtree+' list [...matches]', function(pl, args, data, cmddata){
+				var dht = getDataHandler(cmddata.datatype);
+				var dh = new dht(args.name);
+				var dhids = dh.getAllDataIds(data);
+				tellPlayer(pl, "&l[=======] &6&l Gramados "+cmddata.datatype.rangeUpper(0, 1)+"s List&r &l[=======]");
+				
+				for(var i in dhids as dhid) {
+					var dhi = new dht(dhid).init(data);
+					
+				}
+				return true;
+			}, this.type+'.list', [], {
+				"datatype": this.type
+			}],
+			
+		];
+		
+		
+		return cmds;
 	}
 }
 
@@ -217,8 +278,7 @@ function parseUsageRgx(command, str=null) {//Converts command usage to Regex, an
 function executeXCommand(str, player) {
 	var data = player.world.getStoreddata();
 	var sb = player.world.getScoreboard();
-	for(c in _COMMANDS) {
-		var cmd = _COMMANDS[c];
+	for(c in _COMMANDS as cmd) {
 		var cmdm = parseUsageRgx(cmd, str);
 		
 		var argrgx = cmdm[0];
@@ -382,7 +442,7 @@ function executeXCommand(str, player) {
 						}
 					}
 					
-					return (cmd.callback(player, args, data) || false);
+					return (cmd.callback(player, args, data, cmd.payload) || false);
 				} else {
 					tellPlayer(player, "&cYou don't have permission to this command!");
 					return false;

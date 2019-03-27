@@ -1,6 +1,6 @@
 function tellPlayer(player, rawtext) {
 	
-	return executeCommand(player, "/tellraw "+player.getName()+" "+strf(rawtext));
+	return executeCommand(player, "/tellraw "+player.getName()+" "+parseEmotes(strf(rawtext)));
 }
 
 function storytellPlayer(player, ar) {

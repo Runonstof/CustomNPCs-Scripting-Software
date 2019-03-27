@@ -209,7 +209,8 @@ function occurrences(string, subString, allowOverlapping=false, caseSensitive=tr
     subString = subString.toString()
 	
 	if(!caseSensitive) {
-		
+		string = string.toLowerCase();
+		subString = subString.toLowerCase();
 	}
 	
     if (subString.length <= 0) return (string.length + 1);
@@ -305,6 +306,18 @@ function removeFromArray(arr, vals) {
 	}
 	return a;
 }
+function removeFromArrayByKey(arr, keys) {
+	var narr = [];
+	for(var k in keys as key) {
+		keys[k] = parseInt(key);
+	}
+	for(var i in arr as ari) {
+		if(keys.indexOf(i) > -1) {
+			narr.push(ari);
+		}
+	}
+	return narr;
+}
 
 var _ITEMATTR = [
 	'generic.attackDamage',
@@ -380,11 +393,18 @@ function getColorName(id) {
 	return 'white';
 }
 
+function parseEmotes(str) {
+	for(var ce in CHAT_EMOTES as chatemote) {
+		str = str.replace(new RegExp(':'+ce+':', 'g'), chatemote);
+	}
+	return str;
+}
+
 
 function strf(str, toRaw=true, allowed=null) {
 	return strrawformat(str, toRaw, allowed);
 }
-var trg = /{[\s]*(?:([\w]+)[\s]*\:[\s]*([\w\W\/]+?)|\*)(?:[\s]*\|[\s]*([\w]+)[\s]*\:[\s]*([\w\W\/]+?))?[\s]*}/;
+var trg = /{[\s]*(?:([\w]+)[\s]*\:[\s]*([\w\W\/]+?)|\*)(?:[\s]*\|[\s]*([\w]+)[\s]*\:[\s]*([\w\W\/]+?[\s]*))?}/;
 function strrawformat(str, toRaw=false, allowed=null) {
 	var rf = [];
 	var txt = '';

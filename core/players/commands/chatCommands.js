@@ -120,8 +120,7 @@ function getColorPermId(colorId) {
 				"exists": false,
 			}
 		]],
-		['!chat remove <name>', function(pl, args){
-			var data = pl.world.getStoreddata();
+		['!chat remove <name>', function(pl, args, data){
 			var cc = new ChatChannel(args.name);
 			cc.remove(data);
 			tellPlayer(pl, "&aRemoved chat channel '"+cc.name+"'!");
@@ -143,12 +142,19 @@ function getColorPermId(colorId) {
 				if(args.matches.length == 0 || arrayOccurs(cid, args.matches) > 0) {
 					if(cc.load(data) && cc.getPermission(data).permits(pl.getName(), pl.world.getScoreboard(), data)) {
 						var onlinePlayers = [];
+						var offPlayers = []
 						for(var cpli in cc.data.players as cpl) {
 							if(playerIsOnline(pl.world, cpl)) {
 								onlinePlayers.push(cpl);
+							} else {
+								offPlayers.push(cpl);
 							}
 						}
-						var ontxt = "&r&e"+onlinePlayers.length+"/"+cc.data.players.length+" Online{*|show_text:"+onlinePlayers.join("\n")+"}&r";
+						var onlineText = "$eOnline Players:&r\n"+
+							onlinePlayers.join(" ")+
+							"$eOffline Players:$r "+
+							offPlayers.join(" ");
+						var ontxt = "&r&e"+onlinePlayers.length+"/"+cc.data.players.length+" Online{*|show_text:"+onlineText+"}&r";
 						var opttxt = (cc.data.players.indexOf(pl.getName()) > -1 ? "&c&nLeave{run_command:!chat leave "+cc.name+"}&r":"&a&nJoin{run_command:!chat join "+cc.name+"}&r");
 						tellPlayer(pl, cc.getTag()+"&r ("+cc.name+") "+opttxt+" "+ontxt);
 					}
@@ -212,7 +218,7 @@ function getColorPermId(colorId) {
 		['!chat join <name>', function(pl, args, data){
 			var cc = new ChatChannel(args.name).init(data);
 			var plo = new Player(pl.getName()).init(data);
-			if(cc.getPermission(data).permits(pl.getName(), pl.world.getScoreboard(), data)) {
+			if(cc.getPermission().init(data).permits(pl.getName(), pl.world.getScoreboard(), data)) {
 				if(cc.data.players.indexOf(pl.getName()) == -1) {
 					cc.data.players.push(pl.getName());
 					plo.data.talkchat = cc.name;

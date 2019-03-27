@@ -13,6 +13,12 @@ var CHAT_EMOTES = {
 	"heart": "\u2764",
 	"cross": "\u2715",
 	"sun": "\u2739",
+	"star": "\u2729",
+	"recycle": "\u267B",
+	"lightning": "\u26A1",
+	"flag": "\u2691",
+	"flag2": "\u2690",
+	"danger": "\u26A0",
 };
 
 function init(e) {
