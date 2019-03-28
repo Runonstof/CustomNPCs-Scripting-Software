@@ -1,6 +1,6 @@
 function Player(name) {
 	extends function DataHandler('player', name);
-	
+
 	this.data = {
 		"lastPayed": 0,
 		"pay": getCoinAmount('5g'),
@@ -10,6 +10,7 @@ function Player(name) {
 		"homes": {},
 		"jobs": {},
 		"inventories": [],
+		"emotes": [],
 		"chatcolor": null,
 		"chateffect": null,
 		"color": null,
@@ -55,13 +56,13 @@ function Player(name) {
 		} else if(t != null) {
 			ccol = dc+getColorId(t.getColor());
 		}
-		
+
 		if(t != null) {
 			ctm = ccol+dc+'o'+t.getDisplayName()+' ';
 		}
 		return ccol+dc+'l['+ccol+ctm+(teamsuff||'')+dc+'r'+ccol+this.name+(namesuff||'')+ccol+dc+'l'+']'+(prefix||'')+dc+'r';
 	};
-	
+
 	this.delJob = function(name) {
 		if(this.hasJob(name)) {
 			delete this.data.jobs[name];
@@ -129,7 +130,7 @@ function Player(name) {
 				}
 			}
 		}
-		
+
 		return chats;
 	}
 	this.getAllowedColors = function(data, sb) {
@@ -153,11 +154,10 @@ function Player(name) {
 		if(new Permission('chat.hover').init(data).permits(this.name, sb, data)) {
 			ac.push('y');
 		}
-	
-		
+
+
 		return ac;
 	};
-
 
 	this.getInventory = function(name){
 		for(invName in this.data.inventories as inv){
@@ -172,6 +172,24 @@ function Player(name) {
 		}
 		return false;
 	};
+	this.hasEmote = function(name, sb, data) { //Checks if player has emote
+		var em = new Emote(name).init(data,false);
+		return (this.data.emotes.indexOf(name) > -1
+		|| em.getPermission().init(data, false).permits(this.name, sb, data)
+		|| em.data.default
+		);
+	};
+	this.getAllowedEmotes = function(sb, data) {
+		var ems = [];
+		for(c in CHAT_EMOTES as ce) {
+			var ec = new Emote(c);
+			ec.load(data);
+			if(this.hasEmote(ec.name, sb, data)) {
+				ems.push(ec.name);
+			}
+		}
+		return ems;
+	};
 }
 
 @block init_event
@@ -179,12 +197,12 @@ function Player(name) {
 		var pl = e.player;
 		var plo = new Player(pl.getName());
 		var data = pl.world.getStoreddata();
-		
+
 		if(!plo.exists(data)) {
 			plo.save(data);
 		}
 		plo.load(data);
-		
+
 		var pchats = plo.getChats(data);
 		if(pchats.length == 0) {
 			tellPlayer(pl, "[&6&lGramados&r] &eYou are not in a chatchannel yet! &6&nClick here{run_command:!chat list|show_text:$6!chat list}&r&e to join one!");
@@ -193,10 +211,10 @@ function Player(name) {
 			pchats.forEach(function(pc){
 				tellchannels += pc.getTag('{run_command:!chat leave '+pc.name+'|show_text:$eClick to leave channel.}')+'&r ';
 			});
-			
+
 			tellPlayer(pl, "[&6&lGramados&r] &eYou are talking in channels: &r"+tellchannels);
 		}
-		
+
 		plo.data.lastLogin = new Date().getTime();
 		plo.save(data);
 	})(e);
@@ -209,7 +227,7 @@ function Player(name) {
 		var plo = new Player(pl.getName());
 		var data = pl.world.getStoreddata();
 		plo.load(data);
-		
+
 		if(new Date().getTime() > (plo.data.lastPayed+plo.data.payTime)) {
 			if(plo.data.pay > 0) {
 				var pm = genMoney(pl.world, plo.data.pay);
@@ -221,7 +239,7 @@ function Player(name) {
 				plo.save(data);
 			}
 		}
-		
+
 		//CHECK JOB PAY
 		for(j in plo.data.jobs as pjob) {
 			var job = new Job(j);
@@ -247,8 +265,8 @@ function Player(name) {
 				}
 			}
 		}
-		
-		
+
+
 	})(e);
 @endblock
 
@@ -258,12 +276,12 @@ function Player(name) {
 		//PLAYER MANAGE
 		['!player perms <player> [...matches]', function(pl, args, data){
 			var permids = new Permission().getAllDataIds(data);
-			
+
 			var w = pl.world;
 			var sb = w.getScoreboard();
 			var tm = sb.getPlayerTeam(args.player);
 			tellPlayer(pl, "&l[=======] &6&lGramados Player Perms&r &l[=======]");
-			tellPlayer(pl, "&ePermissions for player: "+args.player);
+			tellPlayer(pl, "&ePermissions for player:&r "+args.player);
 			var shownperms = 0;
 			for(p in permids as pid) {
 				if(args.matches.length == 0 || arrayOccurs(pid, args.matches, false, false) > 0) {
@@ -271,18 +289,18 @@ function Player(name) {
 					if(perm.permits(args.player, sb, data)) {
 						tellPlayer(pl, "&6 - Has permission: &b&l"+perm.name+"&r (&ePerm Info{run_command:!perms info "+perm.name+"}&r)");
 						if(perm.data.players.indexOf(args.player) > -1) {
-							tellPlayer(pl, "&e    - By player&r (&c - Revoke Perm{run_command:!perms removePlayers "+perm.name+" "+args.player+"}&r)");
+							tellPlayer(pl, "&e    - By player&r (&c - Revoke{run_command:!perms removePlayers "+perm.name+" "+args.player+"|show_text:$cClick to revoke permission "+perm.name+" for player "+args.player+".}&r)");
 						}
 						if(tm != null) {
 							if(perm.data.teams.indexOf(tm.getName()) > -1) {
 								var tcol = '&'+getColorId(tm.getColor());
-								tellPlayer(pl, "&e    - By team "+tcol+"&o"+tm.getName()+"&r (&c - Revoke Team Perm{run_command:!perms removeTeams "+perm.name+" "+tm.getName()+"}&r)");
+								tellPlayer(pl, "&e    - By team "+tcol+"&o"+tm.getName()+"&r (&c:cross: Revoke Team{run_command:!perms removeTeams "+perm.name+" "+tm.getName()+"|show_text:$cClick to revoke permission "+perm.name+" for team "+tm.getName()+".}&r)");
 							}
 						}
 						shownperms++;
 					}
 				}
-				
+
 			}
 			if(shownperms == 0) {
 				tellPlayer(pl, "&cNo permissions found for player "+args.player);
@@ -291,11 +309,11 @@ function Player(name) {
 		['!player setPay <player> <amount>', function(pl, args, data){
 			var am = getCoinAmount(args.amount);
 			var p = new Player(args.player).init(data);
-			
+
 			p.data.pay = am;
 			p.save(data);
 			tellPlayer(pl, "&aSet pay amount of player '"+p.name+"' to "+getAmountCoin(am)+'!');
-		
+
 			return true;
 		}, 'player.setPay', [
 			{
@@ -316,7 +334,7 @@ function Player(name) {
 			p.data.payTime = am;
 			p.save(data);
 			tellPlayer(pl, "&aSet pay time of player '"+p.name+"' to "+getTimeString(am)+'!');
-		
+
 			return true;
 		}, 'player.setPayTime', [
 			{
@@ -334,10 +352,10 @@ function Player(name) {
 			var p = new Player(args.player).init(data);
 			p.data.maxJobs = parseInt(args.amount) || 1;
 			p.save(data);
-			
+
 			tellPlayer(pl, "&aSet maxhomes of player '"+p.name+"' to "+(parseInt(args.amount) || 1)+'!');
 			return true;
-		
+
 		}, 'player.setMaxJobs', [
 			{
 				"argname": "player",
@@ -349,14 +367,14 @@ function Player(name) {
 				"argname": "amount",
 				"type": "number"
 			}
-		]],		
+		]],
 		['!player setMaxHomes <player> <amount>', function(pl, args, data){
 			var p = new Player(args.player).init(data);
 			p.data.maxHomes = parseInt(args.amount) || 1;
 			p.save(data);
 			tellPlayer(pl, "&aSet maxhomes of player '"+p.name+"' to "+(parseInt(args.amount) || 1)+'!');
 			return true;
-		
+
 		}, 'player.setMaxHomes', [
 			{
 				"argname": "player",
@@ -442,7 +460,7 @@ function Player(name) {
 			var tleft = (p.data.lastPayed+p.data.payTime) - new Date().getTime();
 			tellPlayer(pl, "&6&o"+getTimeString(tleft, ['ms'])+"&r&e until next pay.");
 			var pjobs = p.getJobs(data);
-			
+
 			if(pjobs.length > 0) {
 				for(pj in pjobs as pjob) {
 					tellPlayer(pl, "&eJob income for &r"+pjob.getDisplayName(data));
@@ -451,8 +469,8 @@ function Player(name) {
 					tellPlayer(pl, "&e - &6&o"+getTimeString(jleft, ['ms'])+"&r&e until next pay for &r"+pjob.getDisplayName(data));
 				}
 			}
-			
-			
+
+
 			//print(p.toJson());
 			return true;
 		}, 'player.income', [
@@ -479,20 +497,24 @@ function Player(name) {
 				"exists": true
 			}
 		]],
-		
-		
-		
+
+
+
 		//PLAYER UTILITY
-		['!myIncome', function(pl, args){
+		['!myMoney', function(pl, args, data){
+			var pnbt = pl.getEntityNbt();
+			tellPlayer(pl, "&cYou carry a total of &e"+getAmountCoin(getMoneyItemCount(pnbt, pl.world)));
+			return true;
+		}, 'myMoney'],
+		['!myIncome', function(pl, args, data){
 			var p = new Player(pl.getName());
-			var data = pl.world.getStoreddata();
 			p.load(data);
 			tellPlayer(pl, "&l[=======] &r&6&lGramados Income&r &l[=======]");
 			tellPlayer(pl, "&eBasic income: &6&o"+getAmountCoin(p.data.pay)+"&r&e per &6&o"+getTimeString(p.data.payTime));
 			var tleft = (p.data.lastPayed+p.data.payTime) - new Date().getTime();
 			tellPlayer(pl, "&6&o"+getTimeString(tleft, ['ms'])+"&r&e until next pay.");
 			var pjobs = p.getJobs(data);
-			
+
 			if(pjobs.length > 0) {
 				for(pj in pjobs as pjob) {
 					tellPlayer(pl, "&eJob income for &r"+pjob.getDisplayName(data));
@@ -501,11 +523,11 @@ function Player(name) {
 					tellPlayer(pl, "&e - &6&o"+getTimeString(jleft, ['ms'])+"&r&e until next pay for &r"+pjob.getDisplayName(data));
 				}
 			}
-			
-			
+
+
 			//print(p.toJson());
 			return true;
-			
+
 		}, 'myIncome'],
 		['!myStats [...matches]', function(pl, args, data){
 			var pskills = getSkills(pl);
@@ -519,7 +541,7 @@ function Player(name) {
 					tellPlayer(pl, "&e&l"+pskill.level+" &3&l"+pskill.name+" "+(pskill.level < maxLvl ? (skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp) : "&r&a&lMAX LEVEL&r"));
 				}
 			}
-			
+
 			return true;
 		}, 'myStats'],
 		['!setHome <name>', function(pl, args){
@@ -527,7 +549,7 @@ function Player(name) {
 			var data = pl.world.getStoreddata();
 			var ppos = pl.getPos();
 			plo.load(data);
-		
+
 			if(plo.data.maxHomes == -1 || Object.keys(plo.data.homes).length < plo.data.maxHomes) {
 				plo.addHome(args.name, ppos.getX(), ppos.getY(), ppos.getZ());
 				tellPlayer(pl, "&aAdded home '"+args.name+"'!");
@@ -536,7 +558,7 @@ function Player(name) {
 			} else {
 				tellPlayer(pl, "&cYou have reached maximum amount of homes! ("+plo.data.maxHomes+")");
 			}
-		
+
 			return false;
 		}, 'setHome'],
 		['!delHome <name>', function(pl, args){
@@ -567,7 +589,7 @@ function Player(name) {
 			} else {
 				tellPlayer(pl, "&cYou don't have any homes!");
 			}
-			
+
 			return false;
 		}, 'listHomes'],
 		['!home <name>', function(pl, args){

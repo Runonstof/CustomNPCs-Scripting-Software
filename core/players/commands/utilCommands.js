@@ -49,10 +49,10 @@ function genMoney(w, amount) {
 			nmItems.push(coinitem);
 		}
 	}
-	
-	
+
+
 	return nmItems;
-	
+
 }
 
 function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=[]) {
@@ -94,7 +94,7 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 		}
 		pteam = pcol+"&o"+t.getDisplayName()+" &r"+pcol;
 	}
-	
+
 	//Override player specific
 	if(plo.data.chatcolor != null) {
 		tcol = '&'+getColorId(plo.data.chatcolor);
@@ -102,18 +102,18 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 	//var timestr = '';
 	//var now = new Date();
 	//timestr = '&l[&r'+pcol+now.getHours().toString().append('0', 2)+':'+now.getMinutes().toString().append('0', 2)+'&l]&r';
-	
+
 	//var newmsg = pcol+timestr+pcol+'&l[&r'+pteam+pname+'&r'+pcol+'&l] -> &r'+tcol+teff;
 	var newmsg = pcol+'&l[&r'+pteam+pname+'&r'+pcol+'&l] -> &r'+tcol+teff;
 	if(!fullraw) {
 		newmsg = ccs(newmsg, allowed);
 	}
 	newmsg += message.rangeUpper(0, 1); //Concat message contents
-	
+
 	var plr = w.getAllPlayers();
 	var mrx = /@(\w+)/g;
 	var mplr = newmsg.match(mrx) || [];
-	
+
 	for(k in mplr) {
 		var mtc = mplr[k].replace(mrx, '$1');
 		var pmtc = null;
@@ -128,7 +128,7 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 			newmsg = ccs(newmsg.replace('@'+mtc, '&9&o&l@'+pmtc+'&r'));
 		}
 	}
-	
+
 	var trx = /\$(\w+)/g;
 	var tlr = newmsg.match(trx) || [];
 	var apl = (function(w){
@@ -137,7 +137,7 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 		for(psi in ps as iplayr) {
 			pnames.push(iplayr.getName());
 		}
-		
+
 		return pnames;
 	})(w);
 	for(t in tlr) {
@@ -152,7 +152,7 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 				if(scol != null) {
 					sscol = "&"+getColorId(scol);
 				}
-				
+
 				for(sp in spl as splayr) {
 					if(apl.indexOf(splayr) > -1) {
 						executeCommand(player, '/playsound '+notifySound+' hostile '+splayr, splayr);
@@ -162,7 +162,7 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 			}
 		}
 	}
-	
+
 	return newmsg;
 }
 
@@ -176,7 +176,7 @@ function getAmountCoin(amount) {
 	amount = Math.abs(amount);
 	var ckeys = Object.keys(_COINTABLE);
 	for(var i = ckeys.length-1; i >= 0; i--) {
-		
+
 		var add = 0;
 		while(amount >= _COINTABLE[ckeys[i]]) {
 			add++;
@@ -186,7 +186,7 @@ function getAmountCoin(amount) {
 			rstr += add.toString()+ckeys[i].toUpperCase();
 		}
 	}
-	
+
 	if(rstr == '') { rstr = '0G'; }
 	return rstr;
 }
@@ -197,7 +197,7 @@ function getCoinAmount(str) {
 	var amount = 0;
 	var sgn = 1;
 	if(str.substr(0, 1) == '-') { sgn = -1; }
-	
+
 	for(a in amounts as _am) {
 		var _amnum = parseInt(_am.replace(arx, '$1'));
 		var _amunit = _am.replace(arx, '$2').toLowerCase();
@@ -219,11 +219,86 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 	registerXCommands([
 		['!debug', function(pl, args){
 			var LogM = Java.type("org.apache.logging.log4j.LogManager");
-			var Logger = LogM.getLogger("Gramados");
-			Logger.info("This is a message in your console Seagull :)");
+			var Logger = LogM.getLogger("LogName");
+			Logger.info("This is a message in your server console");
 			//
 			tellPlayer(pl, "Logged");
 		}, 'debug'],
+		['!listEmotes [...matches]', function(pl, args, data){
+			var plo = new Player(pl.getName()).init(data);
+			var sb = pl.world.getScoreboard();
+			var showStr = "";
+			var showCount = 0;
+			var maxShowCount = 15;
+			var shown = 0;
+
+			tellPlayer(pl, "&l[=======] &6&lGramados Emotes&r &l[=======]");
+			tellPlayer(pl, "&6"+plo.getAllowedEmotes(sb, data).length+"/"+objArray(CHAT_EMOTES).length+" Unlocked.");
+			tellPlayer(pl, "&eUsage:&r :emoji_name:");
+			tellPlayer(pl, "&eHover emoji for info.");
+
+			for(var c in CHAT_EMOTES as ce) {
+				if(args.matches.length == 0 || arrayOccurs(c, args.matches) > 0) {
+					var ec = new Emote(c).init(data, false);
+
+					if(plo.hasEmote(c, sb, data)) {
+						showStr += "&r[:"+c+":] {suggest_command::/"+c+"/:|show_text::"+c+":\n$eName: $r$o"+c+"\n$aUNLOCKED}&r";
+					} else {
+						var lockStr = (ec.data.forSale ? "\n$cLOCKED\nUNLOCK FOR $e"+getAmountCoin(ec.data.price) : "\n$cLOCKED");
+						showStr += "&8[:"+c+":] {*|show_text::"+c+":\n$eName: $r$o"+c+lockStr+"}&r";
+					}
+					showCount++;
+					shown++;
+				}
+
+				if((shown >= objArray(CHAT_EMOTES).length || showCount >= maxShowCount) && showStr != "") {
+					tellPlayer(pl, showStr);
+					showStr = "";
+					showCount = 0;
+				}
+			}
+		}, 'listEmotes'],
+		['!command list [...matches]', function(pl, args, data){
+			tellPlayer(pl, "&l[=======] &6&lGramados Commands &l[=======]");
+			for(c in _COMMANDS as cmd) {
+				var cmdm = getCommandNoArg(cmd.usage).trim();
+				if(args.matches.length == 0 || arrayOccurs(cmdm, args.matches, false, false)) {
+					tellPlayer(pl, "&e - &c"+cmdm+"&r (&6:sun: Info{run_command:!command info "+getCommandName(cmd.usage)+"}&r)");
+				}
+			}
+		}, 'command.list'],
+		['!command info <...command>', function(pl, args, data){
+			var argcmd = args.command.join(" ").trim();
+			for(c in _COMMANDS as cmd) {
+				if(getCommandName(cmd.usage) == argcmd) {
+					tellPlayer(pl, "&l[=======] &6&lGramados Command Info &r&l[=======]");
+					tellPlayer(pl, "&eCommand: &b"+getCommandNoArg(cmd.usage).trim());
+					tellPlayer(pl,
+						"&ePermission ID: &9&l"+
+						cmd.perm+"&r"+
+						(	new Permission(cmd.perm).exists(data) ?
+							" (&6:sun: Info{run_command:!perms info "+cmd.perm+"}&r)"
+							:
+							"(&d:recycle: Regenerate{run_command:!chain !perms create "+cmd.perm+";!command info "+argcmd+"|show_text:Command exists, but permission does not.\nClick to regenerate.}&r)"
+						)
+					);
+					print(JSON.stringify(parseUsageRgx(cmd)));
+					return true;
+				}
+			}
+			tellPlayer(pl, "&cNo commands found.");
+			return true;
+		}, 'command.info'],
+		['!chain <...commands>', function(pl, args, data){
+			var acmds = args.commands.join(" ").split(";");
+			for(a in acmds as acmd) {
+				var excmd = acmd.trim().replace(/\s+/g, ' ');
+				if(excmd.length != "") {
+					executeXCommand(excmd, pl);
+				}
+			}
+			return true;
+		}, 'chain'],
 		['!fakeleave [...players]', function(pl, args){
 			var pcol = '&f';
 			var sb = pl.world.getScoreboard();
@@ -236,7 +311,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 						pcol = '&'+getColorId(tc);
 					}
 				}
-				
+
 				executeCommand(pl, '/tellraw @a '+strf(pcol+sp+' &r&eleft the game', true));
 			}
 		}, 'fakeleave'],
@@ -252,7 +327,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 						pcol = '&'+getColorId(tc);
 					}
 				}
-				
+
 				executeCommand(pl, '/tellraw @a '+strf(pcol+sp+' &r&ejoined the game', true));
 			}
 		}, 'fakejoin'],
@@ -342,7 +417,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 				}
 			}
 			tellPlayer(pl, "&cYou don't have an magazine in your hand!");
-			
+
 			return false;
 		}, 'setMagAmmo', [
 			{
@@ -368,7 +443,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 								if(diAmount > 0) {
 									di.setCustomName(ccs("&2&lMoney&r"));
 									di.setLore([ccs('&e'+getAmountCoin(diAmount))]);
-									
+
 									entinv.setDropItem(i, di, dc);
 								}
 							}
@@ -403,12 +478,12 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 									entrole.getCurrency2(i),
 									entrole.getSold(i),
 								]);
-								
+
 								entrole.remove(i);
 							}
 							for(var i = 0; i < 18; i++) {
 								//print('SLOT: '+i);amount
-								
+
 								for(ii in newTrades[i] as nItem) {
 									if(!nItem.isEmpty()) {
 										var nLore = nItem.getLore();
@@ -425,7 +500,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 								/*newTrades[i].forEach(function(nt){
 											//print(nt.getItemNbt().toJsonString());
 										});*/
-								
+
 								entrole.set(
 									i,
 									newTrades[i][0].isEmpty() ? null : newTrades[i][0],
@@ -471,7 +546,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			} else {
 				tellPlayer(pl, "&cYou don't have anything in your hand!");
 			}
-			
+
 			return false;
 		}, 'convertMoney'],
 		['!giveMoney <amount> [...players]', function(pl, args){
@@ -483,7 +558,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			var am = getCoinAmount(args.amount);
 			if(args.players.length == 0) { args.players = [pl.getName()]; }
 			var mn = genMoney(w, am);
-			
+
 			for(i in args.players as apl) {
 				if(plrs.indexOf(apl) > -1) {
 					for(m in mn as mi) {
@@ -491,9 +566,9 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 					}
 				}
 			}
-			
+
 			tellPlayer(pl, "&aGave "+getAmountCoin(am)+" to players: '"+args.players.join(', ')+"'");
-			
+
 		}, 'giveMoney', [
 			{
 				"argname": "amount",
@@ -510,7 +585,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			var nmsg = getPlayerMessage(pl, msg, w, ap, true);
 			executeCommand(pl, "/tellraw @a "+strf(nmsg, true, apo.getAllowedColors(data, w.getScoreboard())));
 			return true;
-			
+
 		}, 'sayas'],
 		//Inventory load/save
 		['!inv save <name>', function(pl, args, data){
@@ -522,13 +597,13 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			for (var i = 0; i < inv.field_70462_a.length; i++) {
 				inventory.push(API.getIItemStack(inv.field_70462_a.get(i)).getItemNbt().toJsonString());
 			}
-			
+
 			apo.data.inventories.push([args.name, inventory]);
 			apo.save(data);
 			tellPlayer(pl, "&aInventory saved as '"+args.name+"'");
 
 			return true;
-			
+
 		}, 'inv.save'],
 		['!inv load <name>', function(pl, args, data){
 			var w = pl.world;
@@ -543,18 +618,18 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 
 			var inv = pl.getMCEntity().field_71071_by;
 			inv.func_174888_l(); //Clear
-		
+
 			for (var i = 0; i < inventory.length; i++) {
 				if(inventory[i] && API.stringToNbt(inventory[i]).getString("id")!="minecraft:air")
 				inv.field_70462_a.set(i, w.createItemFromNbt(API.stringToNbt(inventory[i])).getMCItemStack());
 			}
-			
+
 			inv.func_70296_d(); //Mark dirty
 			pl.getMCEntity().field_71069_bz.func_75142_b(); //Detect and send changes
 
 			tellPlayer(pl, "&aInventory '"+args.name+"' succefully loaded");
 			return true;
-			
+
 		}, 'inv.load'],
 		['!inv remove <name>', function(pl, args, data){
 			var w = pl.world;
@@ -570,7 +645,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			apo.save(data);
 			tellPlayer(pl, "&aInventory '"+args.name+"' succefully removed");
 			return true;
-			
+
 		}, 'inv.save']
 	]);
 @endblock

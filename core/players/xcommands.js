@@ -30,9 +30,9 @@ function DataHandler(type, name) {
 	this.loadFns = this.loadFns || [];
 	this.saveFns = this.saveFns || [];
 	this.createFns = this.createFns || [];
-	
+
 	this.dkeyrgx = new RegExp(this.type+'_([\\w.\-]+)', 'g');
-	
+
 	//Gets all data IDS
 	this.getAllDataIds = function(data) {
 		var dkeys = data.getKeys();
@@ -42,7 +42,7 @@ function DataHandler(type, name) {
 				ids.push(dkey.replace(this.dkeyrgx, '$1'));
 			}
 		}
-		
+
 		return ids;
 	};
 	this.getDataId = function() {
@@ -98,13 +98,13 @@ function DataHandler(type, name) {
 		this.createFns.push(fn);
 		return this;
 	};
-	this.init = function(data, initdata) {
-		this.data = objMerge(this.data, (initdata||{}));
-		if(!this.exists(data)) {
+	this.init = function(data, createIfNotExists) {
+		if(typeof(createIfNotExists) == typeof(undefined)) { createIfNotExists = true; }
+		if(!this.exists(data) && createIfNotExists) {
 			this.save(data);
 		}
 		this.load(data);
-		
+
 		return this;
 	};
 	this.toJson = function() {
@@ -135,6 +135,11 @@ function getCommandNoArg(cmdstr) {
 	return cmdstr.match(/![\w\s]+/)[0];
 }
 
+function getCommandName(cmdstr) {
+	var cmda = getCommandNoArg(cmdstr).trim();
+	return cmda.substr(1, cmda.length);
+}
+
 function registerXCommands(cmds) {
 	for(c in cmds) {
 		registerXCommand(cmds[c][0], cmds[c][1], cmds[c][2], cmds[c][3] || [], cmds[c][4] || {});
@@ -145,13 +150,13 @@ function CommandFactory(datahandler, cmdtree){
 	this.type = datahandler;
 	this.cmdtree = cmdtree||datahandler;
 	this.settables = [
-	
+
 	];
-	
+
 	this.addSettable = function(key, rules, dataKey){
 		this.settables.push([key, rules||[], dataKey||key ]);
 	}
-	
+
 	this.generate = function(){
 		var cmds = [
 			['!'+this.cmdtree+' create <name>', function(pl, args, data, cmddata){
@@ -191,19 +196,19 @@ function CommandFactory(datahandler, cmdtree){
 				var dh = new dht(args.name);
 				var dhids = dh.getAllDataIds(data);
 				tellPlayer(pl, "&l[=======] &6&l Gramados "+cmddata.datatype.rangeUpper(0, 1)+"s List&r &l[=======]");
-				
+
 				for(var i in dhids as dhid) {
 					var dhi = new dht(dhid).init(data);
-					
+
 				}
 				return true;
 			}, this.type+'.list', [], {
 				"datatype": this.type
 			}],
-			
+
 		];
-		
-		
+
+
 		return cmds;
 	}
 }
@@ -215,7 +220,7 @@ function parseUsageRgx(command, str=null) {//Converts command usage to Regex, an
 	//* == [...vars] //multiple args, optional
 	//  == <var> //arg, required
 	//? == [var] // arg, optional
-	
+
 	var argrx = [];
 	var cmdMatch = command.usage
 	.replace(/(\w)\s+(\w)/g, "$1\\s+$2")
@@ -252,10 +257,10 @@ function parseUsageRgx(command, str=null) {//Converts command usage to Regex, an
 		}
 		cmdMatch = cmdMatch.replace(omcode, ompart);
 	}
-	
+
 	var capt_names = [];
 	var cids = [];
-	
+
 	while(argrx.length > 0) {
 		var hid = 0;
 		for(var i in argrx)  {
@@ -280,7 +285,7 @@ function executeXCommand(str, player) {
 	var sb = player.world.getScoreboard();
 	for(c in _COMMANDS as cmd) {
 		var cmdm = parseUsageRgx(cmd, str);
-		
+
 		var argrgx = cmdm[0];
 		var rgx = new RegExp(argrgx, 'g');
 		if( (str.match(rgx) || []).length == 1) {
@@ -303,11 +308,11 @@ function executeXCommand(str, player) {
 					} else {
 						args[argname] = (argval.trim() == "" ? null : argval.trim());
 					}
-					
-					
+
+
 					cg++;
 				}
-				
+
 				var cmdperm = new Permission(cmd.perm);
 				if(!cmdperm.exists(data)) {
 					cmdperm.save(data);
@@ -317,21 +322,26 @@ function executeXCommand(str, player) {
 					//Check arguments
 					for(a in args as arg) {
 						for(b in cmd.rules as rule) {
-							
+
 							if(!"argname" in rule) { continue; }
+							var errpref = '';
+							var errsuff = '';
+							if("msgprefix" in rule) { errpref = rule.msgprefix }
+							if("msgsuffix" in rule) { errsuff = rule.msgsuffix }
+
 							if("as" in rule) {
 								if(rule.as == "string" && typeof arg == 'object') {
 									arg = arg.join(" ");
 								}
 							}
-							
+
 							if(rule.argname != a) { continue; }
 							var rulename = rule.argname.toString();
 							if('type' in rule) {//Check Arg Type
 								switch(rule.type) {
 									case 'id': {
 										if(arg.replace(/([A-Za-z0-9_\-\.])/g, '') != '') {
-											tellPlayer(player, "&c'"+rulename+"' is not a valid id/name (A-Za-z0-9_)!");
+											tellPlayer(player, errpref+"&c'"+rulename+"' is not a valid id/name (A-Za-z0-9_)!"+errsuff);
 											return false;
 										}
 										//Run case 'string'
@@ -339,27 +349,27 @@ function executeXCommand(str, player) {
 									case 'string': {
 										if('minlen' in rule) {
 											if(arg.toString().length < rule.minlen) {
-												tellPlayer(player, "&c'"+rulename+"' is too short! (Min. "+rule.minlen+" characters)");
+												tellPlayer(player, errpref+"&c'"+rulename+"' is too short! (Min. "+rule.minlen+" characters)"+errsuff);
 												return false;
 											}
 										}
 										if('maxlen' in rule) {
 											if(arg.toString().length < rule.maxlen) {
-												tellPlayer(player, "&c'"+rulename+"' is too long! (Min. "+rule.minlen+" characters)");
+												tellPlayer(player, errpref+"&c'"+rulename+"' is too long! (Min. "+rule.minlen+" characters)"+errsuff);
 												return false;
 											}
 										}
 										if("noColor" in rule) {
 											if(rule.noColor) {
 												if(escCcs(arg.toString()) != arg.toString()) {
-													tellPlayer(player, "&c'"+rulename+"' cannot contain color coding!");
+													tellPlayer(player, errpref+"&c'"+rulename+"' cannot contain color coding!"+errsuff);
 													return false;
 												}
 											}
 										}
 										break;
 									}
-									case 'currency': 
+									case 'currency':
 									case 'time':
 									case 'number': {
 										var num = NaN;
@@ -370,20 +380,20 @@ function executeXCommand(str, player) {
 										} else {
 											num = getStringTime(arg);
 										}
-										
+
 										if(isNaN(num)) {
-											tellPlayer(player, "&c'"+rulename+"' is not a number!");
+											tellPlayer(player, errpref+"&c'"+rulename+"' is not a number!"+errsuff);
 											return false;
 										}
 										if('max' in rule) {
 											if(num > rule.max) {
-												tellPlayer(player, "&c'"+rulename+"' cannot be greater than "+rule.max.toString());
+												tellPlayer(player, errpref+"&c'"+rulename+"' cannot be greater than "+rule.max.toString()+errsuff);
 												return false;
 											}
 										}
 										if('min' in rule) {
 											if(num < rule.min) {
-												tellPlayer(player, "&c'"+rulename+"' cannot be less than "+rule.min.toString());
+												tellPlayer(player, errpref+"&c'"+rulename+"' cannot be less than "+rule.min.toString()+errsuff);
 												return false;
 											}
 										}
@@ -395,13 +405,13 @@ function executeXCommand(str, player) {
 												var exists = dh.exists(data);
 												if(rule.exists && !exists) {
 													//Hasto exists but does not
-													tellPlayer(player, "&c"+dh.type.rangeUpper(0,1)+" '"+dh.name+"' does not exist!");
+													tellPlayer(player, errpref+"&c"+dh.type.rangeUpper(0,1)+" '"+dh.name+"' does not exist!"+errsuff);
 													return false;
 												}
 												if(!rule.exists && exists) {
 													//Has not to exists but does
-													tellPlayer(player, "&c"+dh.type.rangeUpper(0,1)+" '"+dh.name+"' already exists!");
-													return false;	
+													tellPlayer(player, errpref+"&c"+dh.type.rangeUpper(0,1)+" '"+dh.name+"' already exists!"+errsuff);
+													return false;
 												}
 											}
 										}
@@ -409,39 +419,39 @@ function executeXCommand(str, player) {
 									}
 									case 'color': {
 										if(objArray(_RAWCOLORS).indexOf(arg) == -1) {
-											tellPlayer(player, "&cColor must be one of the following: "+objArray(_RAWCOLORS).join(', ')+'!');
+											tellPlayer(player, errpref+"&cColor must be one of the following: "+objArray(_RAWCOLORS).join(', ')+'!'+errsuff);
 											return false;
 										}
 										break;
 									}
 									case 'coloreffect': {
 										if(objArray(_RAWEFFECTS).indexOf(arg) == -1) {
-											tellPlayer(player, "&cChat effects must be one of the following: \n"+objArray(_RAWEFFECTS).join("\n"));
+											tellPlayer(player, errpref+"&cChat effects must be one of the following: \n"+objArray(_RAWEFFECTS).join("\n")+errsuff);
 											return false;
 										}
 										break;
 									}
 									case 'attribute': {
 										if(_ITEMATTR.indexOf(arg) == -1) {
-											tellPlayer(player, "&cItem attributes must be one of these: \n"+_ITEMATTR.join("\n"));
+											tellPlayer(player, errpref+"&cItem attributes must be one of these: \n"+_ITEMATTR.join("\n")+errsuff);
 											return false;
 										}
 										break;
 									}
 									case 'bool': {
 										if(['true', 'false'].indexOf(arg) == -1) {
-											tellPlayer(player, "&c"+rulename.rangeUpper(0,1)+" must be true or false!");
+											tellPlayer(player, errpref+"&c"+rulename.rangeUpper(0,1)+" must be true or false!"+errsuff);
 											return false;
 										}
 										break;
 									}
 								}
-								
+
 							}
-						
+
 						}
 					}
-					
+
 					return (cmd.callback(player, args, data, cmd.payload) || false);
 				} else {
 					tellPlayer(player, "&cYou don't have permission to this command!");
@@ -453,7 +463,6 @@ function executeXCommand(str, player) {
 	//No valid command given
 	var usg = [];
 	var aa = str.split(" ");
-	
 	while(aa.length > 0) {
 		var saa = aa.join(" ");
 		if(usg.length == 0) {
@@ -469,7 +478,7 @@ function executeXCommand(str, player) {
 		}
 		aa.splice(-1,1);
 	}
-	
+
 	if(usg.length > 0) {
 		tellPlayer(player, "&eDid you mean:");
 		for(u in usg) {
@@ -479,7 +488,7 @@ function executeXCommand(str, player) {
 		tellPlayer(player, "&cCould not find this command!");
 	}
 	return false;
-	
+
 }
 
 @block chat_event
@@ -492,4 +501,3 @@ function executeXCommand(str, player) {
 
 //Register commands
 yield register_commands_event;
-

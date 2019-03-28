@@ -6,7 +6,7 @@ String.prototype.allMatch = function(regx) {
 		var rx = regx.exec(this);
 		rr.push(rx);
 	}
-	
+
 	return rr;
 };
 
@@ -47,7 +47,7 @@ String.prototype.pad = function(character, len) {
 };
 
 String.prototype.padMiddle = function(character, len) {
-	
+
 	var n = this.toString();
 	var sc = Math.floor((len-n.length)/2);
 	var ns = '';
@@ -73,7 +73,7 @@ String.prototype.append = function(ch, amount) {
         	new_str += ch.toString();
         }
     }
-  
+
   return new_str;
 };
 
@@ -84,6 +84,15 @@ String.prototype.prepend = function(ch, amount) {
         	new_str = ch.toString()+new_str;
         }
     }
-  
+
   return new_str;
+};
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this.toString();
+    if(typeof(search) == 'string') { search = [search]; }
+		for(var s in search as sr) {
+			target = target.split(sr).join(replacement);
+		}
+		return target;
 };

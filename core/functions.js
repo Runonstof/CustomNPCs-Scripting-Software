@@ -18,24 +18,24 @@ function getHalfRotation(angle) {
 	angle = fixAngle(angle);
 	if(angle <= 180) { return angle; } else { return -(180-(angle-180)); }
 }
-
+//UUIDLeast-Most
 function UUIDLM() { return rrandom_range(1, 99999); }
 
 function getQuartRotation(dir) {
 	dir = getHalfRotation(dir);
-	
+
 	if(Math.abs(dir) > 90) {
 		dir = (180-Math.abs(dir))*sign(dir);
 	}
-	
+
 	return dir;
 }
 
 function getDropChance(npcnbt, slot) {
 	var dropC = npcnbt.getList('DropChance', 10);
 	var dropChance = parseInt(dropC[slot].getInteger('Integer'));
-	
-	
+
+
 	return dropChance;
 }
 
@@ -81,26 +81,83 @@ var pin = pinv[p];
 		var pitm = w.createItemFromNbt(API.stringToNbt(pin.toJsonString()));
 		pitems.push(pitm);
 	}
-	
+
 	return pitems;
 }
 
 function getInvItemCount(pnbt, itemstack, w, ignoreNbt) {
-	if(typeof(ignoreNbt) == typeof(undefined)) { ignoreNbt = false; }
 	return getArrItemCount(getPlayerInvFromNbt(pnbt, w), itemstack, ignoreNbt);
 }
 
-function isItemEqual(stack, other, ignoreNbt){
-	if(typeof(ignoreNbt) == typeof(undefined)) { ignoreNbt = false; }
+
+function getMoneyItems(pnbt, w, amount) {
+    var curamount = 0;
+    var mn = []
+
+
+    var itemcnt = getInvItemCount(pnbt, _coin, w, false);
+    var coinItems = getPlayerInvFromNbt(pnbt, w);
+    for(var _cii in coinItems as _coin) {
+        for(var itemvalue in _COINITEMS as ci) {
+            var itemval = getCoinAmount(itemvalue);
+
+            if(itemval <= amount) {
+                var mncnt = 0;
+                for(var i = 0; i < itemcnt; i++) {
+                    if(curamount+itemval <= amount) {
+                        curamount += itemval;
+                        mncnt++;
+                    }
+                }
+                if(mncnt > 0) {
+                    mn.push();
+                }
+            }
+        }
+    }
+
+
+    return mn;
+}
+
+function getMoneyItemCount(pnbt, w) {
+  var am = 0;
+  for(var itemvalue in _COINITEMS as ci) {
+    var coinItems = genMoney(w, getCoinAmount(itemvalue));
+    for(var _cii in coinItems as _coin) {
+      am += getInvItemCount(pnbt, _coin, w, false)*getCoinAmount(itemvalue);
+    }
+
+  }
+  return am;
+}
+
+function removeMoneyFromPlayer(player, amount, pnbt=null) {
+  /*
+  If you have pnbt defined before, pass it.
+  because IPlayer.getEntityNbt() is a heavy function
+  */
+  var isRemoved = false;
+  var w = player.world;
+  if(pnbt == null) { pnbt = player.getEntityNbt(); }
+  if(getMoneyItemCount(pnbt, w) >= amount) {
+
+  }
+
+
+  return isRemoved;
+}
+
+function isItemEqual(stack, other, ignoreNbt=false){
 	if (!other || other.isEmpty()) {
 		return false;
 	}
-	
+
 	stackNbt = stack.getItemNbt();
 	stackNbt.remove('Count');
 	otherNbt = other.getItemNbt();
 	otherNbt.remove('Count');
-	
+
 	if(ignoreNbt) {
 		if(stackNbt.getString("id") == otherNbt.getString("id")) {
 			return true;
@@ -110,16 +167,14 @@ function isItemEqual(stack, other, ignoreNbt){
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
 //How much items in array
-function getArrItemCount(array, itemstack, ignoreNbt) {
-	if(typeof(ignoreNbt) == typeof(undefined)) { ignoreNbt = false; }
+function getArrItemCount(array, itemstack, ignoreNbt=false) {
 	var icount = 0;
-	for(pi in array) {
-var pitem = array[pi];
+	for(pi in array as pitem) {
 		pinbt = pitem.getItemNbt();
 		var scount = parseInt(pinbt.getByte('Count'));
 		if(isItemEqual(itemstack, pitem, ignoreNbt))
@@ -200,19 +255,19 @@ function arrayOccurs(string, subArray, allowOverlapping=false, caseSensitive=tru
 	for(i in subArray as sel) {
 		occ += occurrences(string, sel, allowOverlapping, caseSensitive);
 	}
-	
+
 	return occ;
 }
 
 function occurrences(string, subString, allowOverlapping=false, caseSensitive=true) {
     string = string.toString()
     subString = subString.toString()
-	
+
 	if(!caseSensitive) {
 		string = string.toLowerCase();
 		subString = subString.toLowerCase();
 	}
-	
+
     if (subString.length <= 0) return (string.length + 1);
 
     var n = 0,
@@ -264,25 +319,25 @@ function g(obj, grp_props) {
 			if(obj != null) {
 				if(typeof(obj[props[0][i]]) != typeof(undefined)) {
 					obj = obj[props[0][i]];
-					
+
 					break;
 				}
 			}
 		}
 	}
-	
-	
+
+
 	return obj;
 }
 
 function httpGetAsync(theUrl, callback)
 {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() { 
+    xmlHttp.onreadystatechange = function() {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             callback(xmlHttp.responseText);
     }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous
     xmlHttp.send(null);
 }
 
@@ -293,7 +348,7 @@ function getAllFuncs(obj) {
         props = props.concat(Object.getOwnPropertyNames(obj));
     } while (obj = Object.getPrototypeOf(obj));
 
-    return props.sort().filter(function(e, i, arr) { 
+    return props.sort().filter(function(e, i, arr) {
        if (e!=arr[i+1] && typeof obj[e] == 'function') return true;
     });
 }
@@ -393,9 +448,14 @@ function getColorName(id) {
 	return 'white';
 }
 
-function parseEmotes(str) {
+function parseEmotes(str, allwd=[]) {
+
+  str = str.replaceAll(objArray(CHAT_EMOTES), '');
 	for(var ce in CHAT_EMOTES as chatemote) {
-		str = str.replace(new RegExp(':'+ce+':', 'g'), chatemote);
+    if(allwd.length == 0  || allwd.indexOf(ce) > -1) {
+		    str = str.replaceAll(':'+ce+':', chatemote);
+		    str = str.replaceAll(':/'+ce+'/:', ':'+ce+':');
+    }
 	}
 	return str;
 }
@@ -405,19 +465,21 @@ function strf(str, toRaw=true, allowed=null) {
 	return strrawformat(str, toRaw, allowed);
 }
 var trg = /{[\s]*(?:([\w]+)[\s]*\:[\s]*([\w\W\/]+?)|\*)(?:[\s]*\|[\s]*([\w]+)[\s]*\:[\s]*([\w\W\/]+?[\s]*))?}/;
-function strrawformat(str, toRaw=false, allowed=null) {
+
+
+function strrawformat(str, toRaw=false, allowed) {
 	var rf = [];
 	var txt = '';
 	var ri = -1;
 	var isCode = false;
 	var txtColor = 'white';
-	var isItalic = 0;
-	var isBold = 0;
-	var isStrike = 0;
-	var isUnderlined = 0;
-	var isObf = 0;
+	var isItalic = false;
+	var isBold = false;
+	var isStrike = false;
+	var isUnderlined = false;
+	var isObf = false;
 	str = str+'&r ';
-	
+
 	for(var i = 0; i < str.length; i++) {
 		var c = str.substr(i, 1);
 		if(c == '&' || i == str.length-1) {
@@ -425,8 +487,8 @@ function strrawformat(str, toRaw=false, allowed=null) {
 			if(txt.length > 0) {
 				ri++;
 				var cmds = [];
-				
-				
+
+
 				rf.push([txt, txtColor, isItalic, isBold, isUnderlined, isStrike, isObf]);
 				isItalic = false;
 				isBold = false;
@@ -482,19 +544,19 @@ function strrawformat(str, toRaw=false, allowed=null) {
 			}
 		}
 	}
-	
-	return (!toRaw ? rf : rawformat(rf, true, allowed));
+
+	return (!toRaw ? rf : rawformat(rf, true));
 }
 
 
 function rawformat(str_pieces, fullraw=true, allowed=null) {
 	if(allowed == null) {
-		allowed = Object.keys(_RAWCOLORS).concat(Object.keys(_RAWEFFECTS));
-		allowed.push('x', 'y');
+		allowed = Object.keys(_RAWCOLORS).concat(Object.keys(_RAWEFFECTS)).concat(['x', 'y']);
+
 	}
 	var txt = '';
 	if(fullraw) { txt+='[""'; }
-	
+
 	for(i in str_pieces) {
 		var p = str_pieces[i];
 		var ntext = p[0].replace(/\"/g, '\\"');
@@ -511,9 +573,9 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 			if(allowed.indexOf(getColorId(p[1])) == -1) {
 				p[1] = 'white';
 			}
-			
+
 			pc+=',"color":"'+p[1].toString()+'"';
-			
+
 		}
 		if(p[2]) {
 			if(allowed.indexOf('o') > -1) {
@@ -540,20 +602,21 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 				pc+=',"obfuscated":true';
 			}
 		}
-		if(p[7]||'' != '' && p[8]||'' != '' && allowed.indexOf('x') > -1) { pc+=',"clickEvent":{"action":"'+p[7]+'","value":"'+p[8]+'"}'; }
-		if((p[9]||"") != '' && (p[10]||"") != '' && allowed.indexOf('y') > -1) { pc+=',"hoverEvent":{"action":"'+p[9]+'","value":"'+ccs((p[10]||"").replace(/\$/g, '\u00A7'),allowed)+'"}'; }
+
+		if(p[7] && p[8]) { pc+=',"clickEvent":{"action":"'+p[7]+'","value":"'+p[8]+'"}'; }
+		if(p[9] && p[10]) { pc+=',"hoverEvent":{"action":"'+p[9]+'","value":"'+ccs((p[10]||"").replace(/\$/g, '\u00A7'),allowed)+'"}'; }
 		pc += '}';
 
-		
+
 		txt+=','+pc.toString();
 	}
-	
+
 	if(fullraw) {
 		txt += ']';
 	}
-	
+
 	return txt;
-	
+
 
 }
 
@@ -564,7 +627,7 @@ function data_get(data, keys) {
 		get[k] = data.get(k);
 		if(get[k] == null) { get[k] = keys[k]; }
 	}
-	
+
 	return get;
 }
 
@@ -612,7 +675,7 @@ function clone(obj) {
 function data_overwrite(data, keys=[], vals=[]) {
 	if(typeof(keys) == 'string') { keys = [keys]; }
 	if(typeof(vals) == 'string') { vals = [vals]; }
-	
+
 	for(k in keys) {
 		var key = keys[k];
 		var val = vals[k];
@@ -662,12 +725,12 @@ function pick(a, amount=1) {
 		return a[index];
 	} else {
 		var picks = [];
-		
+
 		while(picks.length < amount) {
 			index = Math.floor(Math.random() * a.length);
 			if(picks.indexOf(a[index]) == -1) { picks.push(a[index]); }
 		}
-		
+
 		return picks;
 	}
 }
@@ -679,7 +742,7 @@ function escapeNbtJson(json, trim_ends=true) {
 	if(trim_ends) {
 		json = json.slice(1, json.length - 1);
 	}
-	
+
 	return json;
 }
 
@@ -703,7 +766,7 @@ function array_dist(a) {
 			b.push(a[c]);
 		}
 	}
-	
+
 	return b;
 }
 
@@ -720,7 +783,7 @@ function array_filter(a, fn) {
 	for(i in a) {
 		if(fn(a[i])) { aa.push(a[i]); }
 	}
-	
+
 	return aa;
 }
 
@@ -728,7 +791,7 @@ function escCcs(str, esc_formats=null) {
 	if(esc_formats == null) {
 		esc_formats = _RAWCODES;
 	}
-	
+
 	return str.replace(new RegExp('&(['+esc_formats.join("")+'])', 'g'), '');
 }
 
@@ -786,7 +849,7 @@ function genName(name) {
 		'Remorse',
 		'Fury'
 	];
-	
+
 	return pick(p) + ' ' + name + ' of ' + pick(s);
 }
 
@@ -822,7 +885,7 @@ function pickchance(a, amount) {
 			}
 		}
 	}
-	
+
 	return pick(aa, amount);
 }
 
@@ -836,9 +899,9 @@ function rrandom_range(min, max) { return Math.round(random_range(min, max)); }
 function random_range(_min, _max) {
 	var min = Math.min(_min, _max);
 	var max = Math.max(_min, _max);
-	
+
 	var diff = max - min;
-	
+
 	return (min + (Math.random() * diff));
 }
 
@@ -856,10 +919,10 @@ function array_merge(a1, a2) {
 function isArray(obj) {
 	if(typeof(obj) === 'object') {
       for(k in obj) {
-      
+
           if(isNaN(k)) { return false; }
       }
-      
+
 
       return true;
     } else { return false }
@@ -873,6 +936,6 @@ function isObject(obj) {
 function nbtItem(nbt, w, api) {
 	if(typeof(nbt) == 'string') { nbt = api.stringToNbt(nbt); }
 	var item = w.createItemFromNbt(nbt);
-	
+
 	return item;
 }
