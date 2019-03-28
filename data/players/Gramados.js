@@ -1,6 +1,7 @@
-var SCRIPT_VERSION = '1.1a';
+var SCRIPT_VERSION = '2.0';
 
 import core\functions.js;
+import core\players\chatEmotes.js;
 import core\players\executeCommand.js;
 import core\players\tell.js;
 import core\players\xcommands.js;
@@ -8,18 +9,6 @@ import core\players\moreEvents.js;
 import packages\CompatSkills\compatskills.js;
 
 
-var CHAT_EMOTES = {
-	"check": "\u2714",
-	"heart": "\u2764",
-	"cross": "\u2715",
-	"sun": "\u2739",
-	"star": "\u2729",
-	"recycle": "\u267B",
-	"lightning": "\u26A1",
-	"flag": "\u2691",
-	"flag2": "\u2690",
-	"danger": "\u26A0",
-};
 
 function init(e) {
 	yield init_event;
@@ -29,7 +18,7 @@ function init(e) {
 	if(t == null && sb.hasTeam('Player')) {
 		sb.getTeam('Player').addPlayer(e.player.getName());
 	}
-	
+
 	tellPlayer(e.player, "[&6&lGramados&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
 }
 
@@ -90,14 +79,14 @@ function chat(e) {
 	var w = e.player.world;
 	var data = w.getStoreddata();
 	var sb = w.getScoreboard();
-	
+
 	var dpl = new Player(e.player.getName()).init(data);
 	var allwdcolors = dpl.getAllowedColors(data, sb);
 	var esccolors = removeFromArray(_RAWCODES, allwdcolors);
 	var escmsg = escCcs(e.message.toString(), esccolors);
 	var prefcol = dpl.getChatColorPref(sb, data);
 	var chats = dpl.getChats(data);
-	
+
 	//Check @, $ and # mentions
 	//@ - Player
 	//$ - Team
@@ -111,7 +100,7 @@ function chat(e) {
 	var prgx = /@([\w\-\.]+)/g;
 	var trgx = /\$([\w\-\.]+)/g;
 	var crgx = /#([\w\-\.]+)/g;
-	
+
 
 	var tmatch = escmsg.match(trgx) || [];
 	for(tm in tmatch as tmt) {
@@ -121,7 +110,7 @@ function chat(e) {
 			}
 		}
 	}
-	
+
 	var pmatch = escmsg.match(prgx) || [];
 	for(pm in pmatch as pmt) {
 		for(ply in players as plyr) {
@@ -131,8 +120,8 @@ function chat(e) {
 			}
 		}
 	}
-	
-	
+
+
 	var cmatch = escmsg.match(crgx) || [];
 	for(cm in cmatch as cmt) {
 		for(cmi in allChats as chat) {
@@ -146,16 +135,15 @@ function chat(e) {
 			}
 		}
 	}
-	
+
 	//Chat emotes
-	for(var ce in CHAT_EMOTES as chatemote) {
-		escmsg = escmsg.replace(new RegExp(':'+ce+':', 'g'), chatemote);
-	}
-	
+	escmsg = parseEmotes(escmsg, dpl.getAllowedEmotes(sb, data));
+
+
 	//Concat new message
 	var newmsg = dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' }')+prefcol+escmsg;
 
-	
+
 	if(chats.length > 0) {
 		var toldPlayers = [];
 		var wp = w.getAllPlayers();
@@ -174,8 +162,8 @@ function chat(e) {
 				}
 			}
 		}
-		
-		
+
+
 	} else {
 		executeCommand(e.player, "/tellraw @a "+strf(newmsg, true));
 	}

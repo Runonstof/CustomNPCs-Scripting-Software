@@ -64,7 +64,7 @@ function role(e){
 	var w = e.player.world;
 	var pnbt = e.player.getEntityNbt();
 	var npcnbt = e.npc.getEntityNbt();
-	
+
 	var tradeIgnoreNbt = (parseInt(npcnbt.getByte('TraderIgnoreNBT')) == 1);
 	var role = e.npc.getRole();
 	if(role.getType() == 1) {
@@ -75,7 +75,7 @@ function role(e){
 					e.currency1,
 					e.currency2,
 				];
-				
+
 				for(c in currency as crncy) {
 					if(crncy != null) {
 						var reqamount = crncy.getStackSize();
@@ -84,19 +84,18 @@ function role(e){
 						}
 					}
 				}
-				
+
 				if(canTrade) {
 					for(c in currency as crncy) {
 						if(crncy != null) {
 						
-							//Delete as IItemStack for NBT
 							e.player.removeItem(crncy, crncy.getStackSize());
-						
+
 						}
 					}
 					e.player.giveItem(e.sold);
 				}
-				
+
 				e.setCanceled(true);
 			}
 		}
