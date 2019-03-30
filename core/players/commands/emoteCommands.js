@@ -7,6 +7,11 @@ function Emote(name) {
     "desc": "",
     "default": false, //If everyone has the emote by default
     "forSale": false, //If emote can be bought
+    "hidden": false, //Will be hidden from !listEmotes, unless player has it, if forSale == true emote can still be bought via command
+  };
+
+  this.getCode = function(){
+      return CHAT_EMOTES[this.name]||"?";
   };
 }
 
@@ -27,14 +32,21 @@ function Emote(name) {
 @block register_commands_event
   registerXCommands([
     //['', function(pl, args, data){}, '', []],
+    ['!emote list [...matches]', function(pl, args, data){
+        var emids = new Emote().getAllDataIds(data);
+        tellPlayer(pl, getTitleBar('Emote List'));
+        
+    }, 'emote.list', []],
     ['!emote info <name>', function(pl, args, data){
       var em = new Emote(args.name).init(data);
       tellPlayer(pl, getTitleBar('Emote Info'));
       tellPlayer(pl, "&eEmote Name: &r"+em.name);
       tellPlayer(pl, "&eEmote: &r:"+em.name+":");
-      tellPlayer(pl, "&ePermission ID: &9&l"+em.getPermission().name);
+      tellPlayer(pl, "&ePermission ID: &9&l"+em.getPermission().name+"&r [&6:sun: Info{run_command:!perms info "+em.getPermission().name+"}&r]");
+      tellPlayer(pl, "&eIs Default: &c"+(em.data.default ? "&a:check: Yes" : "&c:cross: No"));
       tellPlayer(pl, "&ePrice: &c"+getAmountCoin(em.data.price));
       tellPlayer(pl, "&eFor Sale: "+(em.data.forSale ? "&a:check: Yes" : "&c:cross: No"));
+      tellPlayer(pl, "&eHidden: "+(em.data.hidden ? "&c:check: Yes" : "&a:cross: No"));
     }, 'emote.info', [
       {
         "argname": "name",
@@ -90,7 +102,7 @@ function Emote(name) {
       em.data.forSale = (args.forSale == 'true');
       em.save(data);
       tellPlayer(pl, "&a"+(em.data.forSale ? "Put" : "Pulled")+" emote '"+em.name+"' "+(em.data.forSale ? "on" : "off")+"-sale!");
-    }, '', [
+  }, 'emote.setForSale', [
       {
         "argname": "name",
         "type": "datahandler",
@@ -99,6 +111,40 @@ function Emote(name) {
       },
       {
         "argname": "forSale",
+        "type": "bool",
+      },
+    ]],
+    ['!emote setHidden <name> <hidden>', function(pl, args, data){
+      var em = new Emote(args.name).init(data);
+      em.data.hidden = (args.hidden == 'true');
+      em.save(data);
+      tellPlayer(pl, "&a"+(em.data.hidden ? "Hided":"Showing")+" emote '"+em.name+"'");
+  }, 'emote.setHidden', [
+      {
+        "argname": "name",
+        "type": "datahandler",
+        "datatype": "emote",
+        "exists": true,
+      },
+      {
+        "argname": "hidden",
+        "type": "bool",
+      },
+    ]],
+    ['!emote setDefault <name> <default>', function(pl, args, data){
+      var em = new Emote(args.name).init(data);
+      em.data.default = (args.default == 'true');
+      em.save(data);
+      tellPlayer(pl, "&a"+(em.data.default ? "Put" : "Pulled")+" emote '"+em.name+"' "+(em.data.default ? "into" : "from")+" default emotes!");
+  }, 'emote.setDefault', [
+      {
+        "argname": "name",
+        "type": "datahandler",
+        "datatype": "emote",
+        "exists": true,
+      },
+      {
+        "argname": "default",
         "type": "bool",
       },
     ]],

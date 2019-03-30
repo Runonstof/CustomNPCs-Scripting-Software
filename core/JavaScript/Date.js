@@ -1,14 +1,4 @@
 //==Reallife date handler for hiring regions etc
-var msTable = {
-	'y': 31556926000,
-	'mon': 2629743830,
-	'w': 604800000,
-	'd': 86400000,
-	'h': 3600000,
-	'min': 60000,
-	's': 1000,
-	'ms': 1
-};
 
 Date.prototype.addTime = function(addTime) {
 	this.setTime(this.getTime()+addTime);
@@ -25,7 +15,7 @@ function getStringTime(timeString) {
 	var _m = timeString.match(reg);
 	var newTime = 0;
 	var _tk = Object.keys(msTable);
-	
+
 	for(m in _m) {
 		var fm = _m[m];
 		var nm = fm.replace(reg, '$1').cInt();
@@ -36,7 +26,7 @@ function getStringTime(timeString) {
 			} else { newTime += nm; }
 		}
 	}
-	
+
 	return newTime;
 }
 //Converts number to TimeString
@@ -55,7 +45,7 @@ function getTimeString(stringTime, excludes=[]) {
 			}
 		}
 	}
-	
-	
+
+
 	return newStr;
 }

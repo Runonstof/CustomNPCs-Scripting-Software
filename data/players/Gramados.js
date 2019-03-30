@@ -1,4 +1,97 @@
-var SCRIPT_VERSION = '2.0';
+//===== CONFIG
+var SERVER_NAME = "Gramados";
+var SERVER_PREFIX = "&c&l"; //Color for output
+var DEFAULT_TEAMS = [ //Default scoreboard teams that gets added when permission is created
+	"Owner",
+	"Developer"
+];
+var DEFAULT_PLAYERS = [ //Default players that gets added when permission is created
+
+];
+//Team that player autojoins when player has no team
+//set to null to disable
+var DEFAULT_TEAM_JOIN = "Player";
+//var DEFAULT_TEAM_JOIN = null;
+
+var SERVER_BAR_OPEN = "&r&a&l<-=&e&l===&6&l==] &r"; //For output
+var SERVER_BAR_CLOSE = "&r&6&l [==&e&l===&a&l=->&r";
+var BAR_OPEN = "&l[";
+var BAR_CLOSE = "&l]";
+
+//Currency settings
+var _COINITEMNAME = '&2&lMoney&r';//Custom name of currency
+var _COINITEM_PREFIX = '&e'; //Prefix showing before money value lore (used for color coding)
+
+//Configure your own currency units
+//Units of currency, with own names, with lowest unit being 1
+var _COINTABLE = {
+	'c': 1,
+	'g': 100,
+	'k': 100000,
+	'm': 100000000,
+	'b': 100000000000,
+}; //With this setup, the syntax for 223503 would be 2k235g3c (case-INSensitive)
+
+//Your money items, and their values in money syntax
+var _COINITEMS = {
+	'1c': 'variedcommodities:coin_iron',
+	'5c': 'variedcommodities:coin_iron',
+	'10c': 'variedcommodities:coin_iron',
+	'20c': 'variedcommodities:coin_iron',
+	'50c': 'variedcommodities:coin_iron',
+	'1g': 'variedcommodities:coin_iron',
+	'2g': 'variedcommodities:coin_iron',
+	'5g': 'variedcommodities:money',
+	'10g': 'variedcommodities:money',
+	'20g': 'variedcommodities:money',
+	'50g': 'variedcommodities:money',
+	'100g': 'variedcommodities:money',
+	'200g': 'variedcommodities:money',
+	'500g': 'variedcommodities:money',
+	'1k': 'variedcommodities:plans',
+	'10k': 'variedcommodities:plans',
+	'100k': 'variedcommodities:plans',
+	'1m': 'variedcommodities:plans',
+	'10m': 'variedcommodities:plans',
+	'100m': 'variedcommodities:plans',
+	'1b': 'variedcommodities:plans',
+};
+
+//Configure your own time units!
+var msTable = {
+	//Reallife time
+	'y': 31556926000,
+	'mon': 2629743830,
+	'w': 604800000,
+	'd': 86400000,
+	'h': 3600000,
+	'min': 60000,
+	's': 1000,
+	'ms': 1,
+};
+
+//LANGUAGE settings
+var _MSG = {
+
+	//Error messages for command arguments
+	"argNotValid": "&c'{argName}' is not a valid id/name! It can only contain: &o{allowed}",
+	"argToShort": "&c'{argName}' is too short! (Min. {allowed} characters)",
+	"argToShort": "&c'{argName}' is too long! (Max. {allowed} characters)",
+	"argNoColor": "&c'{argName}' cannot contain colorcoding!",
+	"argEnum": "&c'{argName}' must be one of the following: &o{allowed}!",
+	"argNaN": "&c'{argName}' is not a number!",
+	"argMax": "&c'{argName}' cannot be bigger than {allowed}!",
+	"argMin": "&c'{argName}' cannot be smaller than {allowed}!",
+	"argNotExists": "&c{dataType} '{argVal}' does not exists!",
+	"undoBtnText": "&5&lUNDO",
+};
+
+
+//===== END CONFIG, DO NOT EDIT BELOW, UNLESS YOU KNOW WHAT TO DO
+
+
+var SERVER_TITLE = SERVER_PREFIX+SERVER_NAME;
+var SERVER_TAG = BAR_OPEN+"&r"+SERVER_TITLE+"&r"+BAR_CLOSE;
 
 import core\functions.js;
 import core\players\chatEmotes.js;
@@ -7,16 +100,21 @@ import core\players\tell.js;
 import core\players\xcommands.js;
 import core\players\moreEvents.js;
 import packages\CompatSkills\compatskills.js;
-
-
+var SCRIPT_VERSION = "2.0b";
+var SLOWTICK_TIMER_ID = 1;
+var SLOWTICK_TIMER = 100;
 
 function init(e) {
 	yield init_event;
 	var w = e.player.world;
 	var sb = w.getScoreboard();
-	var t = sb.getPlayerTeam(e.player.getName());
-	if(t == null && sb.hasTeam('Player')) {
-		sb.getTeam('Player').addPlayer(e.player.getName());
+	e.player.getTimers().forceStart(SLOWTICK_TIMER_ID, SLOWTICK_TIMER, true);
+
+	if(DEFAULT_TEAM_JOIN != null) {
+		var t = sb.getPlayerTeam(e.player.getName());
+		if(t == null && sb.hasTeam(DEFAULT_TEAM_JOIN)) {
+			sb.getTeam(DEFAULT_TEAM_JOIN).addPlayer(e.player.getName());
+		}
 	}
 
 	tellPlayer(e.player, "[&6&lGramados&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
@@ -24,6 +122,10 @@ function init(e) {
 
 function interact(e) {
 	yield interact_event;
+}
+
+function slowTick(e) {
+	yield slowTick_event;
 }
 
 function keyPressed(e) {
@@ -56,6 +158,11 @@ function rangedLaunched(e) {
 
 function timer(e) {
 	yield timer_event;
+	if(e.id == SLOWTICK_TIMER_ID) {
+		if(typeof(slowTick) != typeof(undefined)) {
+			slowTick(e);
+		}
+	}
 }
 
 function toss(e) {

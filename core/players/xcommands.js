@@ -6,6 +6,10 @@ import core\players\commands\*.js;
 	yield init_event;
 @endblock
 
+@block login_event
+	yield login_event;
+@endblock
+
 @block tick_event
 	yield tick_event;
 @endblock
@@ -54,12 +58,16 @@ function DataHandler(type, name) {
 	this.save = function(data) {
 		if(!this.exists(data)) {//Run onCreate
 			for(var i in this.createFns as createFn) {
-				createFn(this, data);
+				if(typeof(createFn) == 'function') {
+					createFn(this, data);
+				}
 			}
 		}
 		//Run onSave
 		for(var i in this.saveFns as saveFn) {
-			saveFn(this, data);
+			if(typeof(saveFn) == 'function') {
+				saveFn(this, data);
+			}
 		}
 		data.put(this.getDataId(), this.toJson());
 		return this;
@@ -67,7 +75,7 @@ function DataHandler(type, name) {
 	this.load = function(data) {
 		if(this.exists(data)) {
 			for(var i in this.loadFns as loadFn) {
-				loadFn(this, data);
+				if(typeof(loadFn) == 'function') { loadFn(this, data); }
 			}
 			var ndata = data.get(this.getDataId());
 			this.data = objMerge(this.data, JSON.parse(ndata));
@@ -77,25 +85,27 @@ function DataHandler(type, name) {
 	};
 	this.remove = function(data) {
 		for(var rf in this.removeFns as removeFn) {
-			removeFn(this, data);
+			if(typeof(removeFn) == 'function') {
+				removeFn(this, data);
+			}
 		}
 		data.remove(this.getDataId());
 		return this;
 	};
-	this.onRemove = function(fn) { //When removed
-		this.removeFns.push(fn);
+	this.onRemove = function(fn, args) { //When removed
+		this.removeFns.push(fn, args||{});
 		return this;
 	};
-	this.onLoad = function(fn) { //When gets loaded
-		this.loadFns.push(fn);
+	this.onLoad = function(fn, args) { //When gets loaded
+		this.loadFns.push(fn, args||{});
 		return this;
 	};
-	this.onSave = function(fn) { //Everytime when gets saved
-		this.saveFns.push(fn);
+	this.onSave = function(fn, args) { //Everytime when gets saved
+		this.saveFns.push(fn, args||{});
 		return this;
 	};
-	this.onCreate = function(fn) { //When gets saved but did not exists before (newly created)
-		this.createFns.push(fn);
+	this.onCreate = function(fn, args) { //When gets saved but did not exists before (newly created)
+		this.createFns.push(fn, args||{});
 		return this;
 	};
 	this.init = function(data, createIfNotExists) {
@@ -135,9 +145,33 @@ function getCommandNoArg(cmdstr) {
 	return cmdstr.match(/![\w\s]+/)[0];
 }
 
+function matchXCommands(cmdstrs=[]) {
+	if(typeof(cmdstrs) == 'string') { cmdstrs = [cmdstrs]; }
+	var cmds = [];
+
+	for(c in _COMMANDS as command) {
+		for(ci in cmdstrs as cmdstr) {
+			var cname = getCommandNoArg(command.usage).trim();
+			if(cmdstr.substr(0, 1) == "^") {
+				if((cmdstrs.length == 0 || occurrences(cname, cmdstr.substr(1, cmdstr.length)) == 0) && cmds.indexOf(command) == -1) {
+					cmds.push(command);
+					break;
+				}
+			} else {
+				if((cmdstrs.length == 0 || occurrences(cname, cmdstr) > 0) && cmds.indexOf(command) == -1) {
+					cmds.push(command);
+					break;
+				}
+			}
+		}
+	}
+
+	return cmds;
+}
+
 function getCommandName(cmdstr) {
-	var cmda = getCommandNoArg(cmdstr).trim();
-	return cmda.substr(1, cmda.length);
+	var cmda = getCommandNoArg(cmdstr).trim();//Remove whitespace around
+	return cmda.substr(1, cmda.length);//Remove '!'-character
 }
 
 function registerXCommands(cmds) {
@@ -336,7 +370,7 @@ function executeXCommand(str, player) {
 							}
 
 							if(rule.argname != a) { continue; }
-							var rulename = rule.argname.toString();
+							var rulename = rule.name||rule.argname.toString();
 							if('type' in rule) {//Check Arg Type
 								switch(rule.type) {
 									case 'id': {
@@ -365,6 +399,15 @@ function executeXCommand(str, player) {
 													tellPlayer(player, errpref+"&c'"+rulename+"' cannot contain color coding!"+errsuff);
 													return false;
 												}
+											}
+										}
+										break;
+									}
+									case 'enum': {
+										if("values" in rule) {
+											if(rule.values.indexOf(arg) == -1) {
+												tellPlayer(player, "&c'"+rulename+"' must be one of the following: "+rule.values.join(", "));
+												return false;
 											}
 										}
 										break;

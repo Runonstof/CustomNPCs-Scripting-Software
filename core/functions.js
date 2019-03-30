@@ -73,13 +73,41 @@ function getBackpackInv(pl, item){
 	return;
 }
 
-function getPlayerInvFromNbt(pnbt, w) {
+function givePlayerItems(player, stacks, pnbt=null) {
+    var w = player.world;
+    if(pnbt == null) {
+        pnbt = player.getEntityNbt();//Dont over-use this one
+    }
+    var invcnt = getPlayerInvCount(pnbt, w);
+    for(s in stacks as stack) {
+        if(invcnt < 36) {
+            //Player inv not full
+            player.giveItem(stack);
+            invcnt++;
+        } else {
+            player.dropItem(stack);
+        }
+    }
+}
+
+//Make for givePlayerItems
+function getPlayerInvCount(pnbt, w) {
+    return getPlayerInvFromNbt(pnbt, w, function(item, itnbt){
+        //Exclude armor slots and offhand
+        return ["-106", "100", "101", "102", "103"].indexOf(itnbt.getByte('Slot').toString()) == -1;
+    }).length;
+}
+
+function getPlayerInvFromNbt(pnbt, w, filterFn=null) {
 	var pinv = pnbt.getList('Inventory', pnbt.getListType('Inventory'));
 	var pitems = [];
-	for(p in pinv) {
-var pin = pinv[p];
+	for(p in pinv as pin) {
 		var pitm = w.createItemFromNbt(API.stringToNbt(pin.toJsonString()));
-		pitems.push(pitm);
+        //pin (INbt) contains key "Slot"
+        //pitm.getItemNbt() does not, thats why pin is passed
+        if( (filterFn == null ? true : filterFn(pitm, pin, w)) ) {
+            pitems.push(pitm);
+        }
 	}
 
 	return pitems;
@@ -89,35 +117,17 @@ function getInvItemCount(pnbt, itemstack, w, ignoreNbt) {
 	return getArrItemCount(getPlayerInvFromNbt(pnbt, w), itemstack, ignoreNbt);
 }
 
+function takeMoneyFromPlayer(player, amount, pnbt=null) {
+    if(pnbt == null) { pnbt = player.getEntityNbt(); }
+    var playerMoney = getPlayerInvFromNbt(pnbt, player.world, function(item, itnbt, w){
+        return isItemMoney(item, w);
+    });
+}
 
-function getMoneyItems(pnbt, w, amount) {
-    var curamount = 0;
-    var mn = []
+function getMoneyItemValue(moneystack) {
+    if(moneystack == null) return 0;
+    if(moneystack.isEmpty()) return 0;
 
-
-    var itemcnt = getInvItemCount(pnbt, _coin, w, false);
-    var coinItems = getPlayerInvFromNbt(pnbt, w);
-    for(var _cii in coinItems as _coin) {
-        for(var itemvalue in _COINITEMS as ci) {
-            var itemval = getCoinAmount(itemvalue);
-
-            if(itemval <= amount) {
-                var mncnt = 0;
-                for(var i = 0; i < itemcnt; i++) {
-                    if(curamount+itemval <= amount) {
-                        curamount += itemval;
-                        mncnt++;
-                    }
-                }
-                if(mncnt > 0) {
-                    mn.push();
-                }
-            }
-        }
-    }
-
-
-    return mn;
 }
 
 function getMoneyItemCount(pnbt, w) {
@@ -132,20 +142,19 @@ function getMoneyItemCount(pnbt, w) {
   return am;
 }
 
-function removeMoneyFromPlayer(player, amount, pnbt=null) {
-  /*
-  If you have pnbt defined before, pass it.
-  because IPlayer.getEntityNbt() is a heavy function
-  */
-  var isRemoved = false;
-  var w = player.world;
-  if(pnbt == null) { pnbt = player.getEntityNbt(); }
-  if(getMoneyItemCount(pnbt, w) >= amount) {
+function isItemMoney(stack, w) {
+    for(var ival in _COINITEMS as ci) {
+        var cm = genMoney(w, getCoinAmount(ival))[0];
 
-  }
+        if(isItemEqual(stack, cm)) {
+            return true;
+        }
+    }
+    return false;
+}
 
-
-  return isRemoved;
+function isNbtEqual(nbt, otherNbt) {
+    return nbt.toJsonString() == otherNbt.toJsonString();
 }
 
 function isItemEqual(stack, other, ignoreNbt=false){
@@ -163,7 +172,7 @@ function isItemEqual(stack, other, ignoreNbt=false){
 			return true;
 		}
 	} else {
-		if(stackNbt.toJsonString() == otherNbt.toJsonString()) {
+		if(isNbtEqual(stackNbt, otherNbt)) {
 			return true;
 		}
 	}

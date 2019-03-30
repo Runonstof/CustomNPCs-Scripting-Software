@@ -7,10 +7,7 @@ function Permission(name) {
 
 	this.data = {
 		"enabled": true,
-		"teams": [
-			"Owner",
-			"Developer"
-		],
+		"teams": DEFAULT_TEAMS,
 		"players": [],
 		"jobs": [],
 		"meta": {}
@@ -95,7 +92,27 @@ function Permission(name) {
 
 		return permitted;
 	};
+	this.getParentPerms = function(data) {
+		var parents = [];
+		var permids = this.getAllDataIds(data);
+		var idarr = this.name.split(".");
+		for(pid in permids as permid) {
+			var pidarr = permid.split(".");
+			if(idarr.length > pidarr.length && permid != this.name) {
+				var pidmatch = true;
+				for(pai in pidarr as piditem) {
+					if(piditem != idarr[pai]) {
+						pidmatch = false;
+					}
+				}
+				if(pidmatch && parents.indexOf(permid) == -1) {
+					parents.push(permid);
+				}
+			}
+		}
 
+		return parents;
+	}
 }
 
 
@@ -220,9 +237,8 @@ function Permission(name) {
 			var data = w.getStoreddata();
 			var ids = new Permission().getAllDataIds(data);
 			if(ids.length > 0) {
-				tellPlayer(pl, "&l<-====- &6&lGramados Permission Ids&r&l -====->");
+				tellPlayer(pl, getTitleBar("Homes"));
 				for(i in ids as id) {
-
 					if(args.matches.length == 0 || arrayOccurs(id, args.matches, false, false)) {
 						tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!perms info "+id+"}&r) (&c:cross: Remove{run_command:!perms remove "+id+"}&r)");
 					}
@@ -237,7 +253,7 @@ function Permission(name) {
 			var data = w.getStoreddata();
 			var p = new Permission(args.permission_id);
 			if(p.load(data)) {
-				tellPlayer(pl, "&l[=======] &6&lGramados Permission Info&r&l [=======]");
+				tellPlayer(pl, getTitleBar("Permission Info"));
 				tellPlayer(pl, "&eID: &9&o"+p.name+"&r (&2:recycle: Refresh{run_command:!perms info "+p.name+"}&r) (&4:cross: Remove Perm{run_command:!perms remove "+p.name+"}&r)")
 				tellPlayer(pl, "&eEnabled: &r"+
 					(p.data.enabled ? "&a:check: Yes" : "&c:cross: No")+
@@ -257,6 +273,8 @@ function Permission(name) {
 				for(i in p.data.players as player) {
 					tellPlayer(pl, "&e - &r&o"+player+"&r (&c:cross: Remove{run_command:!perms removePlayers "+p.name+" "+player+"}&r)");
 				}
+
+				tellPlayer(pl, p.getParentPerms(data).join(", "));
 			} else {
 				tellPlayer(pl, "&cCould not find any info for "+args.permission_id);
 			}

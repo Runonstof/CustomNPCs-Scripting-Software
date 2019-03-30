@@ -146,19 +146,19 @@ $arg_opts = [
 		//Set syntax
 		$syntaxID = explode(':', $arg)[1];
 		$sf = __DIR__ . "\config\syntax\\" . $syntaxID . ".php";
-		
+
 		if(file_exists($sf)) {
 			$WORKSPACE = __DIR__;
 			require($sf);
 		}
 		array_splice($argv, $i, 1);
-	
+
 		return $argv;
 	},
 	'-a' => function($argv, $i) {
 		//Extra operations for file
 		if(isset($argv[$i+1])) {
-			
+
 			array_splice($argv, $i, 2);
 		}
 		return $argv;
@@ -167,7 +167,7 @@ $arg_opts = [
 		//Clear compile cache
 		$dirs = $GLOBALS['config']['outputDirPrefix'];
 		if(is_string($dirs)) { $dirs = [$dirs]; }
-		
+
 		foreach($dirs as $dir) {
 			emptyDir($dir, true);
 		}
@@ -193,7 +193,7 @@ $arg_opts = [
 					if(indexOf($allowedOptions, $key) != -1) {
 						$GLOBALS['config'][$key] = $val;
 					}
-					
+
 				}
 			}
 		}
@@ -206,10 +206,10 @@ $arg_opts = [
 			}
 			array_splice($argv, $i, 1);
 		}
-	
+
 		return $argv;
 	}
-	
+
 ];
 
 function sec($ms) { return $ms/1000000; }
@@ -263,7 +263,7 @@ foreach($profiles as $k=>$profile) {//Loop profiles
 				//echo "$co\n";
 				$oo = shell_exec($co);
 				echo $oo; //Echo command output
-				
+
 			}
 		}
 	}
@@ -310,25 +310,25 @@ function getBlocks($string, $tabIndex) {
 	$syn = &$GLOBALS['config']['syntaxRegex'];
 	$getBlockRegex = $syn['defineBlock'];
 	$bMatches = [];
-	
+
 	$formatted = [];
-	
+
 	preg_match_all($getBlockRegex, $string, $bMatches);
-	
+
 	foreach($bMatches[1] as $i=>$match) {
 		if($GLOBALS['config']['compileOutput']) echo getTabs($tabIndex, "\t", "|-------")."Adding blockcode '$match'...\n";
 		$blockname = $match;
 		$blockcode = $bMatches[0][$i];
 		$blockcontents = $bMatches[2][$i];
-		
-		
+
+
 		$formatted[$blockname] = [
 			'name' => $blockname,
 			'code' => $blockcode,
 			'contents' => $blockcontents
 		];
 	}
-	
+
 	return $formatted;
 }
 
@@ -336,52 +336,52 @@ function getBlocks($string, $tabIndex) {
 function getIgnited($filepath, $tabIndex) {
 		$ifilescript = file_get_contents($filepath);
 		$syn = &$GLOBALS['config']['syntaxRegex'];
-		
+
 		$sets = [];
 		$setPattern = $syn['defineVar'];
 		preg_match_all($setPattern, $ifilescript, $sets);
-		
+
 		foreach($sets[0] as $i=>$setcode) {
 			$GLOBALS['vars'][$sets[1][$i]] = (is_numeric($sets[2][$i]) ?intval($sets[2][$i]) : strval($sets[2][$i]));
 			$ifilescript = str_replace($setcode, '', $ifilescript);
 		}
-		
-		
+
+
 		//Handle vars
 		$gv = [];
 		$varPattern = $syn['getVar'];
 		preg_match_all($varPattern, $ifilescript, $gv);
-		
-		
+
+
 		foreach($gv[0] as $i=>$getvar) {
-			
+
 			if(isset($GLOBALS['vars'][$gv[1][$i]])) {
-				
+
 				//echo "{$gv[0][$i]}\n";
 				$ifilescript = str_replace($getvar, $GLOBALS['vars'][$gv[1][$i]], $ifilescript);
 			}
 		}
-		
-		
+
+
 		//Handle optional vars
 		$ov = [];
 		$oVarPattern = $syn['optionalVar'];
 		preg_match_all($oVarPattern, $ifilescript, $ov);
 		foreach($ov[0] as $i=>$optvar) {
-			
+
 			$newvar = (isset($GLOBALS['vars'][$ov[1][$i]]) ? $GLOBALS['vars'][$ov[1][$i]] : $ov[2][$i]);
-			
+
 			$ifilescript = str_replace($optvar, $newvar, $ifilescript);
-			
-			
+
+
 		}
-		
+
 		$im = [];
 		$ignitePattern = $syn['importFile'];
-		
+
 		$igniteRegex = preg_match_all($ignitePattern, $ifilescript, $im);
-		
-		
+
+
 		//Handle Imports
 		//$importCode = "";
 		foreach($im[1] as $i=>$subIgnPath) {//Loop all Imports
@@ -397,55 +397,55 @@ function getIgnited($filepath, $tabIndex) {
 				}
 			}
 			if($im[3][$i] != '') {//As var WIP
-				
+
 			}
-			
-			
+
+
 			$tabIndex += 1;
 			$ignPath = __DIR__ . '\\' . $subIgnPath;
 			$addIgn = '';
-			
+
 			foreach(glob($ignPath) as $gIgnPath) {
 				$importContent = getIgnited($gIgnPath, $tabIndex);
 				$importBlocks = getBlocks($importContent, $tabIndex);
-				
-				
+
+
 				foreach($importBlocks as $iblock) {
 					$importContent = str_replace($iblock['code'], '', $importContent);
 					if(!isset($allBlocks[$iblock['name']])) { $allBlocks[$iblock['name']] = ''; }
 					$allBlocks[strval($iblock['name'])] .= $iblock['contents'];
-			
-					
+
+
 				}
-				
+
 				$addIgn .= $importContent;
-			
-				
-				
-				
+
+
+
+
 			}
 			//$importCode = $addIgn;
 			$ifilescript = str_replace($im[0][$i], $addIgn, $ifilescript);
-		
-			
-			
+
+
+
 		}
-	
+
 		//Handle Yields
 		$yieldRegex = '/yield ([\w-]+);/';
 		$ym = [];
 		preg_match_all($yieldRegex, $ifilescript, $ym);
-		
+
 		$c = 0;
 		foreach($ym[1] as $i=>$getblock) {
 			if($c == 0) { if($GLOBALS['config']['compileOutput']) echo getTabs($tabIndex, "\t", "|\t")."\n"; }
-			
+
 			$rcode = '';
 			if($GLOBALS['config']['compileOutput']) echo getTabs($tabIndex, "\t", "|-------").'Yielding '.$getblock."...\n";
 			if(isset($allBlocks[$getblock])) { $rcode = $allBlocks[$getblock]; }
-			
+
 			$ifilescript = str_replace($ym[0][$i], $rcode, $ifilescript);
-			
+
 			if($c == count($ym[1])-1) { if($GLOBALS['config']['compileOutput'])echo getTabs($tabIndex)."\n"; }
 			$c++;
 		}
@@ -478,10 +478,10 @@ foreach($args as $key_arg=>$arg) {
 		$outputDirs = isset($arg['outputDirs']) ? $arg['outputDirs'] : $outputDirs;
 		$outputName = isset($arg['outputName']) ? $arg['outputName'] : $outputName;
 	}
-	
+
 	foreach(glob(__DIR__ .'\\'. $gPath) as $curpath) {
-		
-	
+
+
 		$ev = explode('\\', $curpath);
 		$v = $ev[count($ev)-1];
 		echo "Compiling\033[33m $v\033[0m...\n";
@@ -493,27 +493,27 @@ foreach($args as $key_arg=>$arg) {
 		if($fregex) {
 			$fname = $finfo[1];
 			$fext = $finfo[2];
-			
-			
+
+
 			$replaces = [
 				"FileName" => $fname,
 				"FileExt" => $fext
 			];
 			$newName = $outputName;
-			
+
 			foreach($replaces as $replace_what=>$replace_to) {
 				$newName = str_replace('{'.$replace_what.'}', $replace_to, $newName);
 			}
-			
+
 			$odirs = $GLOBALS['config']['outputDirPrefix'];
 			if(is_string($odirs)) { $odirs = [$odirs]; }
-			
+
 			foreach($odirs as $io=>$iodir) {
 				$nf = $iodir . '\\' . $outputDirs . $newName;
-				
-				
+
+
 				$newFile = fopen($nf, 'w+');
-				
+
 				$scr = getIgnited($curpath, $tabIndex);
 				//Addons
 				foreach($GLOBALS['config']['addons'] as $addon) {
@@ -522,13 +522,13 @@ foreach($args as $key_arg=>$arg) {
 						$scr = call_user_func_array($addon, [$scr]);
 					}
 				}
-				
-				
-				
+
+
+
 				if($doesMinify) {
 					echo "Minifying \033[33m$v\033[0m...\n";
 					$cRegex = '/\/\/[^\r\n]*/';
-					
+
 					$cc = [];
 					preg_match_all($cRegex, $scr, $cc);
 					foreach($cc[0] as $r) {
@@ -538,9 +538,9 @@ foreach($args as $key_arg=>$arg) {
 					$scr = str_replace("\n", '', $scr);
 					$scr = str_replace("	", '', $scr);
 					$scr = str_replace("  ", '', $scr);
-					
+
 					//$scr = minify_js($scr);
-					
+
 				}
 				echo "Saving\033[33m $v\033[0m to\033[33m $nf\033[0m...\n";
 				fwrite($newFile, $scr);
@@ -548,7 +548,7 @@ foreach($args as $key_arg=>$arg) {
 			}
 		}
 	}
-	
+
 	$ii++;
 }
 
@@ -556,7 +556,7 @@ foreach($args as $key_arg=>$arg) {
 if($GLOBALS['config']['compileOutput'])echo "\n";
 
 function putClosing($cc, $open='(', $close=')') {
-	
+
 }
 function stripDeli($str) {
 	return substr($str, 1, strlen($str)-2);
@@ -575,39 +575,39 @@ function getClosing($str, $open='(', $close=')', $delimeter='|', $include_tags=f
 		$c_close = substr($str, $i, strlen($close));
 		$c = substr($str, $i, 1);
 		$is_key = false;
-		
+
 		//OpenTag
 		if( ($regex_tags ? preg_match($open, $c_open) === 1 : $c_open == $open) ) {
 			$open_i++;
-		
+
 			//$i+=strlen($open)-1;
 		}
-		
+
 		echo "O: $open_i  - C: $l_open_i\n";
 		if(!isset($ss[$open_i])) {
 			$ss[$open_i] = '';
 		}
-		
+
 		if(($c_open != $open && $c_close != $close && $include_tags) || !$include_tags) {
-			
+
 			$ss[$open_i] .= $c;
 		}
-		
+
 		//Close Tag
 		if(($regex_tags ? preg_match($close, $c_close) === 1 : $c_close == $close)) {
 			$open_i--;
 			//$i+=strlen($close);
-			
+
 		}
-		
+
 		//echo substr($ss[$open_i], strlen($ss[$open_i])-1, 1)."\n";
-		
+
 		if(isset($ss[$open_i])
 		&& $open_i != $l_open_i
 		&& substr($ss[$open_i], strlen($ss[$open_i])-1, 1) != $delimeter
 		&& strlen($ss[$open_i]) > 0)
 		{
-			
+
 			$ss[$open_i] .= '|';
 		}
 		$max_levels=max($max_levels, $open_i);

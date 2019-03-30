@@ -10,6 +10,10 @@ function storytellPlayer(player, ar) {
 	}
 }
 
-function getTitleBar(title, serverName="&6&lGamados") {
-	return "&l[=======] "+serverName+" "+title+"&r &l[=======]";
+function getTitleBar(title, showServerName=true) {
+	return SERVER_BAR_OPEN+(showServerName?SERVER_TITLE:"")+" "+title+SERVER_BAR_CLOSE;
+}
+
+function getUndoBtn(undo_cmds) {
+	var str = "";
 }

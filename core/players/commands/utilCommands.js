@@ -1,30 +1,3 @@
-var _COINTABLE = {
-	'c': 1,
-	'g': 100,
-	'k': 100000,
-	'm': 100000000
-};
-
-var _COINITEMS = {
-	'1c': 'variedcommodities:coin_iron',
-	'5c': 'variedcommodities:coin_iron',
-	'10c': 'variedcommodities:coin_iron',
-	'20c': 'variedcommodities:coin_iron',
-	'50c': 'variedcommodities:coin_iron',
-	'1g': 'variedcommodities:coin_iron',
-	'2g': 'variedcommodities:coin_iron',
-	'5g': 'variedcommodities:money',
-	'10g': 'variedcommodities:money',
-	'20g': 'variedcommodities:money',
-	'50g': 'variedcommodities:money',
-	'100g': 'variedcommodities:money',
-	'200g': 'variedcommodities:money',
-	'500g': 'variedcommodities:money',
-	'1k': 'variedcommodities:plans',
-	'10k': 'variedcommodities:plans',
-	'100k': 'variedcommodities:plans',
-	'1m': 'variedcommodities:plans',
-};
 
 
 function genMoney(w, amount) {
@@ -42,9 +15,9 @@ function genMoney(w, amount) {
 		}
 		if(coincount > 0) {
 			var coinitem = w.createItem(_COINITEMS[coinams[i]], 0, coincount);
-			coinitem.setCustomName(ccs('&2&lMoney&r'));
+			coinitem.setCustomName(ccs(_COINITEMNAME));
 			coinitem.setLore([
-				ccs('&e'+coinams[i].toUpperCase())
+				ccs(_COINITEM_PREFIX+coinams[i].toUpperCase())
 			]);
 			nmItems.push(coinitem);
 		}
@@ -224,42 +197,8 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			//
 			tellPlayer(pl, "Logged");
 		}, 'debug'],
-		['!listEmotes [...matches]', function(pl, args, data){
-			var plo = new Player(pl.getName()).init(data);
-			var sb = pl.world.getScoreboard();
-			var showStr = "";
-			var showCount = 0;
-			var maxShowCount = 15;
-			var shown = 0;
-
-			tellPlayer(pl, "&l[=======] &6&lGramados Emotes&r &l[=======]");
-			tellPlayer(pl, "&6"+plo.getAllowedEmotes(sb, data).length+"/"+objArray(CHAT_EMOTES).length+" Unlocked.");
-			tellPlayer(pl, "&eUsage:&r :emoji_name:");
-			tellPlayer(pl, "&eHover emoji for info.");
-
-			for(var c in CHAT_EMOTES as ce) {
-				if(args.matches.length == 0 || arrayOccurs(c, args.matches) > 0) {
-					var ec = new Emote(c).init(data, false);
-
-					if(plo.hasEmote(c, sb, data)) {
-						showStr += "&r[:"+c+":] {suggest_command::/"+c+"/:|show_text::"+c+":\n$eName: $r$o"+c+"\n$aUNLOCKED}&r";
-					} else {
-						var lockStr = (ec.data.forSale ? "\n$cLOCKED\nUNLOCK FOR $e"+getAmountCoin(ec.data.price) : "\n$cLOCKED");
-						showStr += "&8[:"+c+":] {*|show_text::"+c+":\n$eName: $r$o"+c+lockStr+"}&r";
-					}
-					showCount++;
-					shown++;
-				}
-
-				if((shown >= objArray(CHAT_EMOTES).length || showCount >= maxShowCount) && showStr != "") {
-					tellPlayer(pl, showStr);
-					showStr = "";
-					showCount = 0;
-				}
-			}
-		}, 'listEmotes'],
 		['!command list [...matches]', function(pl, args, data){
-			tellPlayer(pl, "&l[=======] &6&lGramados Commands &l[=======]");
+			tellPlayer(pl, getTitleBar('Commands'));
 			for(c in _COMMANDS as cmd) {
 				var cmdm = getCommandNoArg(cmd.usage).trim();
 				if(args.matches.length == 0 || arrayOccurs(cmdm, args.matches, false, false)) {
@@ -271,7 +210,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			var argcmd = args.command.join(" ").trim();
 			for(c in _COMMANDS as cmd) {
 				if(getCommandName(cmd.usage) == argcmd) {
-					tellPlayer(pl, "&l[=======] &6&lGramados Command Info &r&l[=======]");
+					tellPlayer(pl, getTitleBar("Command Info"));
 					tellPlayer(pl, "&eCommand: &b"+getCommandNoArg(cmd.usage).trim());
 					tellPlayer(pl,
 						"&ePermission ID: &9&l"+

@@ -46,6 +46,14 @@ String.prototype.pad = function(character, len) {
 	return n;
 };
 
+String.prototype.fill = function(payload) {
+	str = this.toString();
+	for(p in payload as payl) {
+		str = str.split("{"+p+"}").join(payl);
+	}
+	return str;
+}
+
 String.prototype.padMiddle = function(character, len) {
 
 	var n = this.toString();

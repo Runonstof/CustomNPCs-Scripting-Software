@@ -27,11 +27,15 @@ var CHAT_EMOTES = {
 	"star": "\u2729",
 	"recycle": "\u267B",
 	"seagull": "\u932A",
+	//emoji
+	"cool": "\u9914",
+	"shocked": "\u9915",
+	"smile": "\u9916",
+	"joy": "\u9917",
+	"wink": "\u9918",
+	"happy": "\u9919",
+	"crazy": "\u991A",
 	//Misc
-	"lit": "\u9200",
-	"water": "\u920B",
-	"lava": "\u920E",
-	"portal": "\u920F",
 	"wifi5": "\u936A",
 	"wifi4": "\u936B",
 	"wifi3": "\u936C",
@@ -39,6 +43,35 @@ var CHAT_EMOTES = {
 	"wifi1": "\u936E",
 	"wifi0": "\u936F",
 	"lang": "\u935C",
+	"money": "\u932B",
+	"trin": "\u932D",
+	"unu": "\u932E",
+	"folder": "\u932F",
+	"thumbsup": "\u93F3",
+	"thumbsdown": "\u93F4",
+	"bomb": "\u93F5",
+	"hazard": "\u93F6",
+	"ying": "\u93F7",
+	"danger": "\u93F8",
+	"noperm": "\u93F9",
+	"gear": "\u93FA",
+	"stats": "\u93FB",
+	"medal_bronze": "\u99F0",
+	"medal_silver": "\u99F1",
+	"medal_gold": "\u99F2",
+	"medal_diamond": "\u99F3",
+	"medal_emerald": "\u99F4",
+	"unlock": "\u937E",
+	"lock": "\u937F",
+	//Arrows
+	"arrow_u": "\u9920",
+	"arrow_ur": "\u9921",
+	"arrow_r": "\u9922",
+	"arrow_dr": "\u9923",
+	"arrow_d": "\u9924",
+	"arrow_dl": "\u9925",
+	"arrow_l": "\u9926",
+	"arrow_ul": "\u9927",
 	//Mobs
 	"creeper": "\u92C0",
 	"ccreeper": "\u92C1",
@@ -73,7 +106,7 @@ var CHAT_EMOTES = {
 	"emerald": "\u90B8",
 	"nether_star": "\u90BD",
 
-	//blocks
+	//blocks items
 	"coal_ore": "\u9220",
 	"iron_ore": "\u9221",
 	"gold_ore": "\u9222",
@@ -93,6 +126,17 @@ var CHAT_EMOTES = {
 	"cactus": "\u9276",
 	"sponge": "\u927C",
 	"tnt": "\u927E",
+	"lit": "\u9200",
+	"water": "\u920B",
+	"lava": "\u920E",
+	"portal": "\u920F",
+
+
+	//Foods
+	"creamcookie": "\u932C",
+	"cookie": "\u90EB",
+	"cake": "\u90EC",
+	"ppie": "\u90ED",
 
 	//Weapons and tools
 	"wooden_sword": "\u9000",

@@ -11,13 +11,15 @@ function Player(name) {
 		"jobs": {},
 		"inventories": [],
 		"emotes": [],
-		"chatcolor": null,
+		"chatcodes": [],//Unlockables for color coding
+		"chatcolor": null,//Default chatcolor (NOT FOR UNLOCKS)
 		"chateffect": null,
 		"color": null,
 		"firstLogin": new Date().getTime(),
 		"lastLogin": 0,
 		"color": null,
 		"UUID": null,
+		"money": 0,
 	};
 	this.sync = function(ipl) {
 		this.data.UUID = ipl.getUUID();
@@ -195,24 +197,32 @@ function Player(name) {
 @block init_event
 	(function(e){
 		var pl = e.player;
-		var plo = new Player(pl.getName());
-		var data = pl.world.getStoreddata();
+		var w = pl.world;
+		var data = w.getStoreddata();
+		var plo = new Player(pl.getName()).init(data).sync(pl);
+		var sb = w.getScoreboard();
+		tellPlayer(pl, "["+SERVER_TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://www.dropbox.com/s/m1va7k2zeixgry0/GramadosResources.zip?dl=0|show_text$e$oDownload Resource Pack}&r&e to download.");
 
-		if(!plo.exists(data)) {
-			plo.save(data);
-		}
-		plo.load(data);
+	})(e);
+@endblock
+
+@block login_event
+	(function(e){
+		var pl = e.player;
+		var data = pl.world.getStoreddata();
+		var plo = new Player(pl.getName()).init(data).sync(pl);
+
 
 		var pchats = plo.getChats(data);
 		if(pchats.length == 0) {
-			tellPlayer(pl, "[&6&lGramados&r] &eYou are not in a chatchannel yet! &6&nClick here{run_command:!chat list|show_text:$6!chat list}&r&e to join one!");
+			tellPlayer(pl, "["+SERVER_TITLE+"&r] &eYou are not in a chatchannel yet! &6&nClick here{run_command:!chat list|show_text:$6!chat list}&r&e to join one!");
 		} else {
 			var tellchannels = "";
 			pchats.forEach(function(pc){
 				tellchannels += pc.getTag('{run_command:!chat leave '+pc.name+'|show_text:$eClick to leave channel.}')+'&r ';
 			});
 
-			tellPlayer(pl, "[&6&lGramados&r] &eYou are talking in channels: &r"+tellchannels);
+			tellPlayer(pl, "["+SERVER_TITLE+"&r] &eYou are talking in channels: &r"+tellchannels);
 		}
 
 		plo.data.lastLogin = new Date().getTime();
@@ -501,9 +511,54 @@ function Player(name) {
 
 
 		//PLAYER UTILITY
+		['!withdraw <amount>', function(pl, args, data){
+			var p = new Player(pl.getName()).init(data);
+			var w = pl.world;
+			var wamount = getCoinAmount(args.amount);
+			if(wamount <= p.data.money) {
+				var moneyItems = genMoney(w, wamount);
+				p.data.money -= wamount;
+				givePlayerItems(pl, moneyItems);
+				p.save(data);
+				tellPlayer(pl, "&aWithdrawed &r:money:&e"+getAmountCoin(wamount)+"&r&a from money pouch!");
+				return true;
+			} else {
+				tellPlayer(pl, "&cYou dont have that much money in your pouch!");
+			}
+			return false;
+		}, 'withdraw', [
+			{
+				"argname": "amount",
+				"type": "currency",
+				"min": 1,
+			}
+		]],
+		['!deposit', function(pl, args, data){
+			var p = new Player(pl.getName()).init(data);
+			var w = pl.world;
+			var mItem = pl.getMainhandItem();
+			if(isMoney(mItem, w)) {
+				var mval = getCoinAmount(mItem.getLore()[0]||"0C")*mItem.getStackSize();
+				pl.setMainhandItem(null);
+				p.data.money += mval;
+				tellPlayer(pl, "&aAdded &r:money:&e"+getAmountCoin(mval)+"&a to money pouch.&r [&2:money: Money Pouch{run_command:!myMoney|show_text:Click here or do $o!myMoney}&r]");
+				p.save(data);
+			} else {
+				tellPlayer(pl, "&cYou don't have valid money in your hand!");
+			}
+			return false;
+		}, 'deposit'],
 		['!myMoney', function(pl, args, data){
 			var pnbt = pl.getEntityNbt();
-			tellPlayer(pl, "&cYou carry a total of &e"+getAmountCoin(getMoneyItemCount(pnbt, pl.world)));
+			var p = new Player(pl.getName()).init(data);
+			var mp = getAmountCoin(p.data.money);
+			var mi = getAmountCoin(getMoneyItemCount(pnbt, pl.world));
+			var total = getAmountCoin(p.data.money+getMoneyItemCount(pnbt, pl.world));
+			tellPlayer(pl, getTitleBar('Money Pouch'));
+			tellPlayer(pl, ":danger: &6&oYou will also lose this money on death!&r :danger:");
+			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+mp);
+			tellPlayer(pl, "&6Inventory: &r:money:&e"+mi);
+			tellPlayer(pl, "&cYou carry a total of &r:money:&e"+total);
 			return true;
 		}, 'myMoney'],
 		['!myIncome', function(pl, args, data){
@@ -544,6 +599,58 @@ function Player(name) {
 
 			return true;
 		}, 'myStats'],
+		['!myEmotes [...matches]', function(pl, args, data){
+			var plo = new Player(pl.getName()).init(data);
+			var sb = pl.world.getScoreboard();
+			var showStr = "";
+			var showEmotes = [];
+			var unlocked = [];
+			var showWidth = 10;
+
+			for(var c in CHAT_EMOTES as ce) {
+				if(args.matches.length == 0 || arrayOccurs(c, args.matches, false, false) > 0) {
+					var ec = new Emote(c).init(data, false);
+					showEmotes.push(ec);
+					if(plo.hasEmote(ec.name, sb, data)) {
+						unlocked.push(ec);
+					}
+				}
+			}
+
+			tellPlayer(pl, getTitleBar('Emotes'));
+			tellPlayer(pl, "&6"+unlocked.length+"/"+showEmotes.length+" Unlocked.");
+			tellPlayer(pl, "&eHover emoji for info.");
+			var tellStr = "";
+			for(var i in showEmotes as em) {
+				var plHas = plo.hasEmote(em.name, sb, data);
+				var plHasPerm = em.getPermission().init(data, false).permits(plo.name, sb, data);
+				var infoStr = ":"+em.name+":\n$eName: $r"+em.name+"\n";
+				var lockStr = (
+					em.data.default ?
+						"$6$lDEFAULT EMOTE$r":
+						(plHasPerm ?
+							"$5$lUNLOCKED WITH PERM$r":
+							(plHas ?
+								"$a$lUNLOCKED$r":
+								"$c$lLOCKED$r"
+							)
+						)
+					);
+				var sellStr = (plHas ? "" : (!em.data.forSale ? "\n$cThis emote is not for sale." : "\n$cClick to buy "+em.name+" for $r:money:$e"+getAmountCoin(em.data.price)));
+
+				if(em.data.hidden && !plHas) { continue; }
+
+				tellStr += (plHas ? "&r":"&8")+"[:"+em.name+":]{*|show_text:"+infoStr+lockStr+sellStr+"}&r ";
+				if(parseInt(i) > 0 && (parseInt(i)+1) % showWidth === 0) {
+					tellStr += "\n";
+				}
+
+
+			}
+
+			tellPlayer(pl, tellStr);
+
+		}, 'myEmotes'],
 		['!setHome <name>', function(pl, args){
 			var plo = new Player(pl.getName());
 			var data = pl.world.getStoreddata();
@@ -576,7 +683,7 @@ function Player(name) {
 			}
 			return false;
 		}, 'delHome'],
-		['!listHomes', function(pl, args){
+		['!myHomes', function(pl, args){
 			var plo = new Player(pl.getName());
 			var data = pl.world.getStoreddata();
 			plo.load(data);
@@ -591,7 +698,7 @@ function Player(name) {
 			}
 
 			return false;
-		}, 'listHomes'],
+		}, 'myHomes'],
 		['!home <name>', function(pl, args){
 			var plo = new Player(pl.getName());
 			var data = pl.world.getStoreddata();
