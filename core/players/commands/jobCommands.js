@@ -9,7 +9,7 @@ function Job(name) {
 		"fireTime": getStringTime('1w'),
 		"companyId": null
 	};
-	
+
 	this.getPlayers = function(data) {
 		var pl = [];
 		var dkeys = data.getKeys();
@@ -22,10 +22,10 @@ function Job(name) {
 				}
 			}
 		}
-		
+
 		return pl;
 	};
-	
+
 	this.getDisplayName = function(data) {
 		if(typeof(data) == typeof(undefined)) {
 			return this.data.displayName+'&r';
@@ -33,7 +33,7 @@ function Job(name) {
 			return this.getStatusColor(data)+this.data.displayName+'&r';
 		}
 	}
-	
+
 	this.getStatusColor = function(data) {
 		if(this.data.capacity == -1) {
 			return '&a';
@@ -89,7 +89,7 @@ function Job(name) {
 			var amount = getCoinAmount(args.amount);
 			job.data.pay = amount;
 			job.save(data);
-			tellPlayer(pl, "&aSet the salary of job '"+job.getDisplayName(data)+"&a' to "+getAmountCoin(amount)+"!");
+			tellPlayer(pl, "&aSet the salary of job '"+job.getDisplayName(data)+"&a' to &r:money:&e"+getAmountCoin(amount)+"&a!");
 		}, 'jobs.setPay', [
 			{
 				"argname": "name",
@@ -124,7 +124,7 @@ function Job(name) {
 		['!jobs setOpen <name> <open>', function(pl, args){
 			var job = new Job(args.name);
 			var data = pl.world.getStoreddata();
-			job.load(data);		
+			job.load(data);
 			job.data.isOpen = (args.open == 'true');
 			job.save(data);
 			tellPlayer(pl, "&aSet if job '"+job.getDisplayName(data)+"&a' is open to "+args.open);
@@ -168,12 +168,12 @@ function Job(name) {
 							isMatch = true;
 						}
 					});
-					
+
 					if(args.matches.length == 0 || isMatch) {
 						job.load(data);
 						tellPlayer(pl, "&e - &r"+job.getStatusColor(data)+escCcs(job.getDisplayName())+"&r (&9&o"+job.name+"&r)");
 					}
-					
+
 				}
 			}
 			return true;

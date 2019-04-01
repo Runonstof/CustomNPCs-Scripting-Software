@@ -1,6 +1,6 @@
 //===== CONFIG
 var SERVER_NAME = "Gramados";
-var SERVER_PREFIX = "&c&l"; //Color for output
+var SERVER_PREFIX = "&6&l"; //Color for output
 var DEFAULT_TEAMS = [ //Default scoreboard teams that gets added when permission is created
 	"Owner",
 	"Developer"
@@ -13,8 +13,8 @@ var DEFAULT_PLAYERS = [ //Default players that gets added when permission is cre
 var DEFAULT_TEAM_JOIN = "Player";
 //var DEFAULT_TEAM_JOIN = null;
 
-var SERVER_BAR_OPEN = "&r&a&l<-=&e&l===&6&l==] &r"; //For output
-var SERVER_BAR_CLOSE = "&r&6&l [==&e&l===&a&l=->&r";
+var SERVER_BAR_OPEN = "&r&l<-=======] &r"; //For output
+var SERVER_BAR_CLOSE = "&r&l [=======->&r";
 var BAR_OPEN = "&l[";
 var BAR_CLOSE = "&l]";
 
@@ -24,7 +24,7 @@ var _COINITEM_PREFIX = '&e'; //Prefix showing before money value lore (used for 
 
 //Configure your own currency units
 //Units of currency, with own names, with lowest unit being 1
-var _COINTABLE = {
+var _COINTABLE = {//FROM LOW TO HIGH
 	'c': 1,
 	'g': 100,
 	'k': 100000,
@@ -33,7 +33,8 @@ var _COINTABLE = {
 }; //With this setup, the syntax for 223503 would be 2k235g3c (case-INSensitive)
 
 //Your money items, and their values in money syntax
-var _COINITEMS = {
+//"value": "item_id",
+var _COINITEMS = { //FROM LOW TO HIGH
 	'1c': 'variedcommodities:coin_iron',
 	'5c': 'variedcommodities:coin_iron',
 	'10c': 'variedcommodities:coin_iron',
@@ -73,7 +74,8 @@ var msTable = {
 //LANGUAGE settings
 var _MSG = {
 
-	//Error messages for command arguments
+	"cmdNotFound": "&cCould not find this command!",
+	"cmdNoPerm": "&cYou don't have permission to this command!",
 	"argNotValid": "&c'{argName}' is not a valid id/name! It can only contain: &o{allowed}",
 	"argToShort": "&c'{argName}' is too short! (Min. {allowed} characters)",
 	"argToShort": "&c'{argName}' is too long! (Max. {allowed} characters)",
@@ -83,6 +85,11 @@ var _MSG = {
 	"argMax": "&c'{argName}' cannot be bigger than {allowed}!",
 	"argMin": "&c'{argName}' cannot be smaller than {allowed}!",
 	"argNotExists": "&c{dataType} '{argVal}' does not exists!",
+	"argExists": "&c{dataType} '{argVal}' already exists!",
+	"argColor": "&cColors must be one of the following: {allowed}!",
+	"argColorEffect": "&cChat effects must be one of the following: {allowed}!",
+	"argItemAttr": "&cItem attributes must be one of these {allowed}!",
+	"argBool": "&c{dataType} must be true or false!",
 	"undoBtnText": "&5&lUNDO",
 };
 

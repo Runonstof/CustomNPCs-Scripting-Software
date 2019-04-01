@@ -2,13 +2,13 @@
 	registerXCommands([
 		['!item renameLore <slot> [...lore]', function(pl, args){
 			var mItem = pl.getMainhandItem();
-			
+
 			if(!mItem.isEmpty()) {
 				var newLoreStr = args.lore.join(' ');
 				var newLore = objArray(mItem.getLore());
 				var s = parseInt(args.slot) || 0;
 				if(s < newLore.length) {
-					newLore[s] = ccs(newLoreStr);
+					newLore[s] = parseEmotes(ccs(newLoreStr));
 				} else {
 					newLore.push(ccs(newLoreStr));
 				}
@@ -17,25 +17,25 @@
 			} else {
 				tellPlayer(pl, "&cYou don't have anything in your hand!");
 			}
-			
+
 			return false;
 		}, 'item.renameLore'],
 		['!item rename <...name>', function(pl, args){
 			var mItem = pl.getMainhandItem();
-			
+
 			if(!mItem.isEmpty()) {
 				var newName = args.name.join(' ');
-				mItem.setCustomName(ccs(newName));
+				mItem.setCustomName(parseEmotes(ccs(newName)));
 				return true;
 			} else {
 				tellPlayer(pl, "&cYou don't have anything in your hand!");
 			}
-			
+
 			return false;
 		}, 'item.rename'],
 		['!item setAttr <slot> <attribute> <value>', function(pl, args){
 			var mItem = pl.getMainhandItem();
-			
+
 			if(!mItem.isEmpty()) {
 				mItem.setAttribute(args.attribute, parseFloat(args.value/1000), parseInt(args.slot));
 				tellPlayer(pl, "&aSet "+args.attribute+" to "+args.value+"%!");
@@ -43,7 +43,7 @@
 			} else {
 				tellPlayer(pl, "&cYou don't have anything in your hand!");
 			}
-			
+
 			return false;
 		}, 'item.setAttr', [
 			{
@@ -62,6 +62,6 @@
 				"min": 0,
 			}
 		]],
-		
+
 	]);
 @endblock

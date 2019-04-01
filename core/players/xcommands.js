@@ -375,7 +375,10 @@ function executeXCommand(str, player) {
 								switch(rule.type) {
 									case 'id': {
 										if(arg.replace(/([A-Za-z0-9_\-\.])/g, '') != '') {
-											tellPlayer(player, errpref+"&c'"+rulename+"' is not a valid id/name (A-Za-z0-9_)!"+errsuff);
+											tellPlayer(player, errpref+_MSG["argNotValid"].fill({
+												"argName": rulename,
+												"allowed": "A-Za-z0-9_-:D"
+											})+errsuff);
 											return false;
 										}
 										//Run case 'string'

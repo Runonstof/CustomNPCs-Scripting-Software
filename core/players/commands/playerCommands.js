@@ -244,7 +244,7 @@ function Player(name) {
 				for(p in pm as pii) {
 					pl.giveItem(pii);
 				}
-				tellPlayer(pl, "&aYou have earned "+getAmountCoin(plo.data.pay)+"!");
+				tellPlayer(pl, "&aYou have earned &r:money:&e"+getAmountCoin(plo.data.pay)+"&a!");
 				plo.data.lastPayed = new Date().getTime();
 				plo.save(data);
 			}
@@ -269,7 +269,7 @@ function Player(name) {
 					for(p in pm as pii) {
 						pl.giveItem(pii);
 					}
-					tellPlayer(pl, "&aYou have earned "+getAmountCoin(jobpay)+" from job '"+job.getDisplayName(data)+"'&r&a!");
+					tellPlayer(pl, "&aYou have earned &r:money:&e"+getAmountCoin(jobpay)+"&a from job '"+job.getDisplayName(data)+"'&r&a!");
 					plo.data.jobs[j].lastPayed = now;
 					plo.save(data);
 				}
@@ -322,7 +322,7 @@ function Player(name) {
 
 			p.data.pay = am;
 			p.save(data);
-			tellPlayer(pl, "&aSet pay amount of player '"+p.name+"' to "+getAmountCoin(am)+'!');
+			tellPlayer(pl, "&aSet pay amount of player '"+p.name+"' to &r:money:&e"+getAmountCoin(am)+'&a!');
 
 			return true;
 		}, 'player.setPay', [
@@ -537,7 +537,7 @@ function Player(name) {
 			var p = new Player(pl.getName()).init(data);
 			var w = pl.world;
 			var mItem = pl.getMainhandItem();
-			if(isMoney(mItem, w)) {
+			if(isItemMoney(mItem, w)) {
 				var mval = getCoinAmount(mItem.getLore()[0]||"0C")*mItem.getStackSize();
 				pl.setMainhandItem(null);
 				p.data.money += mval;
@@ -551,14 +551,15 @@ function Player(name) {
 		['!myMoney', function(pl, args, data){
 			var pnbt = pl.getEntityNbt();
 			var p = new Player(pl.getName()).init(data);
-			var mp = getAmountCoin(p.data.money);
-			var mi = getAmountCoin(getMoneyItemCount(pnbt, pl.world));
-			var total = getAmountCoin(p.data.money+getMoneyItemCount(pnbt, pl.world));
+			var mp = p.data.money;
+			var mi = getMoneyItemCount(pnbt, pl.world);
+			var total = mp+mi;
 			tellPlayer(pl, getTitleBar('Money Pouch'));
-			tellPlayer(pl, ":danger: &6&oYou will also lose this money on death!&r :danger:");
-			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+mp);
-			tellPlayer(pl, "&6Inventory: &r:money:&e"+mi);
-			tellPlayer(pl, "&cYou carry a total of &r:money:&e"+total);
+			tellPlayer(pl, ":danger: &6&oYou will lose 50% of your money pouch on death.&r :danger:");
+			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(mp));
+			tellPlayer(pl, "&6Inventory: &r:money:&e"+getAmountCoin(mi));
+			tellPlayer(pl, "&cYou carry a total of &r:money:&e"+getAmountCoin(total));
+			tellPlayer(pl, "&6You will lose &r:money:&e"+getAmountCoin(mi+Math.round(mp/2))+"&6 on death!");
 			return true;
 		}, 'myMoney'],
 		['!myIncome', function(pl, args, data){

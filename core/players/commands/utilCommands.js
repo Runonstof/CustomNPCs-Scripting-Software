@@ -197,6 +197,38 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			//
 			tellPlayer(pl, "Logged");
 		}, 'debug'],
+		['!sign edit <line> [...text]', function(pl, args, data){
+			var rt = pl.rayTraceBlock(16, false, false);
+			var rtb = rt.getBlock();
+			//is sign
+			if(["minecraft:wall_sign", "minecraft:standing_sign"].indexOf(rtb.getName()) > -1 && rtb.hasTileEntity()) {
+				var rnbt = rtb.getTileEntityNBT();
+				var newTxt = parseEmotes(strf(args.text.join(" ")));
+				rnbt.setString("Text"+args.line.toString(), newTxt);
+				rtb.setTileEntityNBT(rnbt);
+
+				//==TEMPORARY: force block update
+				//==Removed when Noppes includes updating in setTileEntityNBT
+				meta = rtb.getMetadata();
+				rtb.setMetadata(0);
+				rtb.setMetadata(1);
+				rtb.setMetadata(meta);
+				//==
+
+				tellPlayer(pl, "&aEdited line #"+args.line.toString()+" of sign!");
+			} else {
+				tellPlayer(pl, "&cYou are not looking at a sign!");
+			}
+
+			return false;
+		}, 'sign.edit', [
+			{
+				"argname": "slot",
+				"type": "number",
+				"min": 1,
+				"max": 4,
+			},
+		]],
 		['!command list [...matches]', function(pl, args, data){
 			tellPlayer(pl, getTitleBar('Commands'));
 			for(c in _COMMANDS as cmd) {

@@ -1,4 +1,3 @@
-
 var UNI = [
 	'0',
 	'1',
@@ -168,5 +167,9 @@ var CHAT_EMOTES = {
 	"diamond_shovel": "\u9017",
 	"diamond_axe": "\u9018",
 	"diamond_hoe": "\u9019",
+
+
+	//Emotes that *should not be* public
+	"box": "\u2B1B",
 
 };

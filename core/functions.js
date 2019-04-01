@@ -617,7 +617,7 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 		pc += '}';
 
 
-		txt+=','+pc.toString();
+		txt+=( fullraw ? ',' : '' )+pc.toString();
 	}
 
 	if(fullraw) {
