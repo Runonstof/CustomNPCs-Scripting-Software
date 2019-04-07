@@ -13,6 +13,8 @@ function Player(name) {
 		"emotes": [],
 		"chatcodes": [],//Unlockables for color coding
 		"chatcolor": null,//Default chatcolor (NOT FOR UNLOCKS)
+		"badges": [],
+		"showbadge": null,
 		"chateffect": null,
 		"color": null,
 		"firstLogin": new Date().getTime(),
@@ -201,8 +203,14 @@ function Player(name) {
 		var data = w.getStoreddata();
 		var plo = new Player(pl.getName()).init(data).sync(pl);
 		var sb = w.getScoreboard();
-		tellPlayer(pl, "["+SERVER_TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://www.dropbox.com/s/m1va7k2zeixgry0/GramadosResources.zip?dl=0|show_text$e$oDownload Resource Pack}&r&e to download.");
 
+		if(!sb.hasObjective("bounty")) {
+			sb.addObjective("bounty", "dummy");
+		}
+		var sbbounty = sb.getObjective("bounty");
+		if(!sbbounty.hasScore(pl.getName())) {
+			sbbounty.createScore(pl.getName()).setValue(0);
+		}
 	})(e);
 @endblock
 
@@ -227,6 +235,46 @@ function Player(name) {
 
 		plo.data.lastLogin = new Date().getTime();
 		plo.save(data);
+	})(e);
+@endblock
+
+@block died_event
+	(function(e){
+		var pl = e.player;
+		var data = pl.world.getStoreddata();
+		var plo = new Player(pl.getName()).init(data).sync(pl);
+		var w = pl.world;
+		var sb = w.getScoreboard();
+		if(e.source != null) { //has source
+			if(e.source.getType() == 1) { //Is source a player
+				if(e.source.getName() != pl.getName()) {
+					var objbounty = sb.getObjective("bounty");
+					if(objbounty != null) {
+						var pscore = objbounty.getScore(pl.getName());
+						var pbounty =pscore.getValue()
+
+						if(pbounty > 0) {
+							var sco = new Player(e.source.getName()).init(data, false);
+							executeCommand(pl, "/tellraw @a "+parseEmotes(strf(sco.getNameTag(sb)+"&a received &r:money:&e"+getAmountCoin(pbounty)+"&a for killing "+pl.getName()+"!")));
+							givePlayerItems(e.source, genMoney(w, pbounty));
+							pscore.setValue(0);
+						}
+					}
+				}
+			}
+		}
+		var loseMoney = Math.ceil(plo.data.money/2);
+		if(loseMoney > 0) {
+			plo.data.money -= loseMoney;
+			var lm = genMoney(w, loseMoney);
+			for(l in lm as lsm) {
+				pl.dropItem(lsm);
+			}
+			plo.save(data);
+			tellPlayer(pl, "&cYou lost &r:money:&e"+getAmountCoin(loseMoney)+"&c from your money pouch!");
+		}
+
+
 	})(e);
 @endblock
 
@@ -494,10 +542,13 @@ function Player(name) {
 		['!player info <player>', function(pl, args, data){
 			var p = new Player(args.player).init(data);
 			var sb = pl.world.getScoreboard();
+			var po = null;
+			tellPlayer(pl, getTitleBar("Player Info", false));
 			tellPlayer(pl, "&e&lPlayer Info For: &r"+p.getNameTag(sb));
 			var now = new Date().getTime();
 			tellPlayer(pl, "&eFirst Login: &6&o"+getTimeString(now - p.data.firstLogin, ['ms'])+"&r &eago.");
 			tellPlayer(pl, "&eLast Login: &6&o"+getTimeString(now - p.data.lastLogin, ['ms'])+"&r &eago.");
+			tellPlayer(pl, "");
 			return true;
 		}, 'player.info', [
 			{
@@ -511,6 +562,78 @@ function Player(name) {
 
 
 		//PLAYER UTILITY
+		['!nickname <player> <name>', function(pl, args, data){
+			pl.setName(args.name);
+		}, 'nickname'],
+		['!bounty add <player> <amount>', function(pl, args, data){
+			var plo = new Player(pl.getName()).init(data);
+			var tplo = new Player(args.player).init(data);
+			var ba = getCoinAmount(args.amount);
+			var w = pl.world;
+			var sb = w.getScoreboard();
+			var sbo = sb.getObjective("bounty");
+			if(sbo != null) {
+				if(plo.data.money >= ba) {
+					plo.data.money -= ba;
+					var btax = Math.ceil(ba/100*5);
+					var nb = ba-btax;
+					if(sbo.hasScore(args.player)) {
+						sbo.getScore(args.player).setValue(sbo.getScore(args.player).getValue()+ba);
+					} else {
+						sbo.createScore(args.player).setValue(ba);
+					}
+					plo.save(data);
+					tellPlayer(pl, "&r:money:&e"+getAmountCoin(btax)+"&a has been taken as bounty tax!")
+					if(tplo.name != plo.name) {
+						executeCommand(pl, "/tellraw @a "+parseEmotes(strf(plo.getNameTag(sb)+"&a has put a bounty of &r:money:&e"+getAmountCoin(nb)+"&a on &r"+tplo.getNameTag(sb)+"&a!")));
+					} else {
+						executeCommand(pl, "/tellraw @a "+parseEmotes(strf(plo.getNameTag(sb)+"&a is so stupid, he gave himself a bounty of &r:money:&e"+getAmountCoin(nb)+"&a!")));
+					}
+
+				} else {
+					tellPlayer(pl, "&cYou don't have enough money in your pouch to add the bounty!&r [&2Money Pouch{run_command:!myMoney}&r]");
+				}
+			} else {
+				tellPlayer(pl, "&cScoreboard objective 'bounty' does not exists!");
+			}
+
+		}, 'bounty.add', [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true,
+			},
+			{
+				"argname": "amount",
+				"type": "currency",
+				"min": 0,
+			},
+		]],
+		['!topBounty', function(pl, args, data){
+			var sb = pl.world.getScoreboard();
+			var bo = sb.getObjective("bounty");
+			var scores = [];
+			if(bo != null) {
+				var bos = bo.getScores();
+				for(b in bos as bscore) {
+					scores.push({
+						name: bscore.getPlayerName(),
+						value: bscore.getValue(),
+					});
+				}
+			}
+			scores = scores.sort(function(a,b){
+				return b.value-a.value;
+			});
+			tellPlayer(pl, getTitleBar("Top Bounties"))
+			for(s in scores as score) {
+				var spl = new Player(score.name);
+				spl.load(data);
+				var pnum = parseInt(s)+1;
+				tellPlayer(pl, " - "+pnum+". "+spl.getNameTag(sb)+"&r :money:&e"+getAmountCoin(score.value));
+			}
+		}, 'topBounty', []],
 		['!withdraw <amount>', function(pl, args, data){
 			var p = new Player(pl.getName()).init(data);
 			var w = pl.world;
@@ -555,11 +678,11 @@ function Player(name) {
 			var mi = getMoneyItemCount(pnbt, pl.world);
 			var total = mp+mi;
 			tellPlayer(pl, getTitleBar('Money Pouch'));
-			tellPlayer(pl, ":danger: &6&oYou will lose 50% of your money pouch on death.&r :danger:");
-			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(mp));
-			tellPlayer(pl, "&6Inventory: &r:money:&e"+getAmountCoin(mi));
+			tellPlayer(pl, ":danger: &4&oYou will lose 50% of your money pouch on death.&r :danger:");
+			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(mp)+"&r [&aWithdraw{suggest_command:!withdraw }&r]");
+			tellPlayer(pl, "&6Inventory: &r:money:&e"+getAmountCoin(mi)+"&r [&aDeposit{run_command:!deposit}&r]");
 			tellPlayer(pl, "&cYou carry a total of &r:money:&e"+getAmountCoin(total));
-			tellPlayer(pl, "&6You will lose &r:money:&e"+getAmountCoin(mi+Math.round(mp/2))+"&6 on death!");
+			tellPlayer(pl, "&9You will lose &r:money:&e"+getAmountCoin(mi+Math.round(mp/2))+"&9 on death!");
 			return true;
 		}, 'myMoney'],
 		['!myIncome', function(pl, args, data){
@@ -638,10 +761,10 @@ function Player(name) {
 						)
 					);
 				var sellStr = (plHas ? "" : (!em.data.forSale ? "\n$cThis emote is not for sale." : "\n$cClick to buy "+em.name+" for $r:money:$e"+getAmountCoin(em.data.price)));
-
+				var descStr = (em.data.desc != "" ? em.data.desc.replaceAll('&', '$')+"\n" : "");
 				if(em.data.hidden && !plHas) { continue; }
 
-				tellStr += (plHas ? "&r":"&8")+"[:"+em.name+":]{*|show_text:"+infoStr+lockStr+sellStr+"}&r ";
+				tellStr += (plHas ? "&r":"&8")+"[:"+em.name+":]{*|show_text:"+infoStr+descStr+lockStr+sellStr+"}&r ";
 				if(parseInt(i) > 0 && (parseInt(i)+1) % showWidth === 0) {
 					tellStr += "\n";
 				}
@@ -690,8 +813,9 @@ function Player(name) {
 			plo.load(data);
 			if(Object.keys(plo.data.homes).length > 0) {
 				tellPlayer(pl, "&l[=======] &6&lGramados Homes &r&l[=======]");
+				tellPlayer(pl, "[&a:check: Add{suggest_command:!setHome }&r]");
 				for(i in plo.data.homes as home) {
-					tellPlayer(pl, "&e - &9&o"+i+"{run_command:!home "+i+"}&r&e (X: &c"+home.x+"&e,Y: &c"+home.y+"&e,Z: &c"+home.z+"&e)&r");
+					tellPlayer(pl, "&e - &9&o"+i+"&r&r [&bTeleport{run_command:!home "+i+"|show_text:Click to TP\n$eX:$c"+home.x+" $eY:$c"+home.y+" $eZ:$c"+home.z+" }&r] [&c:cross: Remove{run_command:!delHome "+i+"|show_text:Click to remove home.}&r]");
 				}
 				return true;
 			} else {

@@ -1,7 +1,7 @@
 function ChatChannel(name) {
 	extends function DataHandler('chatchannel', name);
 	extends function Permittable; //add getPermission etc
-	
+
 	this.data = {
 		"displayName": name,
 		"players": [],
@@ -85,27 +85,27 @@ function getColorPermId(colorId) {
 				pperm.save(data);
 			}
 		}
-		
+
 	})(e);
-	
+
 	//END GEN PLAYER PERMISSIONS
 @endblock
 
 @block register_commands_event
 	//REGISTER CHAT CHANNEL COMMANDS
-	
+
 	registerXCommands([
 		//['', function(pl, args){}, ''],
 		['!chat create <name>', function(pl, args){
 			var data = pl.world.getStoreddata();
 			var cc = new ChatChannel(args.name);
-		
+
 			var ccp = cc.getPermission(data);
 			ccp.data.enabled = false;
 			ccp.save(data);
 			cc.save(data);
 			tellPlayer(pl, "&aCreated chat channel '"+cc.name+"'!");
-		
+
 			return false;
 		}, 'chat.create', [
 			{
@@ -124,7 +124,7 @@ function getColorPermId(colorId) {
 			var cc = new ChatChannel(args.name);
 			cc.remove(data);
 			tellPlayer(pl, "&aRemoved chat channel '"+cc.name+"'!");
-			
+
 			return false;
 		}, 'chat.remove', [
 			{
@@ -150,10 +150,10 @@ function getColorPermId(colorId) {
 								offPlayers.push(cpl);
 							}
 						}
-						var onlineText = "$eOnline Players:&r\n"+
-							onlinePlayers.join(" ")+
-							"$eOffline Players:$r "+
-							offPlayers.join(" ");
+						var onlineText = "$eOnline Players:$r\n"+
+							onlinePlayers.join("\n")+
+							"\n$eOffline Players:$r\n"+
+							offPlayers.join("\n");
 						var ontxt = "&r&e"+onlinePlayers.length+"/"+cc.data.players.length+" Online{*|show_text:"+onlineText+"}&r";
 						var opttxt = (cc.data.players.indexOf(pl.getName()) > -1 ? "&c&nLeave{run_command:!chat leave "+cc.name+"}&r":"&a&nJoin{run_command:!chat join "+cc.name+"}&r");
 						tellPlayer(pl, cc.getTag()+"&r ("+cc.name+") "+opttxt+" "+ontxt);
@@ -183,7 +183,7 @@ function getColorPermId(colorId) {
 		]],
 		['!chat setDisplayName <name> [...displayName]', function(pl, args, data){
 			var cc = new ChatChannel(args.name).init(data);
-			
+
 			cc.data.displayName = (args.displayName.length > 0 ? args.displayName.join(' ') : cc.name);
 			cc.save(data);
 			tellPlayer(pl, '&aSet display name to: '+cc.getName());
@@ -230,8 +230,8 @@ function getColorPermId(colorId) {
 				} else {
 					tellPlayer(pl, "&cYou are already in this chat!");
 				}
-				
-				
+
+
 			} else {
 				tellPlayer(pl, "&cYou are not allowed to join this channel!");
 			}
@@ -247,7 +247,7 @@ function getColorPermId(colorId) {
 		['!chat leave <name>', function(pl, args, data){
 			var cc = new ChatChannel(args.name).init(data);
 			var plo = new Player(pl.getName()).init(data);
-			
+
 			if(cc.data.players.indexOf(pl.getName()) > -1) {
 				cc.data.players = removeFromArray(cc.data.players, pl.getName());
 				cc.save(data);

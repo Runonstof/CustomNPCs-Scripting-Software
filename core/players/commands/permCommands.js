@@ -236,12 +236,19 @@ function Permission(name) {
 			var w = pl.world;
 			var data = w.getStoreddata();
 			var ids = new Permission().getAllDataIds(data);
+			var maxShow = 15;
+			var curShow = 0;
 			if(ids.length > 0) {
-				tellPlayer(pl, getTitleBar("Homes"));
+				tellPlayer(pl, getTitleBar("Permission List"));
 				for(i in ids as id) {
-					if(args.matches.length == 0 || arrayOccurs(id, args.matches, false, false)) {
+					if(args.matches.length == 0 || arrayOccurs(id, args.matches, false, false) && curShow < maxShow) {
 						tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!perms info "+id+"}&r) (&c:cross: Remove{run_command:!perms remove "+id+"}&r)");
 					}
+					curShow++;
+				}
+				if(curShow >= maxShow) {
+					var showMore = (curShow - maxShow);
+					tellPlayer(pl, "&6"+showMore+"&e more results, use specific matches.");
 				}
 			} else {
 				tellPlayer(pl, "&cThere are no registered permissions");

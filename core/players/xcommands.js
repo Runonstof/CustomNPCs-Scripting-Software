@@ -18,13 +18,29 @@ import core\players\commands\*.js;
 	yield interact_event;
 @endblock
 
+@block blockinteract_event
+	yield blockinteract_event;
+@endblock
+
 @block broken_event
 	yield broken_event;
+@endblock
+
+@block build_event
+	yield build_event;
 @endblock
 
 @block attack_event
 	yield attack_event;
 @endblock
+
+@block died_event
+	yield died_event;
+@endblock
+
+function queryDataHandlers(qry) {
+
+}
 
 function DataHandler(type, name) {
 	this.type = type;

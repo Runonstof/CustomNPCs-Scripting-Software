@@ -92,7 +92,89 @@ function Region(name) {
 	}
 }
 
+function normalizePos(pos) {
+	return [
+		pos.getX(),
+		pos.getY(),
+		pos.getZ(),
+	];
+}
+
+@block blockinteract_event
+	if(!e.isCanceled()) {
+		var pl = e.player;
+		var w = pl.world;
+		var data = w.getStoreddata();
+		var sb = w.getScoreboard();
+		var regids = new Region().getAllDataIds(data);
+		for(ri in regids as regid) {
+			var reg = new Region(regid);
+			reg.load(data);
+			var inRegion = reg.hasCoord(normalizePos((e.target==null?e.player:e.target).getPos()));
+			if(inRegion) {
+				var regperm = reg.getPermission();
+				regperm.load(data);
+
+				if(!regperm.permits(pl.getName(), sb, data) && reg.owner != pl.getName()) {
+					tellPlayer(pl, "&cYou don't have permission to interact here!");
+					e.setCanceled(true);
+					break;
+				}
+			}
+		}
+
+	}
+@endblock
+
 @block broken_event
+	var pl = e.player;
+	var w = pl.world;
+	var data = w.getStoreddata();
+	var sb = w.getScoreboard();
+	var regids = new Region().getAllDataIds(data);
+	for(ri in regids as regid) {
+		var reg = new Region(regid);
+		reg.load(data);
+		var inRegion = reg.hasCoord(normalizePos(e.block.getPos()));
+		if(inRegion) {
+			var regperm = reg.getPermission();
+			regperm.load(data);
+
+			if(!regperm.permits(pl.getName(), sb, data) && reg.owner != pl.getName()) {
+				tellPlayer(pl, "&cYou don't have permission to break here!");
+				e.setCanceled(true);
+				break;
+			}
+		}
+	}
+
+	//
+
+@endblock
+
+@block build_event
+	var pl = e.player;
+	var w = pl.world;
+	var data = w.getStoreddata();
+	var sb = w.getScoreboard();
+	var regids = new Region().getAllDataIds(data);
+	for(ri in regids as regid) {
+		var reg = new Region(regid);
+		reg.load(data);
+		var inRegion = reg.hasCoord(normalizePos(e.target.getPos()));
+		if(inRegion) {
+			var regperm = reg.getPermission();
+			regperm.load(data);
+
+			if(!regperm.permits(pl.getName(), sb, data) && reg.owner != pl.getName()) {
+				tellPlayer(pl, "&cYou don't have permission to build here!");
+				e.setCanceled(true);
+				break;
+			}
+		}
+	}
+
+	//
 
 @endblock
 

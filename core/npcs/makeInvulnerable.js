@@ -8,5 +8,6 @@
 		stats.setImmune(3, true);
 		stats.setImmune(4, true);
 		stats.setImmune(5, true);
+		e.npc.addPotionEffect(1, 99999, 100, true);
 	})(e);
 @endblock

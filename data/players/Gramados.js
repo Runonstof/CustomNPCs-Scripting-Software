@@ -1,75 +1,6 @@
-//===== CONFIG
-var SERVER_NAME = "Gramados";
-var SERVER_PREFIX = "&6&l"; //Color for output
-var DEFAULT_TEAMS = [ //Default scoreboard teams that gets added when permission is created
-	"Owner",
-	"Developer"
-];
-var DEFAULT_PLAYERS = [ //Default players that gets added when permission is created
+import core\config\*.js;
 
-];
-//Team that player autojoins when player has no team
-//set to null to disable
-var DEFAULT_TEAM_JOIN = "Player";
-//var DEFAULT_TEAM_JOIN = null;
 
-var SERVER_BAR_OPEN = "&r&l<-=======] &r"; //For output
-var SERVER_BAR_CLOSE = "&r&l [=======->&r";
-var BAR_OPEN = "&l[";
-var BAR_CLOSE = "&l]";
-
-//Currency settings
-var _COINITEMNAME = '&2&lMoney&r';//Custom name of currency
-var _COINITEM_PREFIX = '&e'; //Prefix showing before money value lore (used for color coding)
-
-//Configure your own currency units
-//Units of currency, with own names, with lowest unit being 1
-var _COINTABLE = {//FROM LOW TO HIGH
-	'c': 1,
-	'g': 100,
-	'k': 100000,
-	'm': 100000000,
-	'b': 100000000000,
-}; //With this setup, the syntax for 223503 would be 2k235g3c (case-INSensitive)
-
-//Your money items, and their values in money syntax
-//"value": "item_id",
-var _COINITEMS = { //FROM LOW TO HIGH
-	'1c': 'variedcommodities:coin_iron',
-	'5c': 'variedcommodities:coin_iron',
-	'10c': 'variedcommodities:coin_iron',
-	'20c': 'variedcommodities:coin_iron',
-	'50c': 'variedcommodities:coin_iron',
-	'1g': 'variedcommodities:coin_iron',
-	'2g': 'variedcommodities:coin_iron',
-	'5g': 'variedcommodities:money',
-	'10g': 'variedcommodities:money',
-	'20g': 'variedcommodities:money',
-	'50g': 'variedcommodities:money',
-	'100g': 'variedcommodities:money',
-	'200g': 'variedcommodities:money',
-	'500g': 'variedcommodities:money',
-	'1k': 'variedcommodities:plans',
-	'10k': 'variedcommodities:plans',
-	'100k': 'variedcommodities:plans',
-	'1m': 'variedcommodities:plans',
-	'10m': 'variedcommodities:plans',
-	'100m': 'variedcommodities:plans',
-	'1b': 'variedcommodities:plans',
-};
-
-//Configure your own time units!
-var msTable = {
-	//Reallife time
-	'y': 31556926000,
-	'mon': 2629743830,
-	'w': 604800000,
-	'd': 86400000,
-	'h': 3600000,
-	'min': 60000,
-	's': 1000,
-	'ms': 1,
-};
 
 //LANGUAGE settings
 var _MSG = {
@@ -107,6 +38,7 @@ import core\players\tell.js;
 import core\players\xcommands.js;
 import core\players\moreEvents.js;
 import packages\CompatSkills\compatskills.js;
+
 var SCRIPT_VERSION = "2.0b";
 var SLOWTICK_TIMER_ID = 1;
 var SLOWTICK_TIMER = 100;
@@ -115,7 +47,7 @@ function init(e) {
 	yield init_event;
 	var w = e.player.world;
 	var sb = w.getScoreboard();
-	e.player.getTimers().forceStart(SLOWTICK_TIMER_ID, SLOWTICK_TIMER, true);
+	//e.player.getTimers().forceStart(SLOWTICK_TIMER_ID, SLOWTICK_TIMER, true);
 
 	if(DEFAULT_TEAM_JOIN != null) {
 		var t = sb.getPlayerTeam(e.player.getName());
@@ -124,7 +56,7 @@ function init(e) {
 		}
 	}
 
-	tellPlayer(e.player, "[&6&lGramados&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
+
 }
 
 function interact(e) {
@@ -139,6 +71,10 @@ function keyPressed(e) {
 	yield keyPressed_event;
 }
 
+function blockinteract(e) {//Custom event
+	yield blockinteract_event;
+}
+
 function build(e, placeblock) { //Custom event
 	yield build_event;
 }
@@ -149,6 +85,10 @@ function kill(e) {
 
 function login(e) {
 	yield login_event;
+	var pl = e.player;
+	tellPlayer(pl, "["+SERVER_TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://www.dropbox.com/s/m1va7k2zeixgry0/GramadosResources.zip?dl=0|show_text$e$oDownload Resource Pack}&r&e to download.");
+	tellPlayer(e.player, "[&6&lGramados&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
+
 }
 
 function logout(e) {
@@ -253,14 +193,17 @@ function chat(e) {
 	//Chat emotes
 	escmsg = parseEmotes(escmsg, dpl.getAllowedEmotes(sb, data));
 
-
+	var pbounty = 0;
+	var pobj = sb.getObjective("bounty");
+	if(pobj != null) {
+		pbounty = pobj.getScore(e.player.getName()).getValue();
+	}
 	//Concat new message
-	var newmsg = dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' }')+prefcol+escmsg;
-
+	var newmsg = parseEmotes(dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' |show_text:$6$lBounty: $r:money:$e'+getAmountCoin(pbounty)+'}'))+prefcol+escmsg;
+	var toldPlayers = [];
+	var wp = w.getAllPlayers();
 
 	if(chats.length > 0) {
-		var toldPlayers = [];
-		var wp = w.getAllPlayers();
 		for(c in chats as ch) {
 			for(ww in wp as wpl) {
 				if(toldPlayers.indexOf(wpl.getName()) == -1 && ch.data.players.indexOf(wpl.getName()) > -1) {
@@ -270,8 +213,8 @@ function chat(e) {
 						wchats.push(wchat.getTag('', '$'));
 						wcnames.push(wchat.name);
 					});
-					var ccpref = '&9&l[***]{run_command:!chat list '+wcnames.join(" ")+'|show_text:'+wchats.join("\n")+'}&r ';
-					executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(ccpref+newmsg, true));
+					var ccpref = parseEmotes('&l[:lang:]{run_command:!chat list '+wcnames.join(" ")+'|show_text:'+wchats.join("\n")+'}&r ');
+					executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(ccpref+newmsg));
 					toldPlayers.push(wpl.getName());
 				}
 			}
@@ -279,7 +222,15 @@ function chat(e) {
 
 
 	} else {
-		executeCommand(e.player, "/tellraw @a "+strf(newmsg, true));
+		for(ww in wp as wpl) {
+			var wplo = new Player(wpl.getName()).init(data);
+			if(toldPlayers.indexOf(wpl.getName()) == -1 && wplo.getChats(data).length == 0) {
+
+
+				executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(newmsg));
+				toldPlayers.push(wpl.getName());
+			}
+		}
 	}
 	e.setCanceled(true); //Cancel real message
 }

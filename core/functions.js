@@ -31,6 +31,11 @@ function getQuartRotation(dir) {
 	return dir;
 }
 
+function compare(val1, comp, val2, asString=true) {
+
+    return false;
+}
+
 function getDropChance(npcnbt, slot) {
 	var dropC = npcnbt.getList('DropChance', 10);
 	var dropChance = parseInt(dropC[slot].getInteger('Integer'));
@@ -90,7 +95,7 @@ function givePlayerItems(player, stacks, pnbt=null) {
     }
 }
 
-//Make for givePlayerItems
+//Made for givePlayerItems (does not include armor and offhand)
 function getPlayerInvCount(pnbt, w) {
     return getPlayerInvFromNbt(pnbt, w, function(item, itnbt){
         //Exclude armor slots and offhand
@@ -117,19 +122,38 @@ function getInvItemCount(pnbt, itemstack, w, ignoreNbt) {
 	return getArrItemCount(getPlayerInvFromNbt(pnbt, w), itemstack, ignoreNbt);
 }
 
+//Unstable, use money pouch for taking money
 function takeMoneyFromPlayer(player, amount, pnbt=null) {
     if(pnbt == null) { pnbt = player.getEntityNbt(); }
-    var playerMoney = getPlayerInvFromNbt(pnbt, player.world, function(item, itnbt, w){
-        return isItemMoney(item, w);
-    });
+    var w = player.world;
+    if(getMoneyItemCount(pnbt, w) >= amount) {
+        var pmitems = getPlayerInvFromNbt(pnbt, w, function(item, inbt, w){
+            return isItemMoney(item, w);//Get only money items
+        }).sort(function(r,s){
+            return getItemMoney(r, w)-getItemMoney(s, w);//Sort by money
+        });
+
+        for(pm in pmitems as pmitem) {
+            var pval = getItemMoney(pmitem, w);
+
+            for(var i = 1; i <= pmitem.getStackSize(); i++) {
+                if(amount > 0) {
+                    pmitem.setStackSize(pmitem.getStackSize()-1);
+                    amount -= pval;
+                } else {
+                    break;
+                }
+            }
+        }
+        tellPlayer(player, "Amount: "+amount);
+        if(amount < 0) {
+            var cmoney = genMoney(w, Math.abs(amount));
+            givePlayerItems(player, cmoney, pnbt)
+        }
+    }
+
 }
-
-function getMoneyItemValue(moneystack) {
-    if(moneystack == null) return 0;
-    if(moneystack.isEmpty()) return 0;
-
-}
-
+//Returns amount of money in player inv
 function getMoneyItemCount(pnbt, w) {
   var am = 0;
   for(var itemvalue in _COINITEMS as ci) {
@@ -142,15 +166,20 @@ function getMoneyItemCount(pnbt, w) {
   return am;
 }
 
-function isItemMoney(stack, w) {
+function getItemMoney(stack, w) {
     for(var ival in _COINITEMS as ci) {
-        var cm = genMoney(w, getCoinAmount(ival))[0];
-
-        if(isItemEqual(stack, cm)) {
-            return true;
+        var cm = genMoney(w, getCoinAmount(ival))[0]||null;
+        if(cm != null) {
+            if(isItemEqual(stack, cm)) {
+                return getCoinAmount(ival);
+            }
         }
     }
-    return false;
+    return 0;
+}
+
+function isItemMoney(stack, w) {
+    return getItemMoney(stack, w) > 0;
 }
 
 function isNbtEqual(nbt, otherNbt) {

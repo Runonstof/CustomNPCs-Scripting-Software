@@ -11,9 +11,9 @@ function storytellPlayer(player, ar) {
 }
 
 function getTitleBar(title, showServerName=true) {
-	return SERVER_BAR_OPEN+(showServerName?SERVER_TITLE:"")+" "+title+SERVER_BAR_CLOSE;
+	return SERVER_BAR_OPEN+(showServerName?SERVER_TITLE+" ":"")+title+SERVER_BAR_CLOSE;
 }
 
-function getUndoBtn(undo_cmds) {
-	var str = "";
+function getUndoBtn(undo_cmds, hoverText=null) {
+	return "&r["+_MSG['undoBtnText']+"{run_command:!chain ;"+undo_cmds.join(";")+(hoverText == null ? "" : "|show_text:"+hoverText.toString())+"}&r]";
 }

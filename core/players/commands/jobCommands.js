@@ -47,16 +47,16 @@ function Job(name) {
 
 @block register_commands_event
 	registerXCommands([
-		['!jobs add <name> [...display_name]', function(pl, args){
+		['!jobs create <name> [...display_name]', function(pl, args){
 			var job = new Job(args.name);
 			var dname = args.display_name.join(' ');
 			var data = pl.world.getStoreddata();
 			if(dname != "") {
 				job.data.displayName = dname;
 			}
-			tellPlayer(pl, "&aJob '"+job.getDisplayName(data)+"&a' created!");
+			tellPlayer(pl, "&aJob '"+job.getDisplayName(data)+"&a' created! "+getUndoBtn(["!jobs remove "+job.name], "$cClick to undo"));
 			job.save(data);
-		}, 'jobs.add', [
+		}, 'jobs.create', [
 			{
 				"argname": "name",
 				"type": "id",

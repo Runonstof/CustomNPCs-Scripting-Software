@@ -190,14 +190,33 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
-		['!debug', function(pl, args){
-			var LogM = Java.type("org.apache.logging.log4j.LogManager");
-			var Logger = LogM.getLogger("LogName");
-			Logger.info("This is a message in your server console");
-			//
-			tellPlayer(pl, "Logged");
+		['!debug <amount>', function(pl, args){
+			takeMoneyFromPlayer(pl, getCoinAmount(args.amount));
 		}, 'debug'],
+		['!getDoorCode', function(pl, args, data){
+			var rt = pl.rayTraceBlock(16, false, false);
+			var rtb = rt.getBlock();
+
+			if(rtb.hasTileEntity()) {
+				var rnbt = rtb.getTileEntityNBT();
+				if(rnbt.has("id")) {
+					if(rnbt.getString("id") == "minecraft:doortileentity") {
+						if(rnbt.has("code")) {
+							tellPlayer(pl, "&6The code of this door is: &e"+rnbt.getString("code"));
+							return true;
+						} else {
+							tellPlayer(pl, "&6This is not an locked door.");
+							return false;
+						}
+					}
+				}
+			}
+
+			tellPlayer(pl, "&cYou are not looking at the handle of a door!");
+			return true;
+		}, 'getDoorCode', []],
 		['!sign edit <line> [...text]', function(pl, args, data){
+
 			var rt = pl.rayTraceBlock(16, false, false);
 			var rtb = rt.getBlock();
 			//is sign
@@ -253,7 +272,6 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 							"(&d:recycle: Regenerate{run_command:!chain !perms create "+cmd.perm+";!command info "+argcmd+"|show_text:Command exists, but permission does not.\nClick to regenerate.}&r)"
 						)
 					);
-					print(JSON.stringify(parseUsageRgx(cmd)));
 					return true;
 				}
 			}
@@ -303,16 +321,16 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			}
 		}, 'fakejoin'],
 		['!version', function(pl, args){
-			tellPlayer(pl, '&l[=======] &6&lRun\'s Server Software&r &l[=======]');
-			tellPlayer(pl, '&e&lGramados Version: &c&l'+SCRIPT_VERSION);
-			tellPlayer(pl, '&e&lSubscription: &9&lOriginal Edition');
-			tellPlayer(pl, '&e&lProgrammed by: &r&lRunonstof&e and &r&lslava_110');
-			tellPlayer(pl, '&e&lMade by: &r&lTheOddlySeagull&r&e and &r&lRunonstof');
-			tellPlayer(pl, '&6Contact Runonstof for further questions.');
-		}, 'version'],
+			tellPlayer(pl, getTitleBar("Server Software"));
+			tellPlayer(pl, "&e&l"+SERVER_NAME+" Version: &c&l"+SCRIPT_VERSION);
+			tellPlayer(pl, "&e&lSubscription: &9&lPrototype Edition");
+			tellPlayer(pl, "&e&lProgrammed by: &r&lRunonstof&e and &r&lslava_110");
+			tellPlayer(pl, "&e&lMade by: &r&lTheOddlySeagull&r&e and &r&lRunonstof");
+			tellPlayer(pl, "&6Contact Runonstof for further questions.");
+		}, "version"],
 		['!listEnchants [...matches]', function(pl, args){
 			var ENCHANTS = REGISTRY.ENCHANTMENTS.getValues();
-			tellPlayer(pl, "&l[=======] &r&aAll Registered Enchantments&r &l[=======]");
+			tellPlayer(pl, getTitleBar("All Registered Enchantments", false));
 			for(i in ENCHANTS as ench) {
 				var ename = REGISTRY.ENCHANTMENTS.getKey(ench);
 				var eid = REGISTRY.ENCHANTMENTS.getID(ench);
@@ -323,7 +341,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		}, 'listEnchants'],
 		['!listPotions [...matches]', function(pl, args){
 			var POTIONS = REGISTRY.POTIONS.getValues();
-			tellPlayer(pl, "&l[=======] &r&aAll Registered Potion Effects&r &l[=======]");
+			tellPlayer(pl, getTitleBar("All Registered Potion Effects", false));
 			for(i in POTIONS as pot) {
 				var pname = REGISTRY.POTIONS.getKey(pot);
 				var pid = REGISTRY.POTIONS.getID(pot);
@@ -334,7 +352,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		}, 'listPotions'],
 		['!listBiomes [...matches]', function(pl, args){
 			var BIOMES = REGISTRY.BIOMES.getValues();
-			tellPlayer(pl, "&l[=======] &r&aAll Registered Biomes&r &l[=======]");
+			tellPlayer(pl, getTitleBar("All Registered Biomes", false));
 			for(i in BIOMES as bio) {
 				var bname = REGISTRY.BIOMES.getKey(bio);
 				var bid = REGISTRY.BIOMES.getID(bio);
@@ -345,7 +363,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		}, 'listBiomes'],
 		['!listEntities [...matches]', function(pl, args){
 			var ENTITIES = REGISTRY.ENTITIES.getValues();
-			tellPlayer(pl, "&l[=======] &r&aAll Registered Entities&r &l[=======]");
+			tellPlayer(pl, getTitleBar("All Registered Entities", false));
 			for(i in ENTITIES as ent) {
 				var bname = REGISTRY.ENTITIES.getKey(ent);
 				var bid = REGISTRY.ENTITIES.getID(ent);
@@ -356,7 +374,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		}, 'listEntities'],
 		['!listSkills [...matches]', function(pl, args){
 			var SKILLS = ReskillableRegistry.SKILLS.getValues();
-			tellPlayer(pl, "&l[=======] &r&aAll Registered Skills&r &l[=======]");
+			tellPlayer(pl, getTitleBar("All Registered Skills", false));
 			for(i in SKILLS as skill) {
 				var bname = ReskillableRegistry.SKILLS.getKey(skill);
 				var bid = ReskillableRegistry.SKILLS.getID(skill);

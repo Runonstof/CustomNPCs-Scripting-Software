@@ -6,10 +6,14 @@
 			if( (place_block == null ? true : !place_block.isBlock()) ) { //If placeblock is null or not a block at all
 				place_block = e.player.getOffhandItem(); //Try the offhand item
 			}
-			if( !(place_block == null ? true : !place_block.isBlock()) ) { //Is place_block not null and is a block?
+			if( (place_block == null ? false : place_block.isBlock()) ) { //Is place_block not null and is a block?
 				//Build event can be executed, check if it exists though
 				if(typeof(build) != typeof(undefined)) {
 					build(e, place_block);
+				}
+			} else {
+				if(typeof(blockinteract) != typeof(undefined)) {
+					blockinteract(e);
 				}
 			}
 		}
