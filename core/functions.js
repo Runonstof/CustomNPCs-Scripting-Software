@@ -971,9 +971,18 @@ function isObject(obj) {
 }
 
 
-function nbtItem(nbt, w, api) {
-	if(typeof(nbt) == 'string') { nbt = api.stringToNbt(nbt); }
+function nbtItem(nbt, w) {
+	if(typeof(nbt) == 'string') { nbt = API.stringToNbt(nbt); }
 	var item = w.createItemFromNbt(nbt);
 
 	return item;
+}
+
+function nbtItemArr(nbtArr, w) {
+    var itemArr = [];
+	for(itemData in nbtArr as item){
+        itemArr.push(nbtItem(item, w));
+    }
+
+    return itemArr;
 }
