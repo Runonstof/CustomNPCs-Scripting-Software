@@ -11,6 +11,7 @@ function Player(name) {
 		"jobs": {},
 		"inventories": [],
 		"emotes": [],
+		"actGiftcodes": [], //Activated GiftCodes
 		"chatcodes": [],//Unlockables for color coding
 		"chatcolor": null,//Default chatcolor (NOT FOR UNLOCKS)
 		"badges": [],
