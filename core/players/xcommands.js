@@ -65,6 +65,7 @@ function DataHandler(type, name) {
 
 		return ids;
 	};
+
 	this.getDataId = function() {
 		return this.type+'_'+this.name;
 	}

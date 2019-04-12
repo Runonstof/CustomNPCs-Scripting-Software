@@ -7,18 +7,19 @@ function Region(name) {
 	this.data = {
 		"displayName": this.name,
 		"positions": [],
-		"owner": null,
+		"owner": null,//
 		"rentStartTime": 0,
 		"maxRentCredit": -1,
 		"rentCredit": 0,
 		"forSale": false,
+		"priority": 0,
 		"salePrice": 0,
 		"rentTime": -1,
-		"trusted": [],
+		"trusted": [],//
 	};
 
 	/*String player, IScoreboard sb, IData data*/
-	this.canBreak = function(player, sb, data) {
+	this.can = function(player, sb, data) {
 		var perm = this.getPermission().init(data);
 		return (
 			this.data.owner == player
@@ -107,75 +108,100 @@ function normalizePos(pos) {
 		var data = w.getStoreddata();
 		var sb = w.getScoreboard();
 		var regids = new Region().getAllDataIds(data);
+		var checkregs = 0;
+		var can = false;
+		var regs = [];
+		var prio = 0;
 		for(ri in regids as regid) {
-			var reg = new Region(regid);
-			reg.load(data);
-			var inRegion = reg.hasCoord(normalizePos((e.target==null?e.player:e.target).getPos()));
-			if(inRegion) {
-				var regperm = reg.getPermission();
-				regperm.load(data);
-
-				if(!regperm.permits(pl.getName(), sb, data) && reg.owner != pl.getName()) {
-					tellPlayer(pl, "&cYou don't have permission to interact here!");
-					e.setCanceled(true);
-					break;
+			var reg = new Region(regid).init(data);
+			if(reg.hasCoord(normalizePos((e.target==null?e.player:e.target).getPos()))) {
+				checkregs++;
+				regs.push(reg);
+				if(reg.data.priority > prio) {
+					prio++;
 				}
 			}
 		}
-
+		for(r in regs as reg) {
+			if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
+				can = true;
+				break;
+			}
+		}
+		if(checkregs > 0 && !can) {
+			tellPlayer(pl, "&cYou can't interact here!");
+			e.setCanceled(true);
+		}
 	}
 @endblock
 
 @block broken_event
-	var pl = e.player;
-	var w = pl.world;
-	var data = w.getStoreddata();
-	var sb = w.getScoreboard();
-	var regids = new Region().getAllDataIds(data);
-	for(ri in regids as regid) {
-		var reg = new Region(regid);
-		reg.load(data);
-		var inRegion = reg.hasCoord(normalizePos(e.block.getPos()));
-		if(inRegion) {
-			var regperm = reg.getPermission();
-			regperm.load(data);
-
-			if(!regperm.permits(pl.getName(), sb, data) && reg.owner != pl.getName()) {
-				tellPlayer(pl, "&cYou don't have permission to break here!");
-				e.setCanceled(true);
+	if(!e.isCanceled()) {
+		var pl = e.player;
+		var w = pl.world;
+		var data = w.getStoreddata();
+		var sb = w.getScoreboard();
+		var regids = new Region().getAllDataIds(data);
+		var checkregs = 0;
+		var can = false;
+		var regs = [];
+		var prio = 0;
+		for(ri in regids as regid) {
+			var reg = new Region(regid).init(data);
+			if(reg.hasCoord(normalizePos(e.block.getPos()))) {
+				checkregs++;
+				regs.push(reg);
+				if(reg.data.priority > prio) {
+					prio++;
+				}
+			}
+		}
+		for(r in regs as reg) {
+			if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
+				can = true;
 				break;
 			}
 		}
+		if(checkregs > 0 && !can) {
+			tellPlayer(pl, "&cYou can't break here!");
+			e.setCanceled(true);
+		}
 	}
-
-	//
-
 @endblock
 
 @block build_event
+if(!e.isCanceled()) {
 	var pl = e.player;
 	var w = pl.world;
 	var data = w.getStoreddata();
 	var sb = w.getScoreboard();
+	var rayt = pl.rayTraceBlock(10, false, false);
 	var regids = new Region().getAllDataIds(data);
+	var checkregs = 0;
+	var can = false;
+	var regs = [];
+	var prio = 0;
 	for(ri in regids as regid) {
-		var reg = new Region(regid);
-		reg.load(data);
-		var inRegion = reg.hasCoord(normalizePos(e.target.getPos()));
-		if(inRegion) {
-			var regperm = reg.getPermission();
-			regperm.load(data);
-
-			if(!regperm.permits(pl.getName(), sb, data) && reg.owner != pl.getName()) {
-				tellPlayer(pl, "&cYou don't have permission to build here!");
-				e.setCanceled(true);
-				break;
+		var reg = new Region(regid).init(data);
+		if(reg.hasCoord(normalizePos(e.target.getPos().offset(rayt.getSideHit())))) {
+			checkregs++;
+			regs.push(reg);
+			if(reg.data.priority > prio) {
+				prio++;
 			}
 		}
 	}
-
-	//
-
+	for(r in regs as reg) {
+		if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
+			can = true;
+			break;
+		}
+	}
+	if(checkregs > 0 && !can) {
+		tellPlayer(pl, "&cYou can't build here!");
+		e.setCanceled(true);
+	}
+}
 @endblock
 
 @block register_commands_event
@@ -198,19 +224,20 @@ function normalizePos(pos) {
 		['!region info [...names]', function(pl, args, data){
 			for(var n in args.names as regname) {
 				var region = new Region(regname).init(data);
-				tellPlayer(pl, "&l[=======] &6&lGramados Region Info &r&l[=======]");
+				tellPlayer(pl, getTitleBar("Region Info"));
 				print(region.name);
 				print(region.toJson());
 				tellPlayer(pl, "&eRegion ID: &b&l"+region.name+"&r (&2:recycle: Refresh{run_command:!region info "+region.name+"}&r)");
 				var rpermname = region.getPermission().name;
 				//tellPlayer(pl, "&eRegion Permission: &b&l"+rpermname+"&r "+(region.getPermission().exists(data) ? "(&6:sun: Info{run_command:!perms info "+rpermname+"}&r)"));
-				tellPlayer(pl, "&eOwner: &r&o"+(region.data.owner == null ? "&r&6&lGramados":region.data.owner+"&r (&c:cross: Kick{run_command:!region setOwner "+region.name+"|show_text:Kick "+region.data.owner+" from "+region.name+"}&r)")+"&r (&a+ Set{suggest_command:!region setOwner "+region.name+" |show_text:Set new owner for "+region.name+"}&r)");
+				tellPlayer(pl, "&eOwner: &r&o"+(region.data.owner == null ? SERVER_TITLE:region.data.owner+"&r (&c:cross: Kick{run_command:!region setOwner "+region.name+"|show_text:Kick "+region.data.owner+" from "+region.name+"}&r)")+"&r (&a+ Set{suggest_command:!region setOwner "+region.name+" |show_text:Set new owner for "+region.name+"}&r)");
 				tellPlayer(pl, "&eFor Sale: "+
 					(region.data.forSale ?
 						"&a:check: Yes&r (&cPull off sale{run_command:!region setForSale "+region.name+" false}&r)"
 						:
 						"&c:cross: No&r (&aPut for sale{run_command:!region setForSale "+region.name+" true}&r)")
 				);
+				tellPlayer(pl, "&ePriority: &6"+region.data.priority+"&r [&6&lEDIT{suggest_command:!region setPrio "+region.name+" }&r]");
 				if(region.data.positions.length > 0) {
 					//Cache positions for undo
 					tellPlayer(pl, "&ePosition List:&r (&cClear{run_command:!region removePos "+region.name+" "+Object.keys(region.data.positions).join(" ")+"}&r)");
@@ -224,6 +251,26 @@ function normalizePos(pos) {
 			}
 		}, 'region.info', [
 
+		]],
+		['!region setPrio <name> <priority>', function(pl, args, data){
+			var reg = new Region(args.name);
+			reg.load(data);
+			reg.data.priority = parseInt(args.priority);
+			reg.save(data);
+			tellPlayer(pl, "&aChanged priority of "+args.name+" to "+args.priority+"!");
+			return true;
+		}, 'region.setPrio', [
+			{
+				"argname": "name",
+				"type": "datahandler",
+				"datatype": "region",
+				"exists": true,
+			},
+			{
+				"argname": "priority",
+				"type": "number",
+				"min": 0,
+			}
 		]],
 		['!region setForSale <name> <forSale>', function(pl, args, data){}, 'region.setForSale', []],
 		['!region removePos <name> [...posNumbers]', function(pl, args, data){

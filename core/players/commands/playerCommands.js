@@ -6,7 +6,7 @@ function Player(name) {
 		"pay": getCoinAmount('5g'),
 		"payTime": getStringTime('20min'),
 		"maxJobs": 2,
-		"maxHomes": 1,
+		"maxHomes": 2,
 		"homes": {},
 		"jobs": {},
 		"inventories": [],
@@ -102,7 +102,11 @@ function Player(name) {
 		return Object.keys(this.data.jobs).indexOf(name) > -1;
 	};
 	this.hasMaxJobs = function() {
-		return (this.data.maxJobs != -1 && this.getJobCount() >= this.data.maxJobs);
+		return (this.data.maxJobs != -1 && this.getJobCount() >= this.getMaxJobs());
+	};
+	this.getMaxJobs = function() {
+		//check this.getMaxHomes()
+		return this.data.maxJobs;
 	};
 	this.addHome = function(name, x, y, z) {
 		this.data.homes[name] = {
@@ -121,6 +125,11 @@ function Player(name) {
 	this.hasHome = function(name) {
 		return (this.data.homes.hasOwnProperty(name));
 	};
+	this.getMaxHomes = function() {
+		//WILL be edited later for handling the desision maxHome setting in teams
+		return this.data.maxHomes;
+	};
+
 	this.getChats = function(data) {
 		var chats = [];
 		var dkeys = data.getKeys();
@@ -163,6 +172,8 @@ function Player(name) {
 		return ac;
 	};
 
+	
+
 	this.getInventory = function(name){
 		for(invName in this.data.inventories as inv){
 			if(inv[0] == name) return inv[1];
@@ -183,6 +194,7 @@ function Player(name) {
 		|| em.data.default
 		);
 	};
+
 	this.getAllowedEmotes = function(sb, data) {
 		var ems = [];
 		for(c in CHAT_EMOTES as ce) {

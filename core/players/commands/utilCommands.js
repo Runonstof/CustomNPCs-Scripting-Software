@@ -193,6 +193,13 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		['!debug <amount>', function(pl, args){
 			takeMoneyFromPlayer(pl, getCoinAmount(args.amount));
 		}, 'debug'],
+		['!thunder [player]', function(pl, args){
+			var target = pl||pl.world.getPlayer(args.player);
+			if(target != null) {
+				var tpos = target.getPos();
+				pl.world.thunderStrike(tpos.getX(), tpos.getY(), tpos.getZ());
+			}
+		}, 'thunder', []],
 		['!getDoorCode', function(pl, args, data){
 			var rt = pl.rayTraceBlock(16, false, false);
 			var rtb = rt.getBlock();
