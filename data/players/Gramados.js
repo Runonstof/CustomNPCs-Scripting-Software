@@ -151,15 +151,26 @@ function chat(e) {
 	var players = w.getAllPlayers();
 	var teams = sb.getTeams();
 	var allChats = new ChatChannel().getAllDataIds(data);
-	var prgx = /@([\w\-\.]+)/g;
+	var prgx = /@([\w\-]+)/g;
 	var trgx = /\$([\w\-\.]+)/g;
 	var crgx = /#([\w\-\.]+)/g;
-
+	var mentioned = [];
 
 	var tmatch = escmsg.match(trgx) || [];
 	for(tm in tmatch as tmt) {
 		for(tmi in teams as team) {
 			if(occurrences(team.getName().toLowerCase(), tmt.replace(trgx, '$1').toLowerCase()) > 0) {
+				for(ply in players as plyr) {
+					var pteam = sb.getPlayerTeam(plyr.getName());
+					if(pteam != null) {
+						if(pteam.getName() == team.getName()) {
+							if(mentioned.indexOf(plyr.getName()) == -1) {
+								plyr.sendNotification(ccs('&'+getColorId(team.getColor())+'&o$'+team.getName()), ccs(dpl.getNameTag(sb)), 2);
+								mentioned.push(plyr.getName());
+							}
+						}
+					}
+				}
 				escmsg = escmsg.replace(tmt, '&'+getColorId(team.getColor())+'&o$'+team.getName()+prefcol);
 			}
 		}
@@ -170,6 +181,10 @@ function chat(e) {
 		for(ply in players as plyr) {
 			if(occurrences(plyr.getName().toLowerCase(), pmt.replace(prgx, '$1').toLowerCase()) > 0) {
 				var pmpl = new Player(plyr.getName()); //Dont have to init, only using scoreboard
+				if(mentioned.indexOf(plyr.getName()) == -1) {
+					plyr.sendNotification(ccs("&9&l&o@"+plyr.getName()), ccs(dpl.getNameTag(sb)), 2);
+					mentioned.push(plyr.getName());
+				}
 				escmsg = escmsg.replace(pmt, '&9&o@'+plyr.getName()+'{suggest_command:/msg '+plyr.getName()+' |show_text:'+pmpl.getNameTag(sb, '', '', '', '$')+'}'+prefcol);
 			}
 		}
