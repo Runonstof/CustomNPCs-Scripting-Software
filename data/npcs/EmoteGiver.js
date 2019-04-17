@@ -9,14 +9,15 @@ import core\players\xcommands.js;
 
 
 function init(e) {
-	var data = e.npc.world.getStoreddata();
-	if(!data.has("GIVE_EMOTE")) {
-		data.put("GIVE_EMOTE", "nether_star");
+	var ndata = e.npc.getStoreddata();
+	if(!ndata.has("GIVE_EMOTE")) {
+		ndata.put("GIVE_EMOTE", "nether_star");
 	}
 }
 
 function interact(e) {
 	var data = e.npc.world.getStoreddata();
+	var ndata = e.npc.getStoreddata();
 	var sb = e.player.world.getScoreboard();
 	var pl = e.player;
 	var plo = new Player(pl.getName()).init(data);
@@ -25,7 +26,7 @@ function interact(e) {
 		if(mItem.getName() == "minecraft:name_tag" && mItem.hasCustomName()) {
 			if(Object.keys(CHAT_EMOTES).indexOf(mItem.getDisplayName()) > -1) {
 				tellPlayer(pl, "&aSet give emote to &r:"+mItem.getDisplayName()+":");
-				data.put("GIVE_EMOTE", mItem.getDisplayName());
+				ndata.put("GIVE_EMOTE", mItem.getDisplayName());
 			} else {
 				tellPlayer(pl, "&cEmote does not exists!");
 			}
@@ -34,14 +35,19 @@ function interact(e) {
 	}
 
 
-	var giveEmote = data.get("GIVE_EMOTE");
+	var giveEmote = ndata.get("GIVE_EMOTE");
 	if(Object.keys(CHAT_EMOTES).indexOf(giveEmote) > -1) {
 		if(!plo.hasEmote(giveEmote, sb, data)) {
 			plo.data.emotes.push(giveEmote);
 			plo.save(data);
 			tellPlayer(pl, "&aUnlocked emote: &r:"+giveEmote+":!");
 		} else {
-			tellPlayer(pl, "&cYou already have this emote!");
+			tellPlayer(pl, "&cYou already have emote '&r:"+giveEmote+":&c'!");
 		}
 	}
+}
+
+
+function damaged(e) {
+	e.setCanceled(true);
 }
