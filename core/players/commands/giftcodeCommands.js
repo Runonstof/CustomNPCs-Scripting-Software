@@ -6,7 +6,8 @@ function GiftCode(name) {
         "uses": 0,
         "items": [],
 		"money": 0,
-		"emotes": []
+		"emotes": [],
+		"players": [], //redeemed players
 	};
 
 	this.onCreate(function(self, data){
@@ -42,7 +43,7 @@ function GiftCode(name) {
 			tellPlayer(pl, "&cMax uses reached");
 			return false;
 		}
-		if(p.data.actGiftcodes.indexOf(this.name) > -1){
+		if(this.data.players.indexOf(pl.getName()) > -1){
 			tellPlayer(pl, "&cYou already activated this code");
 			return false;
 		}
@@ -57,9 +58,11 @@ function GiftCode(name) {
 		if(this.data.items.length > 0) givePlayerItems(pl, nbtItemArr(this.data.items, pl.world));
 		if(this.data.money > 0) givePlayerItems(pl, genMoney(pl.world, this.data.money));
 
-		this.data.uses -= 1;
+		if(this.data.uses > 0) { //keep -1 special
+			this.data.uses -= 1;
+		}
+		this.data.players.push(pl.getName());
 		this.save(data);
-		p.data.actGiftcodes.push(this.name);
 		p.save(data);
 		tellPlayer(pl, "&aCode '"+this.name+"&a' activated!");
 		return true;
@@ -82,25 +85,24 @@ function GiftCode(name) {
 	['!giftcode info <name>', function(pl, args, data){
 		var code = new GiftCode(args.name).init(data);
         tellPlayer(pl, getTitleBar('GiftCode Info'));
-        tellPlayer(pl, "&eGiftCode Name: &r"+code.name);
-        tellPlayer(pl, "&eCode: &r"+code.data.code);
-        tellPlayer(pl, "&ePermission ID: &9&l"+code.getPermission().name+"&r [&6:sun: Info{run_command:!perms info "+code.getPermission().name+"}&r]");
-        tellPlayer(pl, "&eUses left: &c"+code.getUsesLeft());
-        tellPlayer(pl, "<== &6&lRewards &r==>");
-		if(code.data.money > 0)
-			tellPlayer(pl, "&eMoney: &c"+getAmountCoin(code.data.money));
+        tellPlayer(pl, "&6GiftCode Name: &r"+code.name);
+        tellPlayer(pl, "&6Code: &r"+code.data.code+"&r [&d:recycle: Regen{run_command:!giftcode setCode "+code.name+"}&r] [&eEdit{suggest_command:!giftcode setCode "+code.name+" }&r]");
+        tellPlayer(pl, "&6Permission ID: &9&l"+code.getPermission().name+"&r [&6:sun: Info{run_command:!perms info "+code.getPermission().name+"}&r]");
+        tellPlayer(pl, "&6Uses left: &c"+code.getUsesLeft());
+        tellPlayer(pl, getTitleBar('Rewards', false));
+		tellPlayer(pl, "&6Money: &r:money:&e"+getAmountCoin(code.data.money));
 		if(code.data.items.length > 0){
 			tellPlayer(pl, "&eItems:");
 			for(var i in code.data.items as itemData){
 				var item = nbtItem(itemData, pl.world);
-				tellPlayer(pl, "&e-&3 [" + (parseInt(i)+1) + "] " + item.getDisplayName() + " &2x"+item.getStackSize() + " &r[&c:cross: Remove{run_command:!giftcode removeItem " + code.name + " " +(parseInt(i)+1)+"}&r]");
+				tellPlayer(pl, "&6-&3 [" + (parseInt(i)+1) + "] " + item.getDisplayName() + " &2x"+item.getStackSize() + " &r[&c:cross: Remove{run_command:!giftcode removeItem " + code.name + " " +(parseInt(i)+1)+"}&r]");
 			}
 		}
 		if(code.data.emotes.length > 0){
 			tellPlayer(pl, "&eEmotes:");
 			for(var i in code.data.emotes as emoteData){
 				var emote = new Emote(emoteData).init(data);
-				tellPlayer(pl, "&e-&3 [" + (parseInt(i)+1) + "] " + emote.name + " &r:" + emote.name + ": [&c:cross: Remove{run_command:!giftcode removeEmote " + code.name + " " +(parseInt(i)+1)+"}&r]");
+				tellPlayer(pl, "&6-&3 [" + (parseInt(i)+1) + "] " + emote.name + " &r:" + emote.name + ": [&c:cross: Remove{run_command:!giftcode removeEmote " + code.name + " " +(parseInt(i)+1)+"}&r]");
 			}
 		}
 
@@ -139,7 +141,7 @@ function GiftCode(name) {
     ['!giftcode setCode <name> [code]', function(pl, args, data){
         var giftcode = new GiftCode(args.name);
         giftcode.load(data);
-        if(args.code != "") {
+        if(args.code != null) {
             giftcode.data.code = args.code;
         } else {
             giftcode.generateCode();
@@ -302,13 +304,14 @@ function GiftCode(name) {
   }, 'giftcode.redeem'],
 
   	['!giftcode unredeem <name> <player>', function(pl, args, data){
-	  var p = new Player(args.player).init(data);
-	  if(p.data.actGiftcodes.indexOf(args.name) == -1){
-		  tellPlayer(pl, "&cGiftcode isn't activated yet!");
+	  var code = new GiftCode(args.name);
+	  code.load(data);
+	  if(code.data.player.indexOf(args.player) == -1) {
+		  tellPlayer(pl, "&cCode isn't activated yet!");
 		  return false;
 	  }
-	  array_remove(p.data.actGiftcodes, args.name);
-	  p.save(data);
+	  array_remove(code.data.players, args.player);
+	  code.save(data);
 	  tellPlayer(pl, "&aUnredeemed giftcode '"+args.name+"&a' for player "+args.player+"!");
 	}, 'giftcode.create', [
 	  {
