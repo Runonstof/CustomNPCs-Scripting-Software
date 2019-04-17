@@ -55,6 +55,12 @@ function ChatChannel(name) {
 		}
 		return this;
 	};
+
+	this.onCreate(function(self, data){
+		var perm = self.getPermission();
+		perm.data.enabled = false;
+		perm.save(data);
+	});
 }
 
 function getColorPermId(colorId) {
@@ -99,10 +105,6 @@ function getColorPermId(colorId) {
 		['!chat create <name>', function(pl, args){
 			var data = pl.world.getStoreddata();
 			var cc = new ChatChannel(args.name);
-
-			var ccp = cc.getPermission(data);
-			ccp.data.enabled = false;
-			ccp.save(data);
 			cc.save(data);
 			tellPlayer(pl, "&aCreated chat channel '"+cc.name+"'!");
 
