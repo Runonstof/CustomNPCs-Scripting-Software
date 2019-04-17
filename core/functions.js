@@ -7,10 +7,14 @@ var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
 var UItem = Java.type("brad16840.common.UniqueItem");
 var UItemInv = Java.type('brad16840.common.UniqueItemInventory');
 
-function objMerge(obj1,obj2){
+function objMerge(obj1, obj2, inheritNewProps=true){
     var obj3 = {};
     for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
-    for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+    for (var attrname in obj2) {
+        if(inheritNewProps || Object.keys(obj1).indexOf(attrname) > -1) {
+            obj3[attrname] = obj2[attrname];
+        }
+    }
     return obj3;
 }
 
@@ -50,8 +54,8 @@ function progressBar(value, max, length, fillColor="&a", leftColor="&c"){
 	var progress = Math.floor((value/max)*length);
 	var proc = Math.round(value/max*100);
 	for(var i = 0; i < length; i++) {
-		if(i < progress) skillBar += "&a\u2B1B";
-		if(i >= progress) skillBar += "&c\u2B1B";
+		if(i < progress) skillBar += "&a:box:";
+		if(i >= progress) skillBar += "&c:box:";
 	}
 	return skillBar += "&r&l]";
 }
@@ -470,7 +474,7 @@ function getColorId(name) {
 			return i;
 		}
 	}
-	return 'f';
+	return 'r';
 }
 function getColorName(id) {
 	for(i in _RAWCOLORS as rc) {
