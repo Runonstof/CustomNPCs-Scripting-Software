@@ -59,6 +59,7 @@ function Region(name) {
 	/*Array xyz*/
 	this.getPos = function(xyz) { //Gets cube number of xyz coord
 		for(var i in this.data.positions as pos) {//Loop cubes
+
 			if(pos.xyz1 != null && pos.xyz2 != null) { //Check is valid cube
 				var minx = Math.min(pos.xyz1[0], pos.xyz2[0]);
 				var miny = Math.min(pos.xyz1[1], pos.xyz2[1]);
@@ -80,7 +81,7 @@ function Region(name) {
 
 				&& z >= minz
 				&& z <= maxz) {
-					return i;
+					return parseInt(i);
 				}
 			}
 		}
@@ -221,13 +222,13 @@ if(!e.isCanceled()) {
 				"exists": false
 			}
 		]],
-		['!region info [...names]', function(pl, args, data){
-			for(var n in args.names as regname) {
-				var region = new Region(regname).init(data);
+		['!region info [name]', function(pl, args, data){
+			if(args.name != null) {
+				var region = new Region(args.name).init(data);
 				tellPlayer(pl, getTitleBar("Region Info"));
-				print(region.name);
-				print(region.toJson());
 				tellPlayer(pl, "&eRegion ID: &b&l"+region.name+"&r (&2:recycle: Refresh{run_command:!region info "+region.name+"}&r)");
+				var regperm = region.getPermission().init(data);
+				tellPlayer(pl, "&ePermission ID: &9&l"+regperm.name+"&r (&6:sun: Perm Info{run_command:!perms info "+regperm.name+"}&r)");
 				var rpermname = region.getPermission().name;
 				//tellPlayer(pl, "&eRegion Permission: &b&l"+rpermname+"&r "+(region.getPermission().exists(data) ? "(&6:sun: Info{run_command:!perms info "+rpermname+"}&r)"));
 				tellPlayer(pl, "&eOwner: &r&o"+(region.data.owner == null ? SERVER_TITLE:region.data.owner+"&r (&c:cross: Kick{run_command:!region setOwner "+region.name+"|show_text:Kick "+region.data.owner+" from "+region.name+"}&r)")+"&r (&a+ Set{suggest_command:!region setOwner "+region.name+" |show_text:Set new owner for "+region.name+"}&r)");
@@ -248,9 +249,37 @@ if(!e.isCanceled()) {
 					tellPlayer(pl, "&6Region has no positions! (This region still can be used for group-rules, like regions with positions set)");
 				}
 
-			}
-		}, 'region.info', [
+				return true;
+			} else {
+				var regids = new Region().getAllDataIds(data);
+				var ppos = [
+					pl.getPos().getX(),
+					pl.getPos().getY()+4,
+					pl.getPos().getZ(),
+				];
+				var showRegs = [];
+				for(var r in regids as regid) {
+					var reg = new Region(regid).init(data);
+					if(reg.hasCoord(ppos)) {
+						showRegs.push(reg.name);
+					}
+				}
+				if(showRegs.length > 0) {
 
+					executeXCommand("!region list "+showRegs.join(" "), pl);
+					return true;
+				} else {
+					tellPlayer(pl, "&cYou are not standing in any region!");
+				}
+			}
+			return false;
+		}, 'region.info', [
+			{
+				"argname": "name",
+				"type": "datahandler",
+				"datatype": "region",
+				"exists": true,
+			},
 		]],
 		['!region setPrio <name> <priority>', function(pl, args, data){
 			var reg = new Region(args.name);
@@ -347,7 +376,9 @@ if(!e.isCanceled()) {
 		]],
 		['!region list [...matches]', function(pl, args, data){
 			var dkeys = new Region().getAllDataIds(data);
-
+			args.matches = args.matches.map(function(el){
+				return el.toLowerCase();
+			});
 			tellPlayer(pl, "&l[=======] &6&lGramados Regions&r &l[=======]");
 			for(d in dkeys as dkey) {
 				var region = new Region(dkey);
