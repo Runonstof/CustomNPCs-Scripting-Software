@@ -95,7 +95,7 @@ function DataHandler(type, name) {
 				if(typeof(loadFn) == 'function') { loadFn(this, data); }
 			}
 			var ndata = data.get(this.getDataId());
-			this.data = objMerge(this.data, JSON.parse(ndata));
+			this.data = objMerge(this.data, JSON.parse(ndata), false);
 			return true;
 		}
 		return false;
@@ -328,7 +328,26 @@ function parseUsageRgx(command, str=null) {//Converts command usage to Regex, an
 		}
 	}
 	capt_names.reverse();
+
 	return [cmdMatch, capt_names];
+}
+
+var ARGPARAM_REGEX = /-([\w]+)(?:\s*:\s*([\w\S]+))?/;
+
+function getArgParams(arr) {
+	var params = {};
+	var remParams = [];
+	for(var i in arr as a) {
+		var am = a.match(ARGPARAM_REGEX);
+		if(am != null) {
+			params[am[1]] = (am[2] === undefined ? true : am[2]);
+			remParams.push(am[0]);
+		}
+	}
+	for(var re in remParams as remPar) {
+		array_remove(arr, remPar);
+	}
+	return params;
 }
 
 function executeXCommand(str, player) {
@@ -338,7 +357,7 @@ function executeXCommand(str, player) {
 		var cmdm = parseUsageRgx(cmd, str);
 
 		var argrgx = cmdm[0];
-		var rgx = new RegExp(argrgx, 'g');
+		var rgx = new RegExp(argrgx, 'gi');
 		if( (str.match(rgx) || []).length == 1) {
 			if(str.indexOf(str.match(rgx)[0]) == 0 && str.replace(rgx, '') == '') {
 				var argnames = cmdm[1];
@@ -372,6 +391,8 @@ function executeXCommand(str, player) {
 				if(cmdperm.permits(player.getName(), sb, data)) {
 					//Check arguments
 					for(a in args as arg) {
+						if(arg == null) { continue; }
+
 						for(b in cmd.rules as rule) {
 
 							if(!"argname" in rule) { continue; }
@@ -450,13 +471,25 @@ function executeXCommand(str, player) {
 										}
 										if('max' in rule) {
 											if(num > rule.max) {
-												tellPlayer(player, errpref+"&c'"+rulename+"' cannot be greater than "+rule.max.toString()+errsuff);
+												var rmax = rule.max;
+												if(rule.type == 'currency') {
+													rmax = getAmountCoin(rule.max);
+												} else if(rule.type == 'time') {
+													rmax = getTimeString(rule.max);
+												}
+												tellPlayer(player, errpref+"&c'"+rulename+"' cannot be greater than "+rmax+errsuff);
 												return false;
 											}
 										}
 										if('min' in rule) {
 											if(num < rule.min) {
-												tellPlayer(player, errpref+"&c'"+rulename+"' cannot be less than "+rule.min.toString()+errsuff);
+												var rmin = rule.min;
+												if(rule.type == 'currency') {
+													rmin = getAmountCoin(rule.min);
+												} else if(rule.type == 'time') {
+													rmin = getTimeString(rule.min);
+												}
+												tellPlayer(player, errpref+"&c'"+rulename+"' cannot be less than "+rmin+errsuff);
 												return false;
 											}
 										}
