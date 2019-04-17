@@ -232,28 +232,51 @@ function Permission(name) {
 				"exists": false,
 			}
 		]],
-		['!perms list [...matches]', function(pl, args){
+		['!perms list [...matches]', function(pl, args, data){
 			var w = pl.world;
-			var data = w.getStoreddata();
+			var params = getArgParams(args.matches);
 			var ids = new Permission().getAllDataIds(data);
-			var maxShow = 15;
+
+			var page = (parseInt(params.page)||1)-1;
+
+			var defaultShowLen = 10;
+			var minShowLen = 4;
+			var maxShowLen = 32;
+
+			var showLen = Math.max(Math.min((parseInt(params.show)||defaultShowLen), maxShowLen), minShowLen);
+			var minShow = page*showLen;
+			var maxShow = minShow+showLen;
+
 			var curShow = 0;
-			var show = 0;
+
 			if(ids.length > 0) {
 				tellPlayer(pl, getTitleBar("Permission List"));
+				var tellIds = [];
+				var pagenum = Math.floor(minShow/showLen)+1;
 				for(i in ids as id) {
 					if((args.matches.length == 0 || arrayOccurs(id, args.matches, false, false))) {
-						show++;
-						if(curShow < maxShow){
-							tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!perms info "+id+"}&r) (&c:cross: Remove{run_command:!perms remove "+id+"}&r)");
-							curShow++;
+						if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
+							tellIds.push(id)
 						}
+						curShow++;
 					}
 
 				}
-				if(show >= maxShow) {
-					var showMore = (show - maxShow);
-					tellPlayer(pl, "&6"+showMore+"&e more results, use specific matches.");
+
+				var maxpages = Math.ceil(curShow/showLen);
+				nxtPage = page+2;
+				var navBtns =
+					" &r"+(page > 0 ? "[&b<< Previous{run_command:!perms list "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
+					" "+(page < maxpages ? "[&aNext >>{run_command:!perms list "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
+				tellPlayer(pl, "&6&lPage: &d&l"+pagenum+"/"+maxpages+navBtns);
+				tellPlayer(pl,
+					"[&cShow 5{run_command:!perms list "+args.matches.join(" ")+" -show:5}&r] "+
+					"[&cShow 10{run_command:!perms list "+args.matches.join(" ")+" -show:10}&r] "+
+					"[&cShow 15{run_command:!perms list "+args.matches.join(" ")+" -show:15}&r] "+
+					"[&cShow 20{run_command:!perms list "+args.matches.join(" ")+" -show:25}&r]"
+				);
+				for(i in tellIds as id) {
+					tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!perms info "+id+"}&r) (&c:cross: Remove{run_command:!perms remove "+id+"}&r)");
 				}
 			} else {
 				tellPlayer(pl, "&cThere are no registered permissions");
