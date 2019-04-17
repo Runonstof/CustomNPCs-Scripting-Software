@@ -190,14 +190,16 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
-		['!debug <amount>', function(pl, args){
-			takeMoneyFromPlayer(pl, getCoinAmount(args.amount));
+		['!debug <...amount> %% <...koek>', function(pl, args){
+			print(JSON.stringify(args))
 		}, 'debug'],
-		['!thunder [player]', function(pl, args){
-			var target = pl||pl.world.getPlayer(args.player);
+		['!thunder [player]', function(pl, args, data){
+			var target = (args.player == null ? pl:pl.world.getPlayer(args.player));
 			if(target != null) {
+				var tpo = new Player(target.getName()).init(data);
 				var tpos = target.getPos();
 				pl.world.thunderStrike(tpos.getX(), tpos.getY(), tpos.getZ());
+				executeCommand(pl, "/tellraw @a "+parseEmotes(strf(tpo.getNameTag(pl.world.getScoreboard())+"&a&l HAS MADE THE &r:seagull:&a&lHOLY SEAGULL&r:seagull:&a&l ANGRY!!!")));
 			}
 		}, 'thunder', []],
 		['!getDoorCode', function(pl, args, data){
@@ -563,13 +565,79 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 				}
 			}
 
-			tellPlayer(pl, "&aGave "+getAmountCoin(am)+" to players: '"+args.players.join(', ')+"'");
-
+			tellPlayer(pl, "&aGave &r:money:&e"+getAmountCoin(am)+"&a to players: '"+args.players.join(', ')+"'");
+			for(a in args.players as apl) {
+				if(playerIsOnline(w, apl)) {
+					executeCommand(pl, "/tellraw "+apl+" "+parseEmotes(strf("&aYou got &r:money:&e"+getAmountCoin(am))));
+				}
+			}
 		}, 'giveMoney', [
 			{
 				"argname": "amount",
 				"type": "currency",
-				"min": 0
+				"min": 1
+			}
+		]],
+		['!giveVMoney <amount> [...players]', function(pl, args, data){
+			var w = pl.world;
+
+			var am = getCoinAmount(args.amount);
+			if(args.players.length == 0) { args.players = [pl.getName()]; }
+
+
+			for(i in args.players as apl) {
+				var apo = new Player(apl);
+				if(apo.exists(data)) {
+					apo.load(data);
+					apo.data.vmoney += am;
+					apo.save(data);
+
+				}
+
+			}
+
+			tellPlayer(pl, "&aGave &b:money:"+getAmountCoin(am)+"&a to players: '"+args.players.join(', ')+"'");
+			for(a in args.players as apl) {
+				if(playerIsOnline(w, apl)) {
+					executeCommand(pl, "/tellraw "+apl+" "+parseEmotes(strf("&aYou got &b:money:"+getAmountCoin(am))));
+				}
+			}
+		}, 'giveMoney', [
+			{
+				"argname": "amount",
+				"type": "currency",
+				"min": 1
+			}
+		]],
+		['!giveArMoney <amount> [...players]', function(pl, args, data){
+			var w = pl.world;
+
+			var am = getCoinAmount(args.amount);
+			if(args.players.length == 0) { args.players = [pl.getName()]; }
+
+
+			for(i in args.players as apl) {
+				var apo = new Player(apl);
+				if(apo.exists(data)) {
+					apo.load(data);
+					apo.data.armoney += am;
+					apo.save(data);
+
+				}
+
+			}
+
+			tellPlayer(pl, "&aGave &d:money:"+getAmountCoin(am)+"&a to players: '"+args.players.join(', ')+"'");
+			for(a in args.players as apl) {
+				if(playerIsOnline(w, apl)) {
+					executeCommand(pl, "/tellraw "+apl+" "+parseEmotes(strf("&aYou got &d:money:"+getAmountCoin(am))));
+				}
+			}
+		}, 'giveMoney', [
+			{
+				"argname": "amount",
+				"type": "currency",
+				"min": 1
 			}
 		]],
 		['!sayas <player> <...message>', function(pl, args, data){
