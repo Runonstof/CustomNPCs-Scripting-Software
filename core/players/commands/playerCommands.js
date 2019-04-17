@@ -11,8 +11,7 @@ function Player(name) {
 		"jobs": {},
 		"inventories": [],
 		"emotes": [],
-		"actGiftcodes": [], //Activated GiftCodes
-		"chatcodes": [],//Unlockables for color coding
+		"chatcolors": [],//Unlockables for color coding
 		"chatcolor": null,//Default chatcolor (NOT FOR UNLOCKS)
 		"badges": [],
 		"showbadge": null,
@@ -23,6 +22,8 @@ function Player(name) {
 		"color": null,
 		"UUID": null,
 		"money": 0,
+		"vmoney": 0, //vote tokens
+		"armoney": 0, //arcade tokens
 	};
 	this.sync = function(ipl) {
 		this.data.UUID = ipl.getUUID();
@@ -42,12 +43,15 @@ function Player(name) {
 				prefeff = '&'+getColorId(td.data.chateffect);
 			}
 		}
-		if(this.data.chatcolor != null) {
+		//chatcolor can be null
+		if(pref == "" || (this.data.chatcolor != null && pref != "")) {
 			pref = '&'+getColorId(this.data.chatcolor);
 		}
-		if(this.data.chateffect != null) {
-			prefeff = '&'+getColorId(this.data.chateffect);
+
+		if((prefeff == "" && this.data.chateffect != null) || (this.data.chateffect != null && prefeff != "")) {
+			prefeff = '&'+getCo+lorId(this.data.chateffect);
 		}
+		//print("PREF: "+prefeff.toString()+pref.toString());
 		return pref+prefeff;
 	};
 	this.getNameTag = function(sb, prefix, namesuff, teamsuff, ccChar) {
@@ -105,7 +109,7 @@ function Player(name) {
 	this.hasMaxJobs = function() {
 		return (this.data.maxJobs != -1 && this.getJobCount() >= this.getMaxJobs());
 	};
-	this.getMaxJobs = function() {
+	this.getMaxJobs = function(sb) {
 		//check this.getMaxHomes()
 		return this.data.maxJobs;
 	};
@@ -126,7 +130,7 @@ function Player(name) {
 	this.hasHome = function(name) {
 		return (this.data.homes.hasOwnProperty(name));
 	};
-	this.getMaxHomes = function() {
+	this.getMaxHomes = function(sb) {
 		//WILL be edited later for handling the desision maxHome setting in teams
 		return this.data.maxHomes;
 	};
@@ -172,8 +176,17 @@ function Player(name) {
 
 		return ac;
 	};
+	this.getBounty = function(sb){
+		var sbo = sb.getObjective("bounty");
+		if(sbo != null) {
+			sbs = sbo.getScore(this.name);
+			if(sbs != null) {
+				return sbs.getValue();
+			}
+		}
+		return 0;
+	};
 
-	
 
 	this.getInventory = function(name){
 		for(invName in this.data.inventories as inv){
@@ -416,7 +429,8 @@ function Player(name) {
 			},
 			{
 				"argname": "time",
-				"type": "time"
+				"type": "time",
+				"min": getStringTime("30s"),
 			}
 		]],
 		['!player setMaxJobs <player> <amount>', function(pl, args, data){
@@ -436,7 +450,8 @@ function Player(name) {
 			},
 			{
 				"argname": "amount",
-				"type": "number"
+				"type": "number",
+				"min": -1,
 			}
 		]],
 		['!player setMaxHomes <player> <amount>', function(pl, args, data){
@@ -455,7 +470,8 @@ function Player(name) {
 			},
 			{
 				"argname": "amount",
-				"type": "number"
+				"type": "number",
+				"min": -1,
 			}
 		]],
 		['!player setChatColor <player> <color>', function(pl, args, data){
@@ -557,13 +573,37 @@ function Player(name) {
 			var sb = pl.world.getScoreboard();
 			var po = null;
 			tellPlayer(pl, getTitleBar("Player Info", false));
-			tellPlayer(pl, "&e&lPlayer Info For: &r"+p.getNameTag(sb));
+			tellPlayer(pl, "&6&lPlayer Info For: &r"+p.getNameTag(sb));
 			var now = new Date().getTime();
-			tellPlayer(pl, "&eFirst Login: &6&o"+getTimeString(now - p.data.firstLogin, ['ms'])+"&r &eago.");
-			tellPlayer(pl, "&eLast Login: &6&o"+getTimeString(now - p.data.lastLogin, ['ms'])+"&r &eago.");
-			tellPlayer(pl, "");
+			tellPlayer(pl, "&6First Login: &e&o"+getTimeString(now - p.data.firstLogin, ['ms'])+"&r &eago.");
+			tellPlayer(pl, "&6Last Login: &e&o"+getTimeString(now - p.data.lastLogin, ['ms'])+"&r &eago.");
+			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(p.data.money));
+			tellPlayer(pl, "&6Bounty: &r:money:&e"+getAmountCoin(p.getBounty(sb)));
+			var mh = p.getMaxHomes(sb);
+			var mj = p.getMaxJobs(sb);
+			var hc = Object.keys(p.data.homes).length;
+			var jc = Object.keys(p.data.jobs).length;
+			tellPlayer(pl, "&6Max Homes: &e"+hc+"/"+(mh == -1 ? "&aInfinite" : mh)+"&r [&a:check: Set{suggest_command:!player setMaxHomes "+p.name+" }&r] [&dView{run_command:!player homes "+p.name+"}&r]");
+			tellPlayer(pl, "&6Max Jobs: &e"+jc+"/"+(mj == -1 ? "&aInfinite" : mj)+"&r [&a:check: Set{suggest_command:!player setMaxJobs "+p.name+" }&r] [&dView{run_command:!player income "+p.name+"}&r]");
 			return true;
 		}, 'player.info', [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true
+			}
+		]],
+		['!player homes <player>', function(pl, args, data){
+			var apo = new Player(args.player).init(data);
+			var w = pl.world;
+			var sb = w.getScoreboard();
+			tellPlayer(pl, getTitleBar("Player Homes"));
+			tellPlayer(pl, "&6Player: "+apo.getNameTag(sb));
+			for(var hname in apo.data.homes as home) {
+				tellPlayer(pl, "&6 - &b&l"+hname+"&r [&9Teleport{run_command:/tp "+pl.getName()+" "+home.x+" "+home.y+" "+home.z+"}&r]");
+			}
+		}, 'player.homes', [
 			{
 				"argname": "player",
 				"type": "datahandler",
@@ -575,9 +615,6 @@ function Player(name) {
 
 
 		//PLAYER UTILITY
-		['!nickname <player> <name>', function(pl, args, data){
-			pl.setName(args.name);
-		}, 'nickname'],
 		['!bounty add <player> <amount>', function(pl, args, data){
 			var plo = new Player(pl.getName()).init(data);
 			var tplo = new Player(args.player).init(data);
@@ -620,7 +657,7 @@ function Player(name) {
 			{
 				"argname": "amount",
 				"type": "currency",
-				"min": 0,
+				"min": getCoinAmount("1G"),
 			},
 		]],
 		['!topBounty', function(pl, args, data){
@@ -684,6 +721,29 @@ function Player(name) {
 			}
 			return false;
 		}, 'deposit'],
+		['!depositAll', function(pl, args, data){
+			var p = new Player(pl.getName()).init(data);
+			var w = pl.world;
+			var pnbt = pl.getEntityNbt();
+			var mItems = getPlayerInvFromNbt(pnbt, w, function(item, itnbt, w){
+				return isItemMoney(item, w);
+			});
+			var addAmount = 0;
+			for(var i in mItems as mItem) {
+				var mVal = getItemMoney(mItem, w)*mItem.getStackSize();
+
+				addAmount += mVal;
+				pl.removeItem(mItem, mItem.getStackSize());
+			}
+			if(addAmount > 0) {
+				tellPlayer(pl, "&aAdded &r:money:&e"+getAmountCoin(addAmount)+"&a to money pouch!&r [&9View{run_command:!myMoney}&r]");
+				p.data.money += addAmount;
+				p.save(data);
+			} else {
+				tellPlayer(pl, "&cYou don't have money in your inventory!");
+			}
+
+		}, 'deposit', []],
 		['!myMoney', function(pl, args, data){
 			var pnbt = pl.getEntityNbt();
 			var p = new Player(pl.getName()).init(data);
@@ -692,6 +752,8 @@ function Player(name) {
 			var total = mp+mi;
 			tellPlayer(pl, getTitleBar('Money Pouch'));
 			tellPlayer(pl, ":danger: &4&oYou will lose 50% of your money pouch on death.&r :danger:");
+			tellPlayer(pl, "&6Arcade Tokens: &d:money:A"+getAmountCoin(p.data.armoney));
+			tellPlayer(pl, "&6Vote Tokens: &b:money:V"+getAmountCoin(p.data.vmoney));
 			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(mp)+"&r [&aWithdraw{suggest_command:!withdraw }&r]");
 			tellPlayer(pl, "&6Inventory: &r:money:&e"+getAmountCoin(mi)+"&r [&aDeposit{run_command:!deposit}&r]");
 			tellPlayer(pl, "&cYou carry a total of &r:money:&e"+getAmountCoin(total));
@@ -730,12 +792,21 @@ function Player(name) {
 				if(arrayOccurs(pskill.name.toLowerCase(), lmatches) || args.matches.length == 0) {
 					var proc = Math.round(pskill.xp/pskill.maxXp*100);
 					skillBar = progressBar(pskill.xp, pskill.maxXp, 10);
-					tellPlayer(pl, "&e&l"+pskill.level+" &3&l"+pskill.name+" "+(pskill.level < maxLvl ? (skillBar+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp) : "&r&a&lMAX LEVEL&r"));
+					var nxtLvl = pskill.level + 1;
+					tellPlayer(pl,"&3&l"+pskill.name+" "+(pskill.level < maxLvl ? ("&e&l"+pskill.level+" "+skillBar+" &e&l"+nxtLvl+"&r"+" "+proc+"%&e - "+pskill.xp+"/"+pskill.maxXp) : "&r&a&lMAX LEVEL&r"));
 				}
 			}
 
 			return true;
 		}, 'myStats'],
+		['!myColors', function(pl, args, data){
+			var plo = new Player(pl.getName()).init(data);
+			for(var r in _RAWCOLORS as rcol) {
+				var colchar = (plo.data.chatcolors.indexOf(rcol) == -1 ? "\u2B1C":":box:");
+				var coltext = "[&"+r+colchar+colchar+colchar+"{*|show_text:$"+r+rcol+"}&r]";
+				tellPlayer(pl, coltext);
+			}
+		}, 'myColors'],
 		['!myEmotes [...matches]', function(pl, args, data){
 			var plo = new Player(pl.getName()).init(data);
 			var sb = pl.world.getScoreboard();
@@ -761,7 +832,7 @@ function Player(name) {
 			for(var i in showEmotes as em) {
 				var plHas = plo.hasEmote(em.name, sb, data);
 				var plHasPerm = em.getPermission().init(data, false).permits(plo.name, sb, data);
-				var infoStr = ":"+em.name+":\n$eName: $r"+em.name+"\n";
+				var infoStr = ":"+em.name+":\n$eName: $r"+em.name+"\n"+(em.data.hidden?"$c$lHidden Emote\n":"");
 				var lockStr = (
 					em.data.default ?
 						"$6$lDEFAULT EMOTE$r":
@@ -826,7 +897,8 @@ function Player(name) {
 			plo.load(data);
 			if(Object.keys(plo.data.homes).length > 0) {
 				tellPlayer(pl, "&l[=======] &6&lGramados Homes &r&l[=======]");
-				tellPlayer(pl, "[&a:check: Add{suggest_command:!setHome }&r]");
+				var maxHomeStr = " - &e"+Object.keys(plo.data.homes).length+"/"+(plo.data.maxHomes == -1 ? "&aInfinite":plo.data.maxHomes)+"&e Homes used";
+				tellPlayer(pl, "[&a:check: Add{suggest_command:!setHome }&r]"+maxHomeStr);
 				for(i in plo.data.homes as home) {
 					tellPlayer(pl, "&e - &9&o"+i+"&r&r [&bTeleport{run_command:!home "+i+"|show_text:Click to TP\n$eX:$c"+home.x+" $eY:$c"+home.y+" $eZ:$c"+home.z+" }&r] [&c:cross: Remove{run_command:!delHome "+i+"|show_text:Click to remove home.}&r]");
 				}
