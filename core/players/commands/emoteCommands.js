@@ -7,7 +7,7 @@ function Emote(name) {
     "desc": "",
     "default": false, //If everyone has the emote by default
     "forSale": false, //If emote can be bought
-    "hidden": false, //Will be hidden from !listEmotes, unless player has it, if forSale == true emote can still be bought via command
+    "hidden": false, //Will be hidden from !myEmotes, unless player has it, if forSale == true emote can still be bought via command
   };
 
   this.getCode = function(){
@@ -35,7 +35,7 @@ function Emote(name) {
     ['!emote list [...matches]', function(pl, args, data){
         var emids = new Emote().getAllDataIds(data);
         tellPlayer(pl, getTitleBar('Emote List'));
-        
+
     }, 'emote.list', []],
     ['!emote info <name>', function(pl, args, data){
       var em = new Emote(args.name).init(data);
@@ -54,6 +54,34 @@ function Emote(name) {
         "datatype": "emote",
         "exists": true,
       }
+    ]],
+    ['!emote buy <emote>', function(pl, args, data){
+        var em = new Emote(args.emote).init(data);
+        var plo = new Player(pl.getName()).init(data);
+        if(!em.data.hidden && em.data.forSale) {
+            if(plo.data.emotes.indexOf() == -1) {
+                if(plo.data.money >= em.data.price) {
+                    plo.data.money -= em.data.price;
+                    plo.data.emotes.push(em.name);
+                    plo.save(data);
+                    tellPlayer(pl, "&aBought emote "+em.name+" :"+em.name+": for &r:money:&e"+getAmountCoin(em.data.price)+"&a!");
+                } else {
+                    tellPlayer(pl, "&cYou don't have enough money in your money pouch!");
+                }
+            } else {
+                tellPlayer(pl, "&cYou already have this emote!");
+            }
+        } else {
+            tellPlayer(pl, "&cThis emote cannot be bought!");
+        }
+        return false;
+    }, 'emote.buy', [
+        {
+            "argname": "emote",
+            "type": "datahandler",
+            "datatype": "emote",
+            "exists": true,
+        },
     ]],
     ['!emote take <emote> <player>', function(pl, args, data){
       var p = new Player(args.player).init(data);
