@@ -1,7 +1,7 @@
 <?php
 
 
-$GLOBALS['config']['syntaxRegex'] = [ 
+$GLOBALS['config']['syntaxRegex'] = [
 	//Regexes regarding import, yield and block
 	/*
 		Regex for importing a file, where 1st caputure group is filename (including extension)
@@ -27,7 +27,7 @@ $GLOBALS['config']['syntaxRegex'] = [
 		1st capture group is function name
 		2nd group is for all arguments (including comma's and possible characters occuring in default values)
 		*/
-	'functionTweak' => "/function\s+([\w]+)\(([\[\]\{\}\w, &=\'\"().+-\/*\s]*?)\)[\s]*{/",
+	'functionTweak' => "/function(?:\s+([\w]+))?\(([\[\]\{\}\w, &=\'\"().+-\/*\s]*?)\)[\s]*{/",
 	'functionTransform' => "/function\s+([\w]+)\(([\w\s,]+)\)\s+{((?:.|\s)*)}/",
 	'forLoopTweak' => "/for\s*\(\s*(?:var\s+)?(\w+)\s+in\s+([\w.()\[\]\"\',+\-\/*\s]+)\s+as\s+(\w+)\s*\)\s*{/",
 	'varTransform' => "//",
