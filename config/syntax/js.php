@@ -27,7 +27,7 @@ $GLOBALS['config']['syntaxRegex'] = [
 		1st capture group is function name
 		2nd group is for all arguments (including comma's and possible characters occuring in default values)
 		*/
-	'functionTweak' => "/function(?:\s+([\w]+))?\(([\[\]\{\}\w, &=\'\"().+-\/*\s]*?)\)[\s]*{/",
+	'functionTweak' => "/(?<!extends )function(?:\s+([\w]+))?\(([\w\S\s]*?)\)[\s]*{/",
 	'functionTransform' => "/function\s+([\w]+)\(([\w\s,]+)\)\s+{((?:.|\s)*)}/",
 	'forLoopTweak' => "/for\s*\(\s*(?:var\s+)?(\w+)\s+in\s+([\w.()\[\]\"\',+\-\/*\s]+)\s+as\s+(\w+)\s*\)\s*{/",
 	'varTransform' => "//",
