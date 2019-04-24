@@ -1,3 +1,4 @@
+registerDataHandler("player", Player);
 function Player(name) {
 	extends function DataHandler('player', name);
 
@@ -8,6 +9,7 @@ function Player(name) {
 		"maxJobs": 2,
 		"maxHomes": 2,
 		"homes": {},
+		"defaultHome": null,
 		"jobs": {},
 		"inventories": [],
 		"emotes": [],
@@ -859,6 +861,62 @@ function Player(name) {
 			tellPlayer(pl, tellStr);
 
 		}, 'myEmotes'],
+		['!myWarps [...matches]', function(pl, args, data){
+			var w = pl.world;
+			var params = getArgParams(args.matches);
+			var ids = new Warp().getAllDataIds(data);
+
+			var page = (parseInt(params.page)||1)-1;
+
+			var defaultShowLen = 10;
+			var minShowLen = 4;
+			var maxShowLen = 32;
+
+			var showLen = Math.max(Math.min((parseInt(params.show)||defaultShowLen), maxShowLen), minShowLen);
+			var minShow = page*showLen;
+			var maxShow = minShow+showLen;
+
+			var curShow = 0;
+
+			if(ids.length > 0) {
+				tellPlayer(pl, getTitleBar("Your Warppp List",false));
+				var tellIds = [];
+				var pagenum = Math.floor(minShow/showLen)+1;
+				for(i in ids as id) {
+					if((args.matches.length == 0 || arrayOccurs(id, args.matches, false, false)) && new Warp(id).getPermission().init(data,false).permits(pl.getName(), pl.world.getScoreboard(), data)) {
+						if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
+							tellIds.push(id);
+						}
+						curShow++;
+					}
+
+				}
+				if(args.matches.length > 0) {
+					tellPlayer(pl, "&6&lSearching for:&e "+args.matches.join(", "));
+				}
+				tellPlayer(pl, "&6&lResults: &c"+curShow);
+				var maxpages = Math.ceil(curShow/showLen);
+				nxtPage = page+2;
+				var navBtns =
+					" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!myWarps "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
+					" "+(pagenum < maxpages ? "[&aNext >>{run_command:!myWarps "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
+				tellPlayer(pl, "&6&lPage: &d&l"+pagenum+"/"+maxpages+navBtns);
+				tellPlayer(pl,
+					"[&cShow 5{run_command:!myWarps "+args.matches.join(" ")+" -show:5}&r] "+
+					"[&cShow 10{run_command:!myWarps "+args.matches.join(" ")+" -show:10}&r] "+
+					"[&cShow 15{run_command:!myWarps "+args.matches.join(" ")+" -show:15}&r] "+
+					"[&cShow 20{run_command:!myWarps "+args.matches.join(" ")+" -show:25}&r]"
+				);
+				for(i in tellIds as id) {
+
+					var wrp = new Warp(id).init(data);
+					tellPlayer(pl, "&e - &b"+wrp.name+"&r "+(wrp.data.price > 0 ? "(:money:&e"+getAmountCoin(wrp.data.price)+"&r) " : "")+"&r[&e:sun: Teleport{run_command:!warp tp "+wrp.name+"}&r]");
+				}
+			} else {
+				tellPlayer(pl, "&cThere are no registered warps");
+			}
+			return true;
+		}, ['myWarps']],
 		['!setHome <name>', function(pl, args){
 			var plo = new Player(pl.getName());
 			var data = pl.world.getStoreddata();
@@ -909,16 +967,34 @@ function Player(name) {
 
 			return false;
 		}, 'myHomes'],
-		['!home <name>', function(pl, args){
+		['!defaultHome <name>', function(pl, args, data){
+			var plo = new Player(pl.getName()).init(data);
+			if(Object.keys(plo.data.homes).indexOf(args.name) > -1) {
+				plo.data.defaultHome = args.name;
+				plo.save(data);
+				tellPlayer(pl, "&aSet default home to '"+args.name+"'");
+				return true;
+			} else {
+				tellPlayer(pl, "&cYou don't have this home!");
+			}
+			return false;
+		}, 'defaultHome'],
+		['!home [name]', function(pl, args){
 			var plo = new Player(pl.getName());
 			var data = pl.world.getStoreddata();
 			var ppos = pl.getPos();
 			plo.load(data);
-			if(plo.hasHome(args.name)) {
-				var h = plo.data.homes[args.name];
-				pl.setPosition(h.x, h.y, h.z);
+			var hname = args.name||plo.data.defaultHome;
+			if(hname != null) {
+				if(plo.hasHome(hname)) {
+					var h = plo.data.homes[hname];
+					pl.setPosition(h.x, h.y, h.z);
+					return true;
+				} else {
+					tellPlayer(pl, "&cHome '"+args.name+"' does not exist!");
+				}
 			} else {
-				tellPlayer(pl, "&cHome '"+args.name+"' does not exist!");
+				tellPlayer(pl, "&cYou don't have an default home!");
 			}
 			return false;
 		}, 'home'],

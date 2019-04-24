@@ -1,3 +1,4 @@
+registerDataHandler("giftcode", GiftCode);
 function GiftCode(name) {
 	extends function DataHandler('giftcode', name);
 	extends function Permittable('giftcodes');

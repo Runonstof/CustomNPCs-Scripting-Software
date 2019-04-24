@@ -200,39 +200,115 @@ function registerXCommands(cmds) {
 function CommandFactory(datahandler, cmdtree){
 	this.type = datahandler;
 	this.cmdtree = cmdtree||datahandler;
-	this.settables = [
+	this.cmds = [];
+	this.info = [];
+	this.onFns = {
+		"create": [],
+		"remove": [],
+		"info": [],
+		"list": [],
+	};
 
-	];
+	//Event functions
+	this.on = function(action, callback) {
+		this.onFns[action].push(callback);
+		return this;
+	};
 
-	this.addSettable = function(key, rules, dataKey){
-		this.settables.push([key, rules||[], dataKey||key ]);
-	}
-
-	this.generate = function(){
-		var cmds = [
-			['!'+this.cmdtree+' create <name>', function(pl, args, data, cmddata){
-				var dht = getDataHandler(cmddata.datatype);
+	//Command Building functions
+	this.addInfoText = function(infoFn) {
+		this.info.push(infoFn);
+		return this;
+	};
+	
+	this.addSettable = function(property, rules=[], argTransformFn=null, outputTransform=null, argNode, argName) {
+		var propname = property.rangeUpper(0, 1);
+		var out = objMerge({
+			"val": "\"{"+property+"}\"",
+		}, (outputTransform || {}));
+		argName = argName||property;
+		argNode = (argNode||"<{NAME}>").fill({
+			"NAME": argName,
+		});
+		this.cmds.push([
+			'!'+this.cmdtree+' set'+propname+' <name> '+argNode,
+			function(pl, args, data, cdata){
+				var dht = getDataHandler(cdata.datatype);
 				var dh = new dht(args.name);
+				var val = args[cdata.argname];
+				dh.load(data);
+				dh.data[cdata.property] = (argTransformFn == null ? val : argTransformFn(val, dh, pl, args, data, cdata));
+				dh.save(data);
+				var tellData = {};
+				tellData[cdata.property] = val;
+				tellPlayer(pl, "&aSet "+propname+" of "+dh.type+" "+dh.name+" to "+cdata.out.val.fill(tellData)+"&r&a!");
+				return true;
+			},
+			this.cmdtree+'.set'+propname,
+			rules.concat([
+				{
+					"argname": "name",
+					"type": "datahandler",
+					"datatype": this.type,
+					"exists": true,
+				}
+			]),
+			{
+				"datatype": this.type,
+				"cmdtree": this.cmdtree,
+				"property": property,
+				"propname": propname,
+				"argname": argName,
+				"argnode": argNode,
+				"out": out,
+			},
+		]);
+
+		return this;
+	};
+
+	//Generate Functions
+	this.genDefault = function(excludes=[]){
+		if(excludes.indexOf("create") == -1)
+		this.cmds.push(
+			['!'+this.cmdtree+' create <name>', function(pl, args, data, cdata){
+				var dht = getDataHandler(cdata.datatype);
+				var dh = new dht(args.name);
+				for(var o in cdata.self.onFns['create'] as onFn) {
+					onFn(dh, pl, args, data, cdata);
+				}
 				dh.save(data);
 				tellPlayer(pl, "&aCreated "+dh.type+" '"+dh.name+"'!");
 				return true;
-			}, this.type+'.create', [
+			}, this.cmdtree+'.create', [
+				{
+					"argname": "name",
+					"type": "string",
+					"noColor": true,
+				},
 				{
 					"argname": "name",
 					"type": "datahandler",
 					"datatype": this.type,
 					"exists": false,
-				}
+				},
 			], {
-				"datatype": this.type
-			}],
-			['!'+this.cmdtree+' remove <name>', function(pl, args, data, cmddata){
-				var dht = getDataHandler(cmddata.datatype);
+				"datatype": this.type,
+				"self": this,
+			}
+		]);
+		if(excludes.indexOf("remove") == -1)
+		this.cmds.push(
+			['!'+this.cmdtree+' remove <name>', function(pl, args, data, cdata){
+				var dht = getDataHandler(cdata.datatype);
 				var dh = new dht(args.name);
+				for(var o in cdata.self.onFns['remove'] as onFn) {
+					onFn(dh, pl, args, data, cdata);
+				}
 				dh.remove(data);
 				tellPlayer(pl, "&aRemoved "+dh.type+" '"+dh.name+"'!");
 				return true;
-			}, this.type+'.remove', [
+			}, this.cmdtree+'.remove', [
 				{
 					"argname": "name",
 					"type": "datahandler",
@@ -240,28 +316,121 @@ function CommandFactory(datahandler, cmdtree){
 					"exists": true,
 				}
 			], {
-				"datatype": this.type
-			}],
-			['!'+this.cmdtree+' list [...matches]', function(pl, args, data, cmddata){
-				var dht = getDataHandler(cmddata.datatype);
+				"datatype": this.type,
+				"self": this,
+			}
+		]);
+		if(excludes.indexOf("info") == -1)
+		this.cmds.push(
+			['!'+this.cmdtree+' info <name>', function(pl, args, data, cdata){
+				var dht = getDataHandler(cdata.datatype);
 				var dh = new dht(args.name);
-				var dhids = dh.getAllDataIds(data);
-				tellPlayer(pl, "&l[=======] &6&l Gramados "+cmddata.datatype.rangeUpper(0, 1)+"s List&r &l[=======]");
+				dh.load(data);
+				var typename = dh.type.rangeUpper(0, 1);
+				tellPlayer(pl, getTitleBar(typename+" Info", false));
+				tellPlayer(pl, "&6&l"+typename+" Name: &b"+dh.name+"&r [&4:cross: Remove{run_command:!"+cdata.cmdtree+" remove "+dh.name+"|show_text:$cClick to remove "+dh.type+"}&r]");
+				if("getPermission" in dh) {
+					var dhp = dh.getPermission().init(data, false);
+					tellPlayer(pl, "&6&lPermission: &9"+dhp.name+"&r [&e:sun: Info{run_command:!}&r]")
+				}
+				var tellInfo = "";
+				for(var i in cdata.info as infoFn) {
+					tellInfo += infoFn(dh, pl, args, data, cdata)+"\n";
+				}
+				if(tellInfo != "") {
+					tellPlayer(pl, tellInfo);
+				}
 
-				for(var i in dhids as dhid) {
-					var dhi = new dht(dhid).init(data);
+				for(var o in cdata.self.onFns['info'] as onFn) {
+					onFn(dh, pl, args, data, cdata);
+				}
 
+				return true;
+			}, this.cmdtree+'.info', [
+				{
+					"argname": "name",
+					"type": "datahandler",
+					"datatype": this.type,
+					"exists": true,
+				}
+			], {
+				"self": this,
+				"datatype": this.type,
+				"cmdtree": this.cmdtree,
+				"info": this.info
+			}
+		]);
+		if(excludes.indexOf("list") == -1)
+		this.cmds.push(
+			['!'+this.cmdtree+' list [...matches]', function(pl, args, data, cdata){
+				var dht = getDataHandler(cdata.datatype);
+				var params = getArgParams(args.matches);
+				var ids = new dht().getAllDataIds(data);
+				for(var o in cdata.self.onFns['list'] as onFn) {
+					onFn(dh, pl, args, data, cdata);
+				}
+				var page = (parseInt(params.page)||1)-1;
+
+				var defaultShowLen = 10;
+				var minShowLen = 4;
+				var maxShowLen = 32;
+
+				var showLen = Math.max(Math.min((parseInt(params.show)||defaultShowLen), maxShowLen), minShowLen);
+				var minShow = page*showLen;
+				var maxShow = minShow+showLen;
+
+				var curShow = 0;
+
+				if(ids.length > 0) {
+					tellPlayer(pl, getTitleBar(cdata.datatype.rangeUpper(0, 1)+" List"));
+					var tellIds = [];
+					var pagenum = Math.floor(minShow/showLen)+1;
+					for(i in ids as id) {
+						if((args.matches.length == 0 || arrayOccurs(id, args.matches, false, false))) {
+							if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
+								tellIds.push(id)
+							}
+							curShow++;
+						}
+
+					}
+					if(args.matches.length > 0) {
+						tellPlayer(pl, "&6&lSearching for:&e "+args.matches.join(", "));
+					}
+					tellPlayer(pl, "&6&lResults: &a"+curShow);
+					var maxpages = Math.ceil(curShow/showLen);
+					nxtPage = page+2;
+					var navBtns =
+						" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
+						" "+(pagenum < maxpages ? "[&aNext >>{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
+					tellPlayer(pl, "&6&lPage: &d&l"+pagenum+"/"+maxpages+navBtns);
+					tellPlayer(pl,
+						"[&cShow 5{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -show:5}&r] "+
+						"[&cShow 10{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -show:10}&r] "+
+						"[&cShow 15{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -show:15}&r] "+
+						"[&cShow 20{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -show:25}&r]"
+					);
+					for(i in tellIds as id) {
+						tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!"+cdata.cmdtree+" info "+id+"}&r) (&c:cross: Remove{run_command:!"+cdata.cmdtree+" remove "+id+"}&r)");
+					}
+				} else {
+					tellPlayer(pl, "&cThere are no registered "+cdata.datatype+"s!");
 				}
 				return true;
-			}, this.type+'.list', [], {
-				"datatype": this.type
-			}],
+			}, this.cmdtree+'.list', [],
+			{
+				"self": this,
+				"datatype": this.type,
+				"cmdtree": this.cmdtree,
+			}
+		]);
 
-		];
-
-
-		return cmds;
-	}
+		return this;
+	};
+	this.register = function(){
+		registerXCommands(this.cmds);
+		return this;
+	};
 }
 
 

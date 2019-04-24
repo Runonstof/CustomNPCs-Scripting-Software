@@ -1,3 +1,4 @@
+registerDataHandler("emote", Emote);
 function Emote(name) {
   extends function DataHandler('emote', name);
   extends function Permittable('emotes');

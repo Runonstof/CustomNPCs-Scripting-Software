@@ -1,3 +1,4 @@
+registerDataHandler("chatchannel", ChatChannel);
 function ChatChannel(name) {
 	extends function DataHandler('chatchannel', name);
 	extends function Permittable; //add getPermission etc

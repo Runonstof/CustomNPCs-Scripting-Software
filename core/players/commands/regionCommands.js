@@ -1,4 +1,4 @@
-
+registerDataHandler("region", Region);
 function Region(name) {
 	extends function DataHandler('region', name);
 	extends function Permittable('regions'); //Uses custom permission domain 'regions'
@@ -375,22 +375,59 @@ if(!e.isCanceled()) {
 			},
 		]],
 		['!region list [...matches]', function(pl, args, data){
-			var dkeys = new Region().getAllDataIds(data);
-			args.matches = args.matches.map(function(el){
-				return el.toLowerCase();
-			});
-			tellPlayer(pl, "&l[=======] &6&lGramados Regions&r &l[=======]");
-			for(d in dkeys as dkey) {
-				var region = new Region(dkey);
-				region.load(data);
-				if(args.matches.length == 0 || arrayOccurs(region.name.toLowerCase(), args.matches) > 0) {
-					tellPlayer(pl, "&e - &b&l"+region.name+"&r (&6&nInfo{run_command:!region info "+region.name+"}&r) (&c&nRemove{run_command:!region remove "+region.name+"}&r)");
+			var w = pl.world;
+			var params = getArgParams(args.matches);
+			var ids = new Region().getAllDataIds(data);
+
+			var page = (parseInt(params.page)||1)-1;
+
+			var defaultShowLen = 10;
+			var minShowLen = 4;
+			var maxShowLen = 32;
+
+			var showLen = Math.max(Math.min((parseInt(params.show)||defaultShowLen), maxShowLen), minShowLen);
+			var minShow = page*showLen;
+			var maxShow = minShow+showLen;
+
+			var curShow = 0;
+
+			if(ids.length > 0) {
+				tellPlayer(pl, getTitleBar("Region List"));
+				var tellIds = [];
+				var pagenum = Math.floor(minShow/showLen)+1;
+				for(i in ids as id) {
+					if((args.matches.length == 0 || arrayOccurs(id, args.matches, false, false))) {
+						if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
+							tellIds.push(id)
+						}
+						curShow++;
+					}
+
 				}
-
+				if(args.matches.length > 0) {
+					tellPlayer(pl, "&6&lSearching for:&e "+args.matches.join(", "));
+				}
+				tellPlayer(pl, "&6&lResults: &c"+curShow);
+				var maxpages = Math.ceil(curShow/showLen);
+				nxtPage = page+2;
+				var navBtns =
+					" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!region list "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
+					" "+(pagenum < maxpages ? "[&aNext >>{run_command:!region list "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
+				tellPlayer(pl, "&6&lPage: &d&l"+pagenum+"/"+maxpages+navBtns);
+				tellPlayer(pl,
+					"[&cShow 5{run_command:!region list "+args.matches.join(" ")+" -show:5}&r] "+
+					"[&cShow 10{run_command:!region list "+args.matches.join(" ")+" -show:10}&r] "+
+					"[&cShow 15{run_command:!region list "+args.matches.join(" ")+" -show:15}&r] "+
+					"[&cShow 20{run_command:!region list "+args.matches.join(" ")+" -show:25}&r]"
+				);
+				for(i in tellIds as id) {
+					tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!region info "+id+"}&r) (&c:cross: Remove{run_command:!region remove "+id+"}&r)");
+				}
+			} else {
+				tellPlayer(pl, "&cThere are no registered regions!");
 			}
-
 			return true;
-		}, 'region.list'],
+		}, ['region.list']],
 		['!region remove <name>', function(pl, args, data){
 			var region = new Region(args.name);
 			region.remove(data);

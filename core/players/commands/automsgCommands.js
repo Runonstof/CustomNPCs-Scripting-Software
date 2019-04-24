@@ -1,3 +1,4 @@
+registerDataHandler("automsg", AutoMsg);
 function AutoMsg(name) {
     extends function DataHandler('automsg', name);
 

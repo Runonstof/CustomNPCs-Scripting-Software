@@ -2,6 +2,7 @@ var PERMISSION_REGEX = /permission_([\w.\-]+)/g;
 
 import core\players\Permittable.js;
 
+registerDataHandler("permission", Permission);
 function Permission(name) {
 	extends function DataHandler('permission', name);
 
@@ -262,12 +263,15 @@ function Permission(name) {
 					}
 
 				}
-
+				if(args.matches.length > 0) {
+					tellPlayer(pl, "&6&lSearching for:&e "+args.matches.join(", "));
+				}
+				tellPlayer(pl, "&6&lResults: &c"+curShow);
 				var maxpages = Math.ceil(curShow/showLen);
 				nxtPage = page+2;
 				var navBtns =
-					" &r"+(page > 0 ? "[&b<< Previous{run_command:!perms list "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
-					" "+(page < maxpages ? "[&aNext >>{run_command:!perms list "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
+					" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!perms list "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
+					" "+(pagenum < maxpages ? "[&aNext >>{run_command:!perms list "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
 				tellPlayer(pl, "&6&lPage: &d&l"+pagenum+"/"+maxpages+navBtns);
 				tellPlayer(pl,
 					"[&cShow 5{run_command:!perms list "+args.matches.join(" ")+" -show:5}&r] "+
