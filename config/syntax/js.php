@@ -18,7 +18,7 @@ $GLOBALS['config']['syntaxRegex'] = [
 	'getBlock' => '/yield ([\w-]+);/',
 	/* Regex for defining a var (1st group is varname, 2nd varvalue)
 		Vars are handy but mostly you don't set them this way*/
-	'defineVar' => '/\/\*set ([\%\w]+)=([\w\\\]+)\*\//',
+	'defineVar' => '/{\%set ([\%\w]+)=([\w\\\]+)\%}/',
 	/* Regex for getting a var, 1st group is varname */
 	'getVar' => '/%([\w]+)%/',
 	/* Regex for getting a var, but optional, 1st group is varname, 2nd group is value if var does not exist */
