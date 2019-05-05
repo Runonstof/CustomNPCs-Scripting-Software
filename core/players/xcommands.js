@@ -57,7 +57,7 @@ function DataHandler(type, name) {
 	this.getAllDataIds = function(data) {
 		var dkeys = data.getKeys();
 		var ids = [];
-		for(d in dkeys as dkey) {
+		for(var d in dkeys as dkey) {
 			if(dkey.cmatch(this.dkeyrgx) > 0) {
 				ids.push(dkey.replace(this.dkeyrgx, '$1'));
 			}
@@ -166,8 +166,8 @@ function matchXCommands(cmdstrs=[]) {
 	if(typeof(cmdstrs) == 'string') { cmdstrs = [cmdstrs]; }
 	var cmds = [];
 
-	for(c in _COMMANDS as command) {
-		for(ci in cmdstrs as cmdstr) {
+	for(var c in _COMMANDS as command) {
+		for(var ci in cmdstrs as cmdstr) {
 			var cname = getCommandNoArg(command.usage).trim();
 			if(cmdstr.substr(0, 1) == "^") {
 				if((cmdstrs.length == 0 || occurrences(cname, cmdstr.substr(1, cmdstr.length)) == 0) && cmds.indexOf(command) == -1) {
@@ -190,9 +190,12 @@ function getCommandName(cmdstr) {
 	var cmda = getCommandNoArg(cmdstr).trim();//Remove whitespace around
 	return cmda.substr(1, cmda.length);//Remove '!'-character
 }
+function getCommandPerm(cmdstr) {
+	return getCommandName(cmdstr).replace(/\s+/g, '.');
+}
 
 function registerXCommands(cmds) {
-	for(c in cmds) {
+	for(var c in cmds) {
 		registerXCommand(cmds[c][0], cmds[c][1], cmds[c][2], cmds[c][3] || [], cmds[c][4] || {});
 	}
 }
@@ -202,11 +205,15 @@ function CommandFactory(datahandler, cmdtree){
 	this.cmdtree = cmdtree||datahandler;
 	this.cmds = [];
 	this.info = [];
+	this.listingTransformer = null;
+	this.listingTransformerFn = null;
+	this.listingRequirement = null;
 	this.onFns = {
 		"create": [],
 		"remove": [],
 		"info": [],
 		"list": [],
+		"copy": [],
 	};
 
 	//Event functions
@@ -220,8 +227,35 @@ function CommandFactory(datahandler, cmdtree){
 		this.info.push(infoFn);
 		return this;
 	};
-	
-	this.addSettable = function(property, rules=[], argTransformFn=null, outputTransform=null, argNode, argName) {
+	this.add = function(subCommand, fn, rules=[], payload={}, dhNameArg="name", dhMustExists=true) {
+		payload = objMerge({
+			"datatype": this.type,
+			"cmdtree": this.cmdtree,
+			"argname": dhNameArg,
+			"fn": fn,
+		}, payload);
+		var cmdstr = "!"+this.cmdtree+" "+subCommand;
+		this.cmds.push([
+			cmdstr,
+			function(pl, args, data, cdata){
+				var dht = getDataHandler(cdata.datatype);
+				var dh = new dht(args[cdata.argname]).init(data,false);
+				return cdata.fn(dh, pl, args, data, cdata);
+			},
+			getCommandPerm(cmdstr),
+			rules.concat([
+				{
+					"argname": dhNameArg,
+					"type": "datahandler",
+					"datatype": this.type,
+					"exists": dhMustExists
+				}
+			]),
+			payload
+		]);
+		return this;
+	};
+	this.addSettable = function(property, argTransformFn=null, rules=[], outputTransform=null, argNode, argName) {
 		var propname = property.rangeUpper(0, 1);
 		var out = objMerge({
 			"val": "\"{"+property+"}\"",
@@ -241,7 +275,7 @@ function CommandFactory(datahandler, cmdtree){
 				dh.save(data);
 				var tellData = {};
 				tellData[cdata.property] = val;
-				tellPlayer(pl, "&aSet "+propname+" of "+dh.type+" "+dh.name+" to "+cdata.out.val.fill(tellData)+"&r&a!");
+				tellPlayer(pl, "&aSet property &2\""+property+"\"&a of "+dh.type+" &2\""+dh.name+"\"&a to "+cdata.out.val.fill(tellData)+"&r&a!");
 				return true;
 			},
 			this.cmdtree+'.set'+propname,
@@ -266,7 +300,12 @@ function CommandFactory(datahandler, cmdtree){
 
 		return this;
 	};
+	this.setListTransformer = function(transformString, transformFn) {
+		this.listingTransformer = transformString;
+		this.listingTransformerFn = transformFn;
 
+		return this;
+	};
 	//Generate Functions
 	this.genDefault = function(excludes=[]){
 		if(excludes.indexOf("create") == -1)
@@ -278,7 +317,7 @@ function CommandFactory(datahandler, cmdtree){
 					onFn(dh, pl, args, data, cdata);
 				}
 				dh.save(data);
-				tellPlayer(pl, "&aCreated "+dh.type+" '"+dh.name+"'!");
+				tellPlayer(pl, "&aCreated "+dh.type+" &2'"+dh.name+"'&a!");
 				return true;
 			}, this.cmdtree+'.create', [
 				{
@@ -328,14 +367,15 @@ function CommandFactory(datahandler, cmdtree){
 				dh.load(data);
 				var typename = dh.type.rangeUpper(0, 1);
 				tellPlayer(pl, getTitleBar(typename+" Info", false));
-				tellPlayer(pl, "&6&l"+typename+" Name: &b"+dh.name+"&r [&4:cross: Remove{run_command:!"+cdata.cmdtree+" remove "+dh.name+"|show_text:$cClick to remove "+dh.type+"}&r]");
+				tellPlayer(pl, "[&2:recycle: Refresh{run_command:!"+cdata.cmdtree+" info "+dh.name+"|show_text:$aClick to reload "+cdata.datatype+" info.}&r]\n"+
+					"&6&l"+typename+" Name: &b"+dh.name+"&r [&4:cross: Remove{run_command:!"+cdata.cmdtree+" remove "+dh.name+"|show_text:$cClick to remove "+dh.type+"}&r]");
 				if("getPermission" in dh) {
 					var dhp = dh.getPermission().init(data, false);
-					tellPlayer(pl, "&6&lPermission: &9"+dhp.name+"&r [&e:sun: Info{run_command:!}&r]")
+					tellPlayer(pl, "&6&lPermission: &9"+dhp.name+"&r [&e:sun: Info{run_command:!perms info "+dhp.name+"}&r]")
 				}
 				var tellInfo = "";
 				for(var i in cdata.info as infoFn) {
-					tellInfo += infoFn(dh, pl, args, data, cdata)+"\n";
+					tellInfo += infoFn(dh, pl, args, data, cdata);
 				}
 				if(tellInfo != "") {
 					tellPlayer(pl, tellInfo);
@@ -357,20 +397,30 @@ function CommandFactory(datahandler, cmdtree){
 				"self": this,
 				"datatype": this.type,
 				"cmdtree": this.cmdtree,
-				"info": this.info
+				"info": this.info,
+				"exc": excludes
 			}
 		]);
 		if(excludes.indexOf("list") == -1)
 		this.cmds.push(
 			['!'+this.cmdtree+' list [...matches]', function(pl, args, data, cdata){
+				var w = pl.world;
+				var sb = w.getScoreboard();
 				var dht = getDataHandler(cdata.datatype);
 				var params = getArgParams(args.matches);
+
 				var ids = new dht().getAllDataIds(data);
 				for(var o in cdata.self.onFns['list'] as onFn) {
 					onFn(dh, pl, args, data, cdata);
 				}
 				var page = (parseInt(params.page)||1)-1;
-
+				var excludes = [];
+				var excludeRgx = /\*([\w]+)/;
+				var newMatches = [];
+				for(var a in args.matches as match) {
+					(match.cmatch(excludeRgx) > 0 ? excludes : newMatches).push(match.replace(excludeRgx, "$1"));
+				}
+				args.matches = newMatches;
 				var defaultShowLen = 10;
 				var minShowLen = 4;
 				var maxShowLen = 32;
@@ -385,33 +435,66 @@ function CommandFactory(datahandler, cmdtree){
 					tellPlayer(pl, getTitleBar(cdata.datatype.rangeUpper(0, 1)+" List"));
 					var tellIds = [];
 					var pagenum = Math.floor(minShow/showLen)+1;
-					for(i in ids as id) {
-						if((args.matches.length == 0 || arrayOccurs(id, args.matches, false, false))) {
-							if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
-								tellIds.push(id)
+					for(var i in ids as id) {
+						var excluded = (arrayOccurs(id, excludes, false, false) > 0);
+						if(args.matches.length == 0 || arrayOccurs(id, args.matches, false, false) > 0) {
+							if(!excluded) {
+								if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
+									tellIds.push(id)
+								}
+								curShow++;
 							}
-							curShow++;
 						}
 
 					}
 					if(args.matches.length > 0) {
 						tellPlayer(pl, "&6&lSearching for:&e "+args.matches.join(", "));
 					}
-					tellPlayer(pl, "&6&lResults: &a"+curShow);
+					if(excludes.length > 0) {
+						tellPlayer(pl, "&6&lFiltering out:&e "+excludes.join(", "));
+					}
+					tellPlayer(pl, "&6&lResults: &a"+curShow+"/"+ids.length+"&r &e&o(Showing "+showLen+" results per page.)");
+					var filterArgs = "";
+					for(var ex in excludes as excl) {
+						filterArgs += "*"+excl+" ";
+					}
+
+					var parsedArgs = filterArgs+args.matches.join(" ");
+					var parsedQuery = parsedArgs+" -page:"+page+" -show:"+showLen;
 					var maxpages = Math.ceil(curShow/showLen);
-					nxtPage = page+2;
+					var nxtPage = page+2;
+
 					var navBtns =
-						" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
-						" "+(pagenum < maxpages ? "[&aNext >>{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
+						" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!"+cdata.cmdtree+" list "+parsedArgs+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
+						" "+(pagenum < maxpages ? "[&aNext >>{run_command:!"+cdata.cmdtree+" list "+parsedArgs+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
 					tellPlayer(pl, "&6&lPage: &d&l"+pagenum+"/"+maxpages+navBtns);
-					tellPlayer(pl,
-						"[&cShow 5{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -show:5}&r] "+
-						"[&cShow 10{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -show:10}&r] "+
-						"[&cShow 15{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -show:15}&r] "+
-						"[&cShow 20{run_command:!"+cdata.cmdtree+" list "+args.matches.join(" ")+" -show:25}&r]"
-					);
-					for(i in tellIds as id) {
-						tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!"+cdata.cmdtree+" info "+id+"}&r) (&c:cross: Remove{run_command:!"+cdata.cmdtree+" remove "+id+"}&r)");
+
+					var showResultVals = [
+						5,
+						10,
+						15,
+						20,
+						25
+					];
+					var showResultBtns = "";
+					for(var i in showResultVals as rv) {
+						showResultBtns += "[&3Show "+rv+"{run_command:!"+cdata.cmdtree+" list "+parsedArgs+" -show:"+rv+"|show_text:$bShow "+rv+" results per page.}&r] ";
+					}
+
+					tellPlayer(pl,showResultBtns);
+					var fstr = (cdata.lt||"{LISTITEM} {INFOBTN} {REMOVEBTN}");
+					for(var i in tellIds as id) {
+						var td = new dht(id).init(data,false);
+						var mobj = (cdata.ltfn != null ? cdata.ltfn(td, pl, args, data)||{} : {});
+						var canUseInfo = new Permission(cdata.cmdtree+".info").init(data).permits(pl.getName(), sb, data);
+						var canUseRemove = new Permission(cdata.cmdtree+".remove").init(data).permits(pl.getName(), sb, data);
+						tellPlayer(pl, fstr.fill(objMerge({
+							"ID": id,
+							"CMDTREE": cdata.cmdtree,
+							"LISTITEM": "&e - &b&l"+id+"&r",
+							"INFOBTN": (canUseInfo ? "&r(&6:sun: Info{run_command:!"+cdata.cmdtree+" info "+id+"}&r)" : ""),
+							"REMOVEBTN": (canUseRemove ? "&r(&c:cross: Remove{run_command:!"+cdata.cmdtree+" remove "+id+"}&r)" : "")
+						}, mobj)));
 					}
 				} else {
 					tellPlayer(pl, "&cThere are no registered "+cdata.datatype+"s!");
@@ -422,9 +505,45 @@ function CommandFactory(datahandler, cmdtree){
 				"self": this,
 				"datatype": this.type,
 				"cmdtree": this.cmdtree,
+				"lt": this.listingTransformer,
+				"ltfn": this.listingTransformerFn,
+			},
+		]);
+		if(excludes.indexOf("copy") == -1)
+		this.cmds.push(
+			['!'+this.cmdtree+' copy <name> <new_name>', function(pl, args, data, cdata){
+				var dht = getDataHandler(cdata.datatype);
+				var dh = new dht(args.name).init(data);
+				for(var o in cdata.self.onFns['copy'] as onFn) {
+					onFn(dh, pl, args, data, cdata);
+				}
+				dh.name = args.new_name;
+				dh.save(data);
+				tellPlayer(pl, "&aCopied "+dh.type+" '"+args.name+"' to '"+args.new_name+"'!");
+				return true;
+			}, this.cmdtree+'.copy', [
+				{
+					"argname": "new_name",
+					"type": "string",
+					"noColor": true,
+				},
+				{
+					"argname": "name",
+					"type": "datahandler",
+					"datatype": this.type,
+					"exists": true,
+				},
+				{
+					"argname": "new_name",
+					"type": "datahandler",
+					"datatype": this.type,
+					"exists": false
+				}
+			], {
+				"datatype": this.type,
+				"self": this,
 			}
 		]);
-
 		return this;
 	};
 	this.register = function(){
@@ -448,7 +567,7 @@ function parseUsageRgx(command, str=null) {//Converts command usage to Regex, an
 	var req_regx = /<([.]{3})*([\w]+)>/g;//Required arg regex
 	var opt_regx = /\[([.]{3})*([\w]+)\]/g;//Optional arg recalc
 	var rm = cmdMatch.allMatch(req_regx);
-	for(i in rm) {//required args
+	for(var i in rm) {//required args
 		var rmcode = rm[i][0];
 		var rmmulti = (rm[i][1] != null);
 		var rmname = rm[i][2];
@@ -463,7 +582,7 @@ function parseUsageRgx(command, str=null) {//Converts command usage to Regex, an
 		cmdMatch = cmdMatch.replace(rmcode, rmpart);
 	}
 	var om = cmdMatch.allMatch(opt_regx);
-	for(i in om) {//optional args
+	for(var i in om) {//optional args
 		var omcode = om[i][0];
 		var ommulti = (om[i][1] != null);
 		var omname = om[i][2];
@@ -522,7 +641,7 @@ function getArgParams(arr) {
 function executeXCommand(str, player) {
 	var data = player.world.getStoreddata();
 	var sb = player.world.getScoreboard();
-	for(c in _COMMANDS as cmd) {
+	for(var c in _COMMANDS as cmd) {
 		var cmdm = parseUsageRgx(cmd, str);
 
 		var argrgx = cmdm[0];
@@ -532,7 +651,7 @@ function executeXCommand(str, player) {
 				var argnames = cmdm[1];
 				var cg = 1;
 				var args = {};
-				for(a in argnames) {
+				for(var a in argnames) {
 					var argname = argnames[a][0];
 					var ismulti = argnames[a][1];
 					if(typeof(args[argname]) == typeof(undefined)) {
@@ -559,10 +678,9 @@ function executeXCommand(str, player) {
 				cmdperm.load(data);
 				if(cmdperm.permits(player.getName(), sb, data)) {
 					//Check arguments
-					for(a in args as arg) {
-						if(arg == null) { continue; }
+					for(var a in args as arg) {
 
-						for(b in cmd.rules as rule) {
+						for(var b in cmd.rules as rule) {
 
 							if(!"argname" in rule) { continue; }
 							var errpref = '';
@@ -731,7 +849,7 @@ function executeXCommand(str, player) {
 	while(aa.length > 0) {
 		var saa = aa.join(" ");
 		if(usg.length == 0) {
-			for(c in _COMMANDS as cmd) {
+			for(var c in _COMMANDS as cmd) {
 				if(occurrences(cmd.usage, saa) > 0) {
 					var lcp = new Permission(cmd.perm);
 					lcp.load(data);
@@ -746,7 +864,7 @@ function executeXCommand(str, player) {
 
 	if(usg.length > 0) {
 		tellPlayer(player, "&eDid you mean:");
-		for(u in usg) {
+		for(var u in usg) {
 			tellPlayer(player, "&e - &c"+usg[u]+"{suggest_command:"+getCommandNoArg(usg[u])+"}");
 		}
 	} else {

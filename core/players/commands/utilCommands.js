@@ -87,10 +87,10 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 	var mrx = /@(\w+)/g;
 	var mplr = newmsg.match(mrx) || [];
 
-	for(k in mplr) {
+	for(var k in mplr) {
 		var mtc = mplr[k].replace(mrx, '$1');
 		var pmtc = null;
-		for(p in plr) {
+		for(var p in plr) {
 			if(occurrences(plr[p].getName().toLowerCase(), mtc.toLowerCase()) > 0) {
 				pmtc = plr[p].getName();
 				break;
@@ -107,15 +107,15 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 	var apl = (function(w){
 		var pnames = [];
 		var ps = w.getAllPlayers();
-		for(psi in ps as iplayr) {
+		for(var psi in ps as iplayr) {
 			pnames.push(iplayr.getName());
 		}
 
 		return pnames;
 	})(w);
-	for(t in tlr) {
+	for(var t in tlr) {
 		var tc = tlr[t].replace(trx, '$1');
-		for(tt in ts as sbt) {
+		for(var tt in ts as sbt) {
 			if(occurrences(sbt.getDisplayName().toLowerCase(), tc.toLowerCase()) > 0) {
 				//Team select
 				var spl = sbt.getPlayers();
@@ -126,7 +126,7 @@ function getPlayerMessage(player, message, w, pname=null, fullraw=true, allowed=
 					sscol = "&"+getColorId(scol);
 				}
 
-				for(sp in spl as splayr) {
+				for(var sp in spl as splayr) {
 					if(apl.indexOf(splayr) > -1) {
 						executeCommand(player, '/playsound '+notifySound+' hostile '+splayr, splayr);
 					}
@@ -171,7 +171,7 @@ function getCoinAmount(str) {
 	var sgn = 1;
 	if(str.substr(0, 1) == '-') { sgn = -1; }
 
-	for(a in amounts as _am) {
+	for(var a in amounts as _am) {
 		var _amnum = parseInt(_am.replace(arx, '$1'));
 		var _amunit = _am.replace(arx, '$2').toLowerCase();
 		var coinkeys = Object.keys(_COINTABLE);
@@ -184,14 +184,14 @@ function getCoinAmount(str) {
 
 var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries');
 
-var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.ReskillableRegistries');
+var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.reskillable.api.ReskillableRegistries') : null);
 
 
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
-		['!debug <...amount> %% <...koek>', function(pl, args){
-			print(JSON.stringify(args))
+		['!debug', function(pl, args){
+
 		}, 'debug'],
 		['!thunder [player]', function(pl, args, data){
 			var target = (args.player == null ? pl:pl.world.getPlayer(args.player));
@@ -203,25 +203,29 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			}
 		}, 'thunder', []],
 		['!getDoorCode', function(pl, args, data){
-			var rt = pl.rayTraceBlock(16, false, false);
-			var rtb = rt.getBlock();
+			if(hasMCMod("malisisdoors")) {
+				var rt = pl.rayTraceBlock(16, false, false);
+				var rtb = rt.getBlock();
 
-			if(rtb.hasTileEntity()) {
-				var rnbt = rtb.getTileEntityNBT();
-				if(rnbt.has("id")) {
-					if(rnbt.getString("id") == "minecraft:doortileentity") {
-						if(rnbt.has("code")) {
-							tellPlayer(pl, "&6The code of this door is: &e"+rnbt.getString("code"));
-							return true;
-						} else {
-							tellPlayer(pl, "&6This is not an locked door.");
-							return false;
+				if(rtb.hasTileEntity()) {
+					var rnbt = rtb.getTileEntityNBT();
+					if(rnbt.has("id")) {
+						if(rnbt.getString("id") == "minecraft:doortileentity") {
+							if(rnbt.has("code")) {
+								tellPlayer(pl, "&6The code of this door is: &e"+rnbt.getString("code"));
+								return true;
+							} else {
+								tellPlayer(pl, "&6This is not an locked door.");
+								return false;
+							}
 						}
 					}
 				}
-			}
 
-			tellPlayer(pl, "&cYou are not looking at the handle of a door!");
+				tellPlayer(pl, "&cYou are not looking at the handle of a door!");
+			} else {
+				tellPlayer(pl, "&6This command requires the 'Malisisdoors' mod to be installed.");
+			}
 			return true;
 		}, 'getDoorCode', []],
 		['!sign edit <line> [...text]', function(pl, args, data){
@@ -259,7 +263,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		]],
 		['!command list [...matches]', function(pl, args, data){
 			tellPlayer(pl, getTitleBar('Commands'));
-			for(c in _COMMANDS as cmd) {
+			for(var c in _COMMANDS as cmd) {
 				var cmdm = getCommandNoArg(cmd.usage).trim();
 				if(args.matches.length == 0 || arrayOccurs(cmdm, args.matches, false, false)) {
 					tellPlayer(pl, "&e - &c"+cmdm+"&r (&6:sun: Info{run_command:!command info "+getCommandName(cmd.usage)+"}&r)");
@@ -268,7 +272,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		}, 'command.list'],
 		['!command info <...command>', function(pl, args, data){
 			var argcmd = args.command.join(" ").trim();
-			for(c in _COMMANDS as cmd) {
+			for(var c in _COMMANDS as cmd) {
 				if(getCommandName(cmd.usage) == argcmd) {
 					tellPlayer(pl, getTitleBar("Command Info"));
 					tellPlayer(pl, "&eCommand: &b"+getCommandNoArg(cmd.usage).trim());
@@ -289,7 +293,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		}, 'command.info'],
 		['!chain <...commands>', function(pl, args, data){
 			var acmds = args.commands.join(" ").split(";");
-			for(a in acmds as acmd) {
+			for(var a in acmds as acmd) {
 				var excmd = acmd.trim().replace(/\s+/g, ' ');
 				if(excmd.length != "") {
 					executeXCommand(excmd, pl);
@@ -301,7 +305,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			var pcol = '&f';
 			var sb = pl.world.getScoreboard();
 			var spl = (args.players.length > 0 ? args.players : [pl.getName()]);
-			for(ss in spl as sp) {
+			for(var ss in spl as sp) {
 				var t = sb.getPlayerTeam(sp);
 				if(t != null) {
 					var tc = t.getColor();
@@ -317,7 +321,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			var pcol = '&f';
 			var sb = pl.world.getScoreboard();
 			var spl = (args.players.length > 0 ? args.players : [pl.getName()]);
-			for(ss in spl as sp) {
+			for(var ss in spl as sp) {
 				var t = sb.getPlayerTeam(sp);
 				if(t != null) {
 					var tc = t.getColor();
@@ -340,7 +344,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		['!listEnchants [...matches]', function(pl, args){
 			var ENCHANTS = REGISTRY.ENCHANTMENTS.getValues();
 			tellPlayer(pl, getTitleBar("All Registered Enchantments", false));
-			for(i in ENCHANTS as ench) {
+			for(var i in ENCHANTS as ench) {
 				var ename = REGISTRY.ENCHANTMENTS.getKey(ench);
 				var eid = REGISTRY.ENCHANTMENTS.getID(ench);
 				if(args.matches.length == 0 || arrayOccurs(ename, args.matches)) {
@@ -351,7 +355,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		['!listPotions [...matches]', function(pl, args){
 			var POTIONS = REGISTRY.POTIONS.getValues();
 			tellPlayer(pl, getTitleBar("All Registered Potion Effects", false));
-			for(i in POTIONS as pot) {
+			for(var i in POTIONS as pot) {
 				var pname = REGISTRY.POTIONS.getKey(pot);
 				var pid = REGISTRY.POTIONS.getID(pot);
 				if(args.matches.length == 0 || arrayOccurs(pname, args.matches) > 0) {
@@ -362,7 +366,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		['!listBiomes [...matches]', function(pl, args){
 			var BIOMES = REGISTRY.BIOMES.getValues();
 			tellPlayer(pl, getTitleBar("All Registered Biomes", false));
-			for(i in BIOMES as bio) {
+			for(var i in BIOMES as bio) {
 				var bname = REGISTRY.BIOMES.getKey(bio);
 				var bid = REGISTRY.BIOMES.getID(bio);
 				if(args.matches.length == 0 || arrayOccurs(bname, args.matches) > 0) {
@@ -373,7 +377,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		['!listEntities [...matches]', function(pl, args){
 			var ENTITIES = REGISTRY.ENTITIES.getValues();
 			tellPlayer(pl, getTitleBar("All Registered Entities", false));
-			for(i in ENTITIES as ent) {
+			for(var i in ENTITIES as ent) {
 				var bname = REGISTRY.ENTITIES.getKey(ent);
 				var bid = REGISTRY.ENTITIES.getID(ent);
 				if(args.matches.length == 0 || arrayOccurs(bname, args.matches) > 0) {
@@ -382,15 +386,19 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			}
 		}, 'listEntities'],
 		['!listSkills [...matches]', function(pl, args){
-			var SKILLS = ReskillableRegistry.SKILLS.getValues();
-			tellPlayer(pl, getTitleBar("All Registered Skills", false));
-			for(i in SKILLS as skill) {
-				var bname = ReskillableRegistry.SKILLS.getKey(skill);
-				var bid = ReskillableRegistry.SKILLS.getID(skill);
-				var obj = skill.getKey().replace(/\w+\.(\w+)/g, '$1_xp');
-				if(args.matches.length == 0 || arrayOccurs(bname, args.matches) > 0) {
-					tellPlayer(pl, "&e - &b"+bname+"&r (ID: "+bid+", Objective: "+obj+")");
+			if(ReskillableRegistry != null) {
+				var SKILLS = ReskillableRegistry.SKILLS.getValues();
+				tellPlayer(pl, getTitleBar("All Registered Skills", false));
+				for(var i in SKILLS as skill) {
+					var bname = ReskillableRegistry.SKILLS.getKey(skill);
+					var bid = ReskillableRegistry.SKILLS.getID(skill);
+					var obj = skill.getKey().replace(/\w+\.(\w+)/g, '$1_xp');
+					if(args.matches.length == 0 || arrayOccurs(bname, args.matches) > 0) {
+						tellPlayer(pl, "&e - &b"+bname+"&r (ID: "+bid+", Objective: "+obj+")");
+					}
 				}
+			} else {
+				tellPlayer(pl, "&6This command requires the mod 'Reskillable' to be installed.");
 			}
 		}, 'listSkills'],
 		['!tellraw <player> <...message>', function(pl, args){
@@ -427,7 +435,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 		['!convertNpcLoot <radius>', function(pl, args){
 			var w = pl.world;
 			var ents = w.getNearbyEntities(pl.getPos(), args.radius, 2);
-			for(ee in ents as ent) {
+			for(var ee in ents as ent) {
 				if(ent.getType() == 2) {//Is NPC
 					var entnbt = ent.getEntityNbt();
 					var entinv = ent.getInventory();
@@ -462,7 +470,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			var ppos = pl.getPos();
 			var ents = pl.world.getNearbyEntities(ppos, radius, 2);
 			var entcnt = 0; //Affected entity count
-			for(en in ents as ent) {
+			for(var en in ents as ent) {
 				//print(ent.getPos().normalize());
 				if(ent.getType() == 2) {//Is NPC
 					var entrole = ent.getRole();
@@ -482,7 +490,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 							for(var i = 0; i < 18; i++) {
 								//print('SLOT: '+i);amount
 
-								for(ii in newTrades[i] as nItem) {
+								for(var ii in newTrades[i] as nItem) {
 									if(!nItem.isEmpty()) {
 										var nLore = nItem.getLore();
 										if(nLore.length > 0) {
@@ -557,16 +565,16 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			if(args.players.length == 0) { args.players = [pl.getName()]; }
 			var mn = genMoney(w, am);
 
-			for(i in args.players as apl) {
+			for(var i in args.players as apl) {
 				if(plrs.indexOf(apl) > -1) {
-					for(m in mn as mi) {
+					for(var m in mn as mi) {
 						w.getPlayer(apl).giveItem(mi);
 					}
 				}
 			}
 
 			tellPlayer(pl, "&aGave &r:money:&e"+getAmountCoin(am)+"&a to players: '"+args.players.join(', ')+"'");
-			for(a in args.players as apl) {
+			for(var a in args.players as apl) {
 				if(playerIsOnline(w, apl)) {
 					executeCommand(pl, "/tellraw "+apl+" "+parseEmotes(strf("&aYou got &r:money:&e"+getAmountCoin(am))));
 				}
@@ -585,7 +593,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			if(args.players.length == 0) { args.players = [pl.getName()]; }
 
 
-			for(i in args.players as apl) {
+			for(var i in args.players as apl) {
 				var apo = new Player(apl);
 				if(apo.exists(data)) {
 					apo.load(data);
@@ -597,7 +605,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			}
 
 			tellPlayer(pl, "&aGave &b:money:"+getAmountCoin(am)+"&a to players: '"+args.players.join(', ')+"'");
-			for(a in args.players as apl) {
+			for(var a in args.players as apl) {
 				if(playerIsOnline(w, apl)) {
 					executeCommand(pl, "/tellraw "+apl+" "+parseEmotes(strf("&aYou got &b:money:"+getAmountCoin(am))));
 				}
@@ -616,7 +624,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			if(args.players.length == 0) { args.players = [pl.getName()]; }
 
 
-			for(i in args.players as apl) {
+			for(var i in args.players as apl) {
 				var apo = new Player(apl);
 				if(apo.exists(data)) {
 					apo.load(data);
@@ -628,7 +636,7 @@ var ReskillableRegistry = Java.type('codersafterdark.reskillable.api.Reskillable
 			}
 
 			tellPlayer(pl, "&aGave &d:money:"+getAmountCoin(am)+"&a to players: '"+args.players.join(', ')+"'");
-			for(a in args.players as apl) {
+			for(var a in args.players as apl) {
 				if(playerIsOnline(w, apl)) {
 					executeCommand(pl, "/tellraw "+apl+" "+parseEmotes(strf("&aYou got &d:money:"+getAmountCoin(am))));
 				}

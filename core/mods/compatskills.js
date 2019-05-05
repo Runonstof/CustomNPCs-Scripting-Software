@@ -21,7 +21,7 @@ var _TRAITS = [
 //add xp objectives
 var xp_stats = [];
 var skill_names = [];
-for(s in _SKILLS) {
+for(var s in _SKILLS) {
 	xp_stats[s] = _SKILLS[s].replace(/[\w]+\.([\w]+)/g, "$1_xp"); //Converts 'reskillable.mining' to 'mining_xp'
 	skill_names[s] = _SKILLS[s].replace(/[\w]+\.([\w]+)/g, "$1").rangeUpper(0,1); //Converts 'reskillable.mining' to 'Mining'
 }
@@ -88,9 +88,9 @@ function hasTraits(player, traits) {
 	if(typeof(traits) == 'string') { traits = [traits]; }
 	var s = getSkills(player, null, traits);
 	var t = 0;
-	for(k in s) {
+	for(var k in s) {
 		var skill = s[k];
-		for(u in skill.unlockables) {
+		for(var u in skill.unlockables) {
 			if(traits.indexOf(skill.unlockables[u]) > -1) {
 				t++;
 			}
@@ -108,7 +108,7 @@ function getMaxXp(lvl) {
 function getSkillArray(player, skills=null, traits=null) {
 	var s = getSkills(player, skills, traits);
 	var a = [];
-	for(n in s) { a.push(n); }
+	for(var n in s) { a.push(n); }
 	return a;
 }
 
@@ -126,7 +126,7 @@ function getSkills(player, skills=null, traits=null) {
 	var sb = w.getScoreboard();
 	var pp = nbt.getCompound('PlayerPersisted');
 	var sk = pp.getCompound('SkillableData').getCompound('SkillLevels');
-	for(k in skills) {
+	for(var k in skills) {
 		var skill = sk.getCompound(skills[k]);
 		var unlocks = [];
 		var unl = skill.getCompound('unlockables');
@@ -138,7 +138,7 @@ function getSkills(player, skills=null, traits=null) {
 				sxp = sxp_sc.getValue();
 			}
 		}
-		for(u in traits) {
+		for(var u in traits) {
 			if(parseInt(unl.getByte(traits[u])) == 1) {
 				unlocks.push(traits[u]);
 			}

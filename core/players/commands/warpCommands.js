@@ -33,17 +33,54 @@ function Warp(name) {
 			};
 		})
 		.addInfoText(function(warp){
-			return "&6Teleport Price: &r:money:&e"+getAmountCoin(warp.data.price)+"&r [&a:check: Set{suggest_command:!warp setPrice "+warp.name+" }&r]";
+			return "&6&lTeleport Price: &r:money:&e"+getAmountCoin(warp.data.price)+"&r [&a:check: Set{suggest_command:!warp setPrice "+warp.name+" }&r]\n";
 		})
 		.addInfoText(function(warp){
 			var wpos = warp.data.pos;
-			return "&6X: &c"+wpos.x+"&6 Y: &c"+wpos.y+"&6 Z: &c"+wpos.z;
+			return "&aX: &c"+wpos.x+"&a Y: &c"+wpos.y+"&a Z: &c"+wpos.z;
 		})
+		.setListTransformer(
+			"{LISTITEM} {PRICE} {TPBTN} {INFOBTN} {REMOVEBTN}",
+			function(warp, pl, args, data){
+				var sb = pl.world.getScoreboard();
+				var wperm = warp.getPermission().init(data).permits(pl.getName(), sb, data);
+				var canUseTp = new Permission("warp.tp").init(data).permits(pl.getName(), sb, data);
+				var tdata = {
+					"PRICE": "&r:money:&e"+getAmountCoin(warp.data.price)+"&r",
+					"TPBTN": (canUseTp && wperm ? "(&9Teleport{run_command:!warp tp "+warp.name+"}&r)" : ""),
+				};
+
+				return tdata;
+			}
+		)
 		.genDefault()
-		.addSettable("price", [], function(price){
+		.addSettable("price", function(price){
 			return getCoinAmount(price);
-		},{
+		}, [
+			{
+				"argname": "price",
+				"type": "currency",
+				"min": 0
+			}
+		], {
 			"val": "&r:money:&e{price}"
+		})
+		.add("tp <name>", function(warp, pl, args, data){
+			var plo = new Player(pl.getName()).init(data);
+			if(warp.getPermission().init(data).permits(pl.getName(), pl.world.getScoreboard(), pl.world.getStoreddata())) {
+				if(plo.data.money >= warp.data.price) {
+						plo.data.money -= warp.data.price;
+						tellPlayer(pl, "&aTook &r:money:&e"+getAmountCoin(warp.data.price)+"&a as warp tax!");
+						pl.setPosition(warp.data.pos.x, warp.data.pos.y, warp.data.pos.z);
+						plo.save(data);
+						return true;
+				} else {
+					tellPlayer(pl, "&cYou don't have enough money!");
+				}
+			} else {
+				tellPlayer(pl, "&cYou don't have access to this warp!");
+			}
+			return false;
 		})
 		.register();
 @endblock

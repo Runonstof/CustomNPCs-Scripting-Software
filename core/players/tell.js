@@ -11,7 +11,7 @@ function storytellPlayer(player, ar) {
 }
 
 function getTitleBar(title, showServerName=true) {
-	return SERVER_BAR_OPEN+(showServerName?SERVER_TITLE+" ":"")+title+SERVER_BAR_CLOSE;
+	return SERVER_BAR_OPEN+(showServerName?SERVER_TITLE+" ":SERVER_PREFIX)+title+SERVER_BAR_CLOSE;
 }
 
 function getUndoBtn(undo_cmds, hoverText=null) {

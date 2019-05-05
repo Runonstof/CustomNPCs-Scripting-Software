@@ -68,7 +68,7 @@ function interact(event){
 	}
 	//You know that part. Stolen from your code XD Will give player his profit
 	var pm = genMoney(pl.getWorld(), profit);
-	for(p in pm) {
+	for(var p in pm) {
 		var pii = pm[p];
 		pl.giveItem(pii);
 	}

@@ -12,26 +12,27 @@ function Team(name) {
 
 @block register_commands_event
 	//REGISTER TEAM COMMANDS
+	var teamCommands = new CommandFactory("team");
+
+
 	registerXCommands([
-		['!teams set chatcolor <team_name> [color]', function(pl, args){
+		['!team syncAll [removeNonExistend]', function(pl, args, data){
 			var w = pl.world;
 			var sb = w.getScoreboard();
-			var t = new Team(args.team_name);
-			var data = w.getStoreddata();
-			t.data.chatcolor = args.color;
-			t.save(data);
-			tellPlayer(pl, "&aSet chatcolor for team ");
-		}, 'teams.set.chatcolor', [
-			{
-				"argname": "color",
-				"type": "color"
-			},
-			{
-				"argname": "team_name",
-				"type": "datahandler",
-				"datatype": "team",
-				"exists": true
+			var sbteams = sb.getTeams();
+			var dhteams = new Team().getAllDataIds(data);
+			for(var s in sbteams as sbt) {
+				if(dhteams.indexOf(sbt.getName()) == -1) {
+					tellPlayer(pl, "&cScoreboard team '"+sbt.getName()+"' has no synced data! Syncing...");
+				}
 			}
-		]]
+
+		}, 'team.syncAll', [
+				{
+					"argname": "removeNonExistend",
+					"type": "bool"
+				}
+			]
+		]
 	]);
 @endblock

@@ -6,7 +6,7 @@ import core\npc\moreEvents.js;
 		
 		var allCreative = (function(e){
 			var pl = e.npc.world.getAllPlayers();
-			for(ayer in pl) {
+			for(var ayer in pl) {
 				if(pl[ayer].getGamemode() != 1) { return false; }
 			}
 			return true;

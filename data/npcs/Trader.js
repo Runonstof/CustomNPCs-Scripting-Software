@@ -76,7 +76,7 @@ function role(e){
 					e.currency2,
 				];
 
-				for(c in currency as crncy) {
+				for(var c in currency as crncy) {
 					if(crncy != null) {
 						var reqamount = crncy.getStackSize();
 						if(getInvItemCount(pnbt, crncy, w, tradeIgnoreNbt) < reqamount) {
@@ -86,7 +86,7 @@ function role(e){
 				}
 
 				if(canTrade) {
-					for(c in currency as crncy) {
+					for(var c in currency as crncy) {
 						if(crncy != null) {
 						
 							e.player.removeItem(crncy, crncy.getStackSize());

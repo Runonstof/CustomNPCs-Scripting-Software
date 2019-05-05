@@ -18,15 +18,17 @@ function Player(name) {
 		"badges": [],
 		"showbadge": null,
 		"chateffect": null,
-		"color": null,
 		"firstLogin": new Date().getTime(),
 		"lastLogin": 0,
 		"color": null,
 		"UUID": null,
-		"money": 0,
-		"vmoney": 0, //vote tokens
-		"armoney": 0, //arcade tokens
+		"money": DEFAULT_MONEY,
 	};
+	for(var v in VIRTUAL_CURRENCIES as crncy) {
+		this.data[crncy.name] = crncy.default||0;
+	}
+
+
 	this.sync = function(ipl) {
 		this.data.UUID = ipl.getUUID();
 		this.name = ipl.getName();
@@ -88,7 +90,7 @@ function Player(name) {
 	};
 	this.getJobs = function(data) {
 		var jobs = [];
-		for(i in this.data.jobs as job) {
+		for(var i in this.data.jobs as job) {
 			pjob = new Job(i);
 			if(pjob.load(data)) {
 				jobs.push(pjob);
@@ -140,7 +142,7 @@ function Player(name) {
 	this.getChats = function(data) {
 		var chats = [];
 		var dkeys = data.getKeys();
-		for(d in dkeys as dkey) {
+		for(var d in dkeys as dkey) {
 			if(dkey.cmatch(/chatchannel_([\w]+)/g) > 0) {
 				var cc = new ChatChannel(dkey.replace(/chatchannel_([\w]+)/g, "$1"));
 				if(cc.load(data)) {
@@ -156,13 +158,13 @@ function Player(name) {
 	this.getAllowedColors = function(data, sb) {
 		var ac = [];
 		//Check individual colors
-		for(i in _RAWCOLORS as rc) {
+		for(var i in _RAWCOLORS as rc) {
 			var cp = new Permission(getColorPermId(getColorId(rc))).init(data);
 			if(cp.permits(this.name, sb, data)) {
 				ac.push(getColorId(rc));
 			}
 		}
-		for(i in _RAWEFFECTS as rc) {
+		for(var i in _RAWEFFECTS as rc) {
 			var cp = new Permission(getColorPermId(getColorId(rc))).init(data);
 			if(cp.permits(this.name, sb, data)) {
 				ac.push(getColorId(rc));
@@ -191,13 +193,13 @@ function Player(name) {
 
 
 	this.getInventory = function(name){
-		for(invName in this.data.inventories as inv){
+		for(var invName in this.data.inventories as inv){
 			if(inv[0] == name) return inv[1];
 		}
 		return;
 	};
 	this.removeInventory = function(name){
-		for(invName in this.data.inventories){
+		for(var invName in this.data.inventories){
 			this.data.inventories.splice(invName, 1);
 			return true;
 		}
@@ -213,7 +215,7 @@ function Player(name) {
 
 	this.getAllowedEmotes = function(sb, data) {
 		var ems = [];
-		for(c in CHAT_EMOTES as ce) {
+		for(var c in CHAT_EMOTES as ce) {
 			var ec = new Emote(c);
 			ec.load(data);
 			if(this.hasEmote(ec.name, sb, data)) {
@@ -295,7 +297,7 @@ function Player(name) {
 		if(loseMoney > 0) {
 			plo.data.money -= loseMoney;
 			var lm = genMoney(w, loseMoney);
-			for(l in lm as lsm) {
+			for(var l in lm as lsm) {
 				pl.dropItem(lsm);
 			}
 			plo.save(data);
@@ -317,7 +319,7 @@ function Player(name) {
 		if(new Date().getTime() > (plo.data.lastPayed+plo.data.payTime)) {
 			if(plo.data.pay > 0) {
 				var pm = genMoney(pl.world, plo.data.pay);
-				for(p in pm as pii) {
+				for(var p in pm as pii) {
 					pl.giveItem(pii);
 				}
 				tellPlayer(pl, "&aYou have earned &r:money:&e"+getAmountCoin(plo.data.pay)+"&a!");
@@ -327,7 +329,7 @@ function Player(name) {
 		}
 
 		//CHECK JOB PAY
-		for(j in plo.data.jobs as pjob) {
+		for(var j in plo.data.jobs as pjob) {
 			var job = new Job(j);
 			if(!job.exists(data)) {
 				plo.delJob(j);
@@ -342,7 +344,7 @@ function Player(name) {
 				var now = new Date().getTime();
 				if(now >= joblastPayed+jobpayTime) {
 					var pm = genMoney(pl.world, jobpay);
-					for(p in pm as pii) {
+					for(var p in pm as pii) {
 						pl.giveItem(pii);
 					}
 					tellPlayer(pl, "&aYou have earned &r:money:&e"+getAmountCoin(jobpay)+"&a from job '"+job.getDisplayName(data)+"'&r&a!");
@@ -369,7 +371,7 @@ function Player(name) {
 			tellPlayer(pl, "&l[=======] &6&lGramados Player Perms&r &l[=======]");
 			tellPlayer(pl, "&ePermissions for player:&r "+args.player);
 			var shownperms = 0;
-			for(p in permids as pid) {
+			for(var p in permids as pid) {
 				if(args.matches.length == 0 || arrayOccurs(pid, args.matches, false, false) > 0) {
 					var perm = new Permission(pid).init(data);
 					if(perm.permits(args.player, sb, data)) {
@@ -551,7 +553,7 @@ function Player(name) {
 			var pjobs = p.getJobs(data);
 
 			if(pjobs.length > 0) {
-				for(pj in pjobs as pjob) {
+				for(var pj in pjobs as pjob) {
 					tellPlayer(pl, "&eJob income for &r"+pjob.getDisplayName(data));
 					tellPlayer(pl, "&e - Job salary: &6&o"+getAmountCoin(pjob.data.pay));
 					var jleft = (p.getJob(pjob.name).lastPayed+pjob.data.payTime) - new Date().getTime();
@@ -668,7 +670,7 @@ function Player(name) {
 			var scores = [];
 			if(bo != null) {
 				var bos = bo.getScores();
-				for(b in bos as bscore) {
+				for(var b in bos as bscore) {
 					scores.push({
 						name: bscore.getPlayerName(),
 						value: bscore.getValue(),
@@ -679,7 +681,7 @@ function Player(name) {
 				return b.value-a.value;
 			});
 			tellPlayer(pl, getTitleBar("Top Bounties"))
-			for(s in scores as score) {
+			for(var s in scores as score) {
 				var spl = new Player(score.name);
 				spl.load(data);
 				var pnum = parseInt(s)+1;
@@ -754,8 +756,12 @@ function Player(name) {
 			var total = mp+mi;
 			tellPlayer(pl, getTitleBar('Money Pouch'));
 			tellPlayer(pl, ":danger: &4&oYou will lose 50% of your money pouch on death.&r :danger:");
-			tellPlayer(pl, "&6Arcade Tokens: &d:money:A"+getAmountCoin(p.data.armoney));
-			tellPlayer(pl, "&6Vote Tokens: &b:money:V"+getAmountCoin(p.data.vmoney));
+			for(var v in VIRTUAL_CURRENCIES as crncy) {
+				tellPlayer(pl, "&6"+crncy.displayName+": &r"+crncy.prefix+getAmountCoin(p.data[crncy.name])+crncy.suffix);
+			}
+
+			//tellPlayer(pl, "&6Arcade Tokens: &d:money:A"+getAmountCoin(p.data.armoney));
+			//tellPlayer(pl, "&6Vote Tokens: &b:money:V"+getAmountCoin(p.data.vmoney));
 			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(mp)+"&r [&aWithdraw{suggest_command:!withdraw }&r]");
 			tellPlayer(pl, "&6Inventory: &r:money:&e"+getAmountCoin(mi)+"&r [&aDeposit{run_command:!deposit}&r]");
 			tellPlayer(pl, "&cYou carry a total of &r:money:&e"+getAmountCoin(total));
@@ -772,7 +778,7 @@ function Player(name) {
 			var pjobs = p.getJobs(data);
 
 			if(pjobs.length > 0) {
-				for(pj in pjobs as pjob) {
+				for(var pj in pjobs as pjob) {
 					tellPlayer(pl, "&eJob income for &r"+pjob.getDisplayName(data));
 					tellPlayer(pl, "&e - Job salary: &6&o"+getAmountCoin(pjob.data.pay));
 					var jleft = (p.getJob(pjob.name).lastPayed+pjob.data.payTime) - new Date().getTime();
@@ -788,7 +794,7 @@ function Player(name) {
 		['!myStats [...matches]', function(pl, args, data){
 			var pskills = getSkills(pl);
 			var maxLvl = 32;
-			tellPlayer(pl, "&l[=======] &6&lGramados Stats&r &l[=======]");
+			tellPlayer(pl, getTitleBar("Stats"));
 			var lmatches = arrayTransform(args.matches, function(arr_el){return arr_el.toLowerCase();});
 			for(var p in pskills as pskill) {
 				if(arrayOccurs(pskill.name.toLowerCase(), lmatches) || args.matches.length == 0) {
@@ -882,7 +888,7 @@ function Player(name) {
 				tellPlayer(pl, getTitleBar("Your Warppp List",false));
 				var tellIds = [];
 				var pagenum = Math.floor(minShow/showLen)+1;
-				for(i in ids as id) {
+				for(var i in ids as id) {
 					if((args.matches.length == 0 || arrayOccurs(id, args.matches, false, false)) && new Warp(id).getPermission().init(data,false).permits(pl.getName(), pl.world.getScoreboard(), data)) {
 						if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
 							tellIds.push(id);
@@ -907,7 +913,7 @@ function Player(name) {
 					"[&cShow 15{run_command:!myWarps "+args.matches.join(" ")+" -show:15}&r] "+
 					"[&cShow 20{run_command:!myWarps "+args.matches.join(" ")+" -show:25}&r]"
 				);
-				for(i in tellIds as id) {
+				for(var i in tellIds as id) {
 
 					var wrp = new Warp(id).init(data);
 					tellPlayer(pl, "&e - &b"+wrp.name+"&r "+(wrp.data.price > 0 ? "(:money:&e"+getAmountCoin(wrp.data.price)+"&r) " : "")+"&r[&e:sun: Teleport{run_command:!warp tp "+wrp.name+"}&r]");
@@ -957,7 +963,7 @@ function Player(name) {
 				tellPlayer(pl, "&l[=======] &6&lGramados Homes &r&l[=======]");
 				var maxHomeStr = " - &e"+Object.keys(plo.data.homes).length+"/"+(plo.data.maxHomes == -1 ? "&aInfinite":plo.data.maxHomes)+"&e Homes used";
 				tellPlayer(pl, "[&a:check: Add{suggest_command:!setHome }&r]"+maxHomeStr);
-				for(i in plo.data.homes as home) {
+				for(var i in plo.data.homes as home) {
 					tellPlayer(pl, "&e - &9&o"+i+"&r&r [&bTeleport{run_command:!home "+i+"|show_text:Click to TP\n$eX:$c"+home.x+" $eY:$c"+home.y+" $eZ:$c"+home.z+" }&r] [&c:cross: Remove{run_command:!delHome "+i+"|show_text:Click to remove home.}&r]");
 				}
 				return true;

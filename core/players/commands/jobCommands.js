@@ -1,6 +1,6 @@
 registerDataHandler("job", Job);
 function Job(name) {
-	DataHandler.apply(this, ['job', name]);
+	extends function DataHandler('job', name);
 	this.data = {
 		"displayName": name,
 		"pay": getCoinAmount('5g'),
@@ -14,7 +14,7 @@ function Job(name) {
 	this.getPlayers = function(data) {
 		var pl = [];
 		var dkeys = data.getKeys();
-		for(d in dkeys as dkey) {
+		for(var d in dkeys as dkey) {
 			if(dkey.cmatch(/player_(\w+)/g) == 1) {
 				var player = new Player(dkey.replace(/player_(\w+)/g, '$1'));
 				player.load(data);
@@ -160,7 +160,7 @@ function Job(name) {
 			var data = pl.world.getStoreddata();
 			var dkeys = data.getKeys();
 			tellPlayer(pl, "&l[=======]&r&6&lGramados Job List&r&l[=======]");
-			for(d in dkeys as dkey) {
+			for(var d in dkeys as dkey) {
 				if( ( dkey.match(/job_(\w.)/g) || [] ).length > 0 ) {
 					var job = new Job(dkey.replace(/job_(\w.)/g, '$1'));
 					var isMatch = false;
@@ -206,7 +206,7 @@ function Job(name) {
 			tellPlayer(pl, "&l[=======] &r&6&lGramados Job Player List &r&l[=======]");
 			tellPlayer(pl, "&eJob: &9&o"+args.name);
 			var pls = job.getPlayers(data);
-			for(p in pls as plr) {
+			for(var p in pls as plr) {
 				tellPlayer(pl, "&e - &r"+plr);
 			}
 		}, 'jobs.playerList', [
@@ -221,7 +221,7 @@ function Job(name) {
 			var job = new Job(args.name);
 			var data = pl.world.getStoreddata();
 			job.load(data);
-			for(p in  args.player_names as apl) {
+			for(var p in  args.player_names as apl) {
 				var apo = new Player(apl);
 				if(apo.load(data)) {
 					apo.addJob(job.name);
@@ -277,7 +277,7 @@ function Job(name) {
 		['!jobs removePlayers <name> <...players>', function(pl, args){
 			var job = new Job(args.name);
 			var data = pl.world.getStoreddata();
-			for(p in args.players as apl) {
+			for(var p in args.players as apl) {
 				var apo = new Player(apl);
 				if(apo.load(data)) {
 					apo.delJob(job.name);
@@ -297,7 +297,7 @@ function Job(name) {
 			var data = pl.world.getStoreddata();
 			var dkeys = data.getKeys();
 			var jc = 0;
-			for(d in dkeys as dkey) {
+			for(var d in dkeys as dkey) {
 				if(dkey.cmatch(/job_(\w+)/g)) {
 					var job = new Job(dkey.replace(/job_(\w+)/g, '$1'));
 					if(job.load(data)) {

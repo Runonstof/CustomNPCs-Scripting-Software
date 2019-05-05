@@ -14,7 +14,7 @@ var merchant_id = '';
 
 function marketSlotAddTrade(slot, cur1, cur2, sold) {
 	var exists = false;
-	for(i in MARKET_TABLE) {
+	for(var i in MARKET_TABLE) {
 		var trade = MARKET_TABLE[i];
 		if(trade.slot == slot) {
 			trade.trades[trade.trades.length] = {
@@ -58,7 +58,7 @@ function genQuestItem(quest, w, mId) {
 		ccs('&r'+quest.desc),
 		ccs('&7Gather the following items:'),
 	];
-	for(i in quest.items) {
+	for(var i in quest.items) {
 		var qi = quest.items[i];
 		questitems_nbt.push(qi.getItemNbt());
 		lore.push(ccs(' &6&l'+qi.getStackSize().toString()+' &8&lX &r'+qi.getDisplayName()));
@@ -68,7 +68,7 @@ function genQuestItem(quest, w, mId) {
 	nbt.setString('MerchantId', mId);
 	
 	lore.push(ccs('&7To receive the following items:'));
-	for(i in quest.rewards) {
+	for(var i in quest.rewards) {
 		var qr = quest.rewards[i];
 		questrewards_nbt.push(qr.getItemNbt());
 		lore.push(ccs(' &6&l'+qr.getStackSize().toString()+' &8&lX &r'+qr.getDisplayName()));
@@ -105,7 +105,7 @@ function redeemMoney(e, money) {
 			
 			var coins = createCoins(mn, e.player.world);
 		
-			for(i in coins) {
+			for(var i in coins) {
 				e.player.dropItem(coins[i]);
 			}
 		
@@ -143,7 +143,7 @@ function redeemQuest(e, questitem, mId) {
 					//Array conversion
 					var TEMP_quest_tags = quest_tags;
 					quest_tags = [];
-					for(i in TEMP_quest_tags) { quest_tags[i] = TEMP_quest_tags[i]; }
+					for(var i in TEMP_quest_tags) { quest_tags[i] = TEMP_quest_tags[i]; }
 					
 					
 					
@@ -165,7 +165,7 @@ function redeemQuest(e, questitem, mId) {
 					if(questrewards == null) { questrewards = []; }
 					
 					//check if has items
-					for(i in questitems) {
+					for(var i in questitems) {
 						var qi = w.createItemFromNbt(questitems[i]);
 						if(e.player.inventoryItemCount(qi) < qi.getStackSize()) {
 							e.npc.say("You don't have enough "+qi.getItemName());
@@ -174,13 +174,13 @@ function redeemQuest(e, questitem, mId) {
 					}
 					//player Has items
 					//remove items
-					for(i in questitems) {
+					for(var i in questitems) {
 						var qi = w.createItemFromNbt(questitems[i]);
 						if(!e.player.removeItem(qi, qi.getStackSize())) { return false; }
 					}
 					
 					//Give rewards
-					for(i in questrewards) {
+					for(var i in questrewards) {
 						var qr = w.createItemFromNbt(questrewards[i]);
 						e.player.dropItem(qr);
 					}
@@ -209,7 +209,7 @@ function getQuests(groups) {
 		var qst = QUEST_TABLE[i];
 		var add = true;
 		
-		for(g in groups) {
+		for(var g in groups) {
 			if(qst.groups.indexOf(groups[g]) == -1) { add = false; }
 		}
 		
@@ -246,7 +246,7 @@ function addQuest(quest) {
 		//Remove old trades
 		for(var i = 0; i < 18; i++) { m.remove(i); }
 		//Add new Trades
-		for(i in MARKET_TABLE) {
+		for(var i in MARKET_TABLE) {
 			var trade = MARKET_TABLE[i];
 			var newTrade = pickchance(trade.trades);
 			m.set(trade.slot, newTrade.cur1, newTrade.cur2, newTrade.sold);

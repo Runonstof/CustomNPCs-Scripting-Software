@@ -1,8 +1,8 @@
 var PERMISSION_REGEX = /permission_([\w.\-]+)/g;
-
+registerDataHandler("permission", Permission);
 import core\players\Permittable.js;
 
-registerDataHandler("permission", Permission);
+
 function Permission(name) {
 	extends function DataHandler('permission', name);
 
@@ -16,7 +16,7 @@ function Permission(name) {
 
 	this.addTeams = function(teams) {
 		if(typeof(teams) == 'string') { teams = [teams]; }
-		for(t in teams as team) {
+		for(var t in teams as team) {
 			var teamname = team;
 			if(this.data.teams.indexOf(teamname) == -1) {
 				this.data.teams.push(teamname);
@@ -31,7 +31,7 @@ function Permission(name) {
 		}
 
 		var nteams = [];
-		for(t in this.data.teams as team) {
+		for(var t in this.data.teams as team) {
 			if(teams.indexOf(team) == -1) {
 				nteams.push(team);
 			}
@@ -41,7 +41,7 @@ function Permission(name) {
 	};
 	this.addPlayers = function(players) {
 		if(typeof(players) == 'string') { players = [players]; }
-		for(p in players as player) {
+		for(var p in players as player) {
 			if(this.data.players.indexOf(player) == -1) {
 				this.data.players.push(player);
 			}
@@ -52,14 +52,14 @@ function Permission(name) {
 	this.removePlayers = function(players) {
 		if(typeof(players) == 'string') { players = [players]; }
 		var nplayers = [];
-		for(p in this.data.players as player) {
+		for(var p in this.data.players as player) {
 			if(players.indexOf(player) == -1) {
 				nplayers.push(player);
 			}
 		}
 		this.data.players = nplayers;
 		return this;
-	}
+	};
 	this.permits = function(player, sb, data) {
 		///String player
 		///IScoreboard sb
@@ -84,7 +84,7 @@ function Permission(name) {
 		}
 		//Check jobs
 		var pjobs = p.getJobs(data);
-		for(p in pjobs as pjob) {
+		for(var p in pjobs as pjob) {
 			if(this.data.jobs.indexOf(pjob.name) != -1) {
 				permitted = true;
 			}
@@ -97,11 +97,11 @@ function Permission(name) {
 		var parents = [];
 		var permids = this.getAllDataIds(data);
 		var idarr = this.name.split(".");
-		for(pid in permids as permid) {
+		for(var pid in permids as permid) {
 			var pidarr = permid.split(".");
 			if(idarr.length > pidarr.length && permid != this.name) {
 				var pidmatch = true;
-				for(pai in pidarr as piditem) {
+				for(var pai in pidarr as piditem) {
 					if(piditem != idarr[pai]) {
 						pidmatch = false;
 					}
@@ -121,24 +121,40 @@ function Permission(name) {
 
 @block register_commands_event
 	//REGISTER PERMISSION COMMANDS
-	registerXCommands([
-		['!perms setEnabled <permission_id> <value>', function(pl, args, data){
-			var perm = new Permission(args.permission_id).init(data);
-			perm.data.enabled = (args.value == 'true');
-			perm.save(data);
-			tellPlayer(pl, "&a"+(args.value == 'true' ? 'Enabled' : 'Disabled')+" permission '"+args.permission_id+"'! &r[&5&lUndo{run_command:!perms setEnabled "+perm.name+" "+(args.value == 'true' ? 'false' : 'true')+"}&r]");
-		}, 'perms.setEnabled', [
-			{
-				"argname": "value",
-				"type": "bool"
-			},
-			{
-				"argname": "permission_id",
-				"type": "datahandler",
-				"datatype": "permission",
-				"exists": true,
+	var permCommands = new CommandFactory("permission", "perms");
+
+	permCommands
+		.addInfoText(function(perm){
+			var infoText = "&6&lEnabled: "+(perm.data.enabled ? "&atrue" : "&cfalse");
+			infoText += "&r ["+
+				(perm.data.enabled ?
+					"&c:cross: Disable{run_command:!perms setEnabled "+perm.name+" false|show_text:$cClick to disable permission.}"
+				:
+					"&a:check: Enable{run_command:!perms setEnabled "+perm.name+" true|show_text:$aClick to enable permission.}"
+				)
+			+"&r]\n";
+			infoText += "&6&lPermitted Teams: &r(&a:check: Add Teams{suggest_command:!perms addTeams "+perm.name+" }&r)\n";
+			for(var t in perm.data.teams as permteam) {
+				infoText += "&e - &r"+permteam+"&r (&c:cross: Remove{run_command:!perms removeTeams "+perm.name+" "+permteam+"|show_text:$cClick to remove team $o"+permteam+"$c from permission $o"+perm.name+"}&r)\n";
 			}
-		]],
+
+			infoText += "&6&lPermitted Players: &r(&a:check: Add Players{suggest_command:!perms addPlayers "+perm.name+" }&r)\n";
+
+			return infoText;
+		})
+		.genDefault()
+		.addSettable("enabled", function(enabled){
+			return (enabled.toString() === "true");
+		}, [
+			{
+				"argname": "enabled",
+				"type": "bool",
+			}
+		], {
+			"val": "{enabled}"
+		})
+		.register();
+	registerXCommands([
 		['!perms addTeams <permission_id> <...teams>', function(pl, args, data){
 			var w = pl.world;
 			var p = new Permission(args.permission_id).init(data);
@@ -197,133 +213,5 @@ function Permission(name) {
 				"exists": true,
 			}
 		]],
-		['!perms remove <permission_id>', function(pl, args, data){
-			var data = pl.world.getStoreddata();
-			var p = new Permission(args.permission_id).init(data);
-			//Cache data for undo-action
-			var undocmds = [
-				'!perms create '+p.name,
-				'!perms setEnabled '+p.name+' '+p.data.enabled.toString(),
-			];
-			if(p.data.teams.length > 0) { undocmds.push('!perms addTeams '+p.name+' '+p.data.teams.join(" ")); }
-			if(p.data.players.length > 0) { undocmds.push('!perms addPlayers '+p.name+' '+p.data.players.join(" ")); }
-			p.remove(data);
-			tellPlayer(pl, "&aRemoved permission '"+p.name+"'!&r [&5&lUndo{run_command:!chain "+undocmds.join(";")+"}&r]");
-			return true;
-
-		}, "perms.remove", [
-			{
-				"argname": "permission_id",
-				"type": "datahandler",
-				"datatype": "permission",
-				"exists": true,
-			}
-		]],
-		['!perms create <permission_id>', function(pl, args){
-			var w = pl.world;
-			var data = w.getStoreddata();
-			var p = new Permission(args.permission_id);
-			tellPlayer(pl, "&aSaved new permission "+p.name+"!&r [&5&lUndo{run_command:!perms remove "+p.name+"}&r]");
-			p.save(data);
-		}, 'perms.create', [
-			{
-				"argname": "permission_id",
-				"type": "datahandler",
-				"datatype": "permission",
-				"exists": false,
-			}
-		]],
-		['!perms list [...matches]', function(pl, args, data){
-			var w = pl.world;
-			var params = getArgParams(args.matches);
-			var ids = new Permission().getAllDataIds(data);
-
-			var page = (parseInt(params.page)||1)-1;
-
-			var defaultShowLen = 10;
-			var minShowLen = 4;
-			var maxShowLen = 32;
-
-			var showLen = Math.max(Math.min((parseInt(params.show)||defaultShowLen), maxShowLen), minShowLen);
-			var minShow = page*showLen;
-			var maxShow = minShow+showLen;
-
-			var curShow = 0;
-
-			if(ids.length > 0) {
-				tellPlayer(pl, getTitleBar("Permission List"));
-				var tellIds = [];
-				var pagenum = Math.floor(minShow/showLen)+1;
-				for(i in ids as id) {
-					if((args.matches.length == 0 || arrayOccurs(id, args.matches, false, false))) {
-						if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
-							tellIds.push(id)
-						}
-						curShow++;
-					}
-
-				}
-				if(args.matches.length > 0) {
-					tellPlayer(pl, "&6&lSearching for:&e "+args.matches.join(", "));
-				}
-				tellPlayer(pl, "&6&lResults: &c"+curShow);
-				var maxpages = Math.ceil(curShow/showLen);
-				nxtPage = page+2;
-				var navBtns =
-					" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!perms list "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
-					" "+(pagenum < maxpages ? "[&aNext >>{run_command:!perms list "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
-				tellPlayer(pl, "&6&lPage: &d&l"+pagenum+"/"+maxpages+navBtns);
-				tellPlayer(pl,
-					"[&cShow 5{run_command:!perms list "+args.matches.join(" ")+" -show:5}&r] "+
-					"[&cShow 10{run_command:!perms list "+args.matches.join(" ")+" -show:10}&r] "+
-					"[&cShow 15{run_command:!perms list "+args.matches.join(" ")+" -show:15}&r] "+
-					"[&cShow 20{run_command:!perms list "+args.matches.join(" ")+" -show:25}&r]"
-				);
-				for(i in tellIds as id) {
-					tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!perms info "+id+"}&r) (&c:cross: Remove{run_command:!perms remove "+id+"}&r)");
-				}
-			} else {
-				tellPlayer(pl, "&cThere are no registered permissions");
-			}
-			return true;
-		}, ['perms.list']],
-		['!perms info <permission_id>', function(pl, args){
-			var w = pl.world;
-			var data = w.getStoreddata();
-			var p = new Permission(args.permission_id);
-			if(p.load(data)) {
-				tellPlayer(pl, getTitleBar("Permission Info"));
-				tellPlayer(pl, "&eID: &9&o"+p.name+"&r (&2:recycle: Refresh{run_command:!perms info "+p.name+"}&r) (&4:cross: Remove Perm{run_command:!perms remove "+p.name+"}&r)")
-				tellPlayer(pl, "&eEnabled: &r"+
-					(p.data.enabled ? "&a:check: Yes" : "&c:cross: No")+
-					"&r ("+
-					(p.data.enabled ?
-						"&c:cross: Disable{run_command:!perms setEnabled "+p.name+" false|show_text:Click to disable.}"
-						:
-						"&a:check: Enable{run_command:!perms setEnabled "+p.name+" true|show_text:Click to enable.}"
-					)+
-					"&r)"
-				);
-				tellPlayer(pl, "&ePermitted Teams: &r(&a:check: Add{suggest_command:!perms addTeams "+p.name+" }&r) (&c:cross: Remove{suggest_command:!perms removeTeams "+p.name+" }&r)");
-				for(i in p.data.teams as team) {
-					tellPlayer(pl, "&e - &r&o"+team+"&r (&c:cross: Remove{run_command:!perms removeTeams "+p.name+" "+team+"}&r)");
-				}
-				tellPlayer(pl, "&ePermitted Players: &r(&a:check: Add{suggest_command:!perms addPlayers "+p.name+" }&r) (&cRemove{suggest_command:!perms removePlayers "+p.name+" }&r)");
-				for(i in p.data.players as player) {
-					tellPlayer(pl, "&e - &r&o"+player+"&r (&c:cross: Remove{run_command:!perms removePlayers "+p.name+" "+player+"}&r)");
-				}
-
-				tellPlayer(pl, p.getParentPerms(data).join(", "));
-			} else {
-				tellPlayer(pl, "&cCould not find any info for "+args.permission_id);
-			}
-		}, 'perms.info', [
-			{
-				"argname": "permission_id",
-				"type": "datahandler",
-				"datatype": "permission",
-				"exists": true,
-			}
-		]]
 	]);
 @endblock

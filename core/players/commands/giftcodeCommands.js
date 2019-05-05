@@ -50,7 +50,7 @@ function GiftCode(name) {
 		}
 		//give
 		if(this.data.emotes.length > 0){
-			for(n in this.data.emotes as emote) {
+			for(var n in this.data.emotes as emote) {
 				if(p.data.emotes.indexOf(emote) == -1) {
 	          		p.data.emotes.push(emote);
 	        	}
@@ -77,7 +77,7 @@ function GiftCode(name) {
     ['!giftcode list [...matches]', function(pl, args, data){
         tellPlayer(pl, getTitleBar("GiftCodes List"));
         var codes = new GiftCode().getAllDataIds(data);
-        for(n in codes as codeId) {
+        for(var n in codes as codeId) {
             var code = new GiftCode(codeId).init(data);
             var hoverInfo = "$e$lCode: $r"+code.data.code+"\n$e$lUses left: $r"+code.getUsesLeft();
             tellPlayer(pl, "&e - &b&l"+code.name+"{*|show_text:"+hoverInfo+"}&r [&6:sun: Info{run_command:!giftcode info "+code.name+"}&r] [&c:cross: Remove{run_command:!giftcode remove "+code.name+"}&r]");
@@ -295,7 +295,7 @@ function GiftCode(name) {
     ]],
     ['!giftcode redeem <code>', function(pl, args, data){
 		var codes = new GiftCode().getAllDataIds(data);
-        for(n in codes as codeId) {
+        for(var n in codes as codeId) {
             var code = new GiftCode(codeId).init(data);
 			if(code.data.code == args.code){
 				return code.redeem(pl, data);

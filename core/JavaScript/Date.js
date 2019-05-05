@@ -16,7 +16,7 @@ function getStringTime(timeString) {
 	var newTime = 0;
 	var _tk = Object.keys(msTable);
 
-	for(m in _m) {
+	for(var m in _m) {
 		var fm = _m[m];
 		var nm = fm.replace(reg, '$1').cInt();
 		var om = fm.replace(reg, '$2');
@@ -33,7 +33,7 @@ function getStringTime(timeString) {
 function getTimeString(stringTime, excludes=[]) {
 	var newTime = parseInt(stringTime);
 	var newStr = '';
-	for(ms in msTable) {
+	for(var ms in msTable) {
 		if(excludes.indexOf(ms) == -1) {
 			var msnum = 0;
 			while(newTime >= msTable[ms]) {

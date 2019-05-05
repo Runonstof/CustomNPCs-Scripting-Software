@@ -1,7 +1,7 @@
 String.prototype.allMatch = function(regx) {
 	var m = this.match(regx);
 	var rr = [];
-	for(mm in m) {
+	for(var mm in m) {
 		var mt = m[mm];
 		var rx = regx.exec(this);
 		rr.push(rx);
@@ -47,8 +47,8 @@ String.prototype.pad = function(character, len) {
 };
 
 String.prototype.fill = function(payload) {
-	str = this.toString();
-	for(p in payload as payl) {
+	var str = this.toString();
+	for(var p in payload as payl) {
 		str = str.split("{"+p+"}").join(payl);
 	}
 	return str;
@@ -63,7 +63,7 @@ String.prototype.padMiddle = function(character, len) {
 		ns += character.toString();
 	}
 	ns+=n;
-	for(i = 0; i < sc; i++) {
+	for(var i = 0; i < sc; i++) {
 		ns += character.toString();
 	}
 	return ns;

@@ -63,13 +63,30 @@ function progressBar(value, max, length, fillColor="&a", leftColor="&c"){
 function playerIsOnline(world, player) {
 	var isOnline = false;
 	var pl = world.getAllPlayers();
-	for(p in pl) {
+	for(var p in pl) {
 		if(pl[p].getName() == player.toString()) {
 			isOnline = true;
 			break;
 		}
 	}
 	return isOnline;
+}
+
+var ForgeLoader = Java.type("net.minecraftforge.fml.common.Loader").instance();
+
+function getMCModList() {
+    var modlist = [];
+    var loadmods = Java.type("net.minecraftforge.fml.common.Loader").instance().getModList();
+
+    for(var mid in loadmods as lmod) {
+        modlist.push(lmod.getModId());
+    }
+
+    return modlist;
+}
+
+function hasMCMod(name) {
+    return getMCModList().indexOf(name) > -1;
 }
 
 //===================ItemStack Array Utils===================
@@ -88,7 +105,7 @@ function givePlayerItems(player, stacks, pnbt=null) {
         pnbt = player.getEntityNbt();//Dont over-use this one
     }
     var invcnt = getPlayerInvCount(pnbt, w);
-    for(s in stacks as stack) {
+    for(var s in stacks as stack) {
         if(invcnt < 36) {
             //Player inv not full
             player.giveItem(stack);
@@ -110,7 +127,7 @@ function getPlayerInvCount(pnbt, w) {
 function getPlayerInvFromNbt(pnbt, w, filterFn=null) {
 	var pinv = pnbt.getList('Inventory', pnbt.getListType('Inventory'));
 	var pitems = [];
-	for(p in pinv as pin) {
+	for(var p in pinv as pin) {
 		var pitm = w.createItemFromNbt(API.stringToNbt(pin.toJsonString()));
         //pin (INbt) contains key "Slot"
         //pitm.getItemNbt() does not, thats why pin is passed
@@ -137,7 +154,7 @@ function takeMoneyFromPlayer(player, amount, pnbt=null) {
             return getItemMoney(r, w)-getItemMoney(s, w);//Sort by money
         });
 
-        for(pm in pmitems as pmitem) {
+        for(var pm in pmitems as pmitem) {
             var pval = getItemMoney(pmitem, w);
 
             for(var i = 1; i <= pmitem.getStackSize(); i++) {
@@ -195,9 +212,9 @@ function isItemEqual(stack, other, ignoreNbt=false){
 		return false;
 	}
 
-	stackNbt = stack.getItemNbt();
+	var stackNbt = stack.getItemNbt();
 	stackNbt.remove('Count');
-	otherNbt = other.getItemNbt();
+	var otherNbt = other.getItemNbt();
 	otherNbt.remove('Count');
 
 	if(ignoreNbt) {
@@ -216,8 +233,8 @@ function isItemEqual(stack, other, ignoreNbt=false){
 //How much items in array
 function getArrItemCount(array, itemstack, ignoreNbt=false) {
 	var icount = 0;
-	for(pi in array as pitem) {
-		pinbt = pitem.getItemNbt();
+	for(var pi in array as pitem) {
+		var pinbt = pitem.getItemNbt();
 		var scount = parseInt(pinbt.getByte('Count'));
 		if(isItemEqual(itemstack, pitem, ignoreNbt))
 			icount += scount;
@@ -294,7 +311,7 @@ function uniqid() {
 
 function arrayOccurs(string, subArray, allowOverlapping=false, caseSensitive=true) {
 	var occ = 0;
-	for(i in subArray as sel) {
+	for(var i in subArray as sel) {
 		occ += occurrences(string, sel, allowOverlapping, caseSensitive);
 	}
 
@@ -328,7 +345,7 @@ function occurrences(string, subString, allowOverlapping=false, caseSensitive=tr
 
 function arrayTransform(arr, elfn) {
 	var newa = [];
-	for(a in arr as arri) {
+	for(var a in arr as arri) {
 		newa.push(elfn(arri, a, arr));
 	}
 	return newa;
@@ -355,9 +372,9 @@ function sign(num=0) {
 }
 
 function g(obj, grp_props) {
-	for(j in grp_props) {
+	for(var j in grp_props) {
 		var props = grp_props[j];
-		for(i in props[0]) {
+		for(var i in props[0]) {
 			if(obj != null) {
 				if(typeof(obj[props[0][i]]) != typeof(undefined)) {
 					obj = obj[props[0][i]];
@@ -398,7 +415,7 @@ function getAllFuncs(obj) {
 function removeFromArray(arr, vals) {
 	if(typeof(vals) == 'string') { vals = [vals]; }
 	var a = arr;
-	for(v in vals as val) {
+	for(var v in vals as val) {
 		array_remove(a, val);
 	}
 	return a;
@@ -464,12 +481,12 @@ var _RAWEFFECTS = {
 
 var _RAWCODES = Object.keys(_RAWCOLORS).concat(Object.keys(_RAWEFFECTS));
 function getColorId(name) {
-	for(i in _RAWCOLORS) {
+	for(var i in _RAWCOLORS) {
 		if(name == _RAWCOLORS[i]) {
 			return i;
 		}
 	}
-	for(i in _RAWEFFECTS as re) {
+	for(var i in _RAWEFFECTS as re) {
 		if(name == re) {
 			return i;
 		}
@@ -477,12 +494,12 @@ function getColorId(name) {
 	return 'r';
 }
 function getColorName(id) {
-	for(i in _RAWCOLORS as rc) {
+	for(var i in _RAWCOLORS as rc) {
 		if(id == i) {
 			return rc;
 		}
 	}
-	for(i in _RAWEFFECTS as re) {
+	for(var i in _RAWEFFECTS as re) {
 		if(id == i) {
 			return re;
 		}
@@ -599,7 +616,7 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 	var txt = '';
 	if(fullraw) { txt+='[""'; }
 
-	for(i in str_pieces) {
+	for(var i in str_pieces) {
 		var p = str_pieces[i];
 		var ntext = p[0].replace(/\"/g, '\\"');
 		var nm =  ntext.match(trg) || [];
@@ -664,7 +681,7 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 
 function data_get(data, keys) {
 	var get = {};
-	for(k in keys) {
+	for(var k in keys) {
 		//var key = keys[k];
 		get[k] = data.get(k);
 		if(get[k] == null) { get[k] = keys[k]; }
@@ -674,7 +691,7 @@ function data_get(data, keys) {
 }
 
 function data_register(data, vals) {
-	for(k in vals) {
+	for(var k in vals) {
 		var val = vals[k];
 		if(data.get(k) == null) { data.put(k, val); }
 	}
@@ -718,7 +735,7 @@ function data_overwrite(data, keys=[], vals=[]) {
 	if(typeof(keys) == 'string') { keys = [keys]; }
 	if(typeof(vals) == 'string') { vals = [vals]; }
 
-	for(k in keys) {
+	for(var k in keys) {
 		var key = keys[k];
 		var val = vals[k];
 		data.put(key, val);
@@ -803,7 +820,7 @@ function pickwhere(a, fn, amount) {
 
 function array_dist(a) {
 	var b = [];
-	for(c in a) {
+	for(var c in a) {
 		if(b.indexOf(a[c]) == -1) {
 			b.push(a[c]);
 		}
@@ -814,7 +831,7 @@ function array_dist(a) {
 
 function objArray(obj) {
 	var a = [];
-	for(i in obj as o) {
+	for(var i in obj as o) {
 		a.push(o);
 	}
 	return a;
@@ -822,7 +839,7 @@ function objArray(obj) {
 
 function array_filter(a, fn) {
 	var aa = [];
-	for(i in a) {
+	for(var i in a) {
 		if(fn(a[i])) { aa.push(a[i]); }
 	}
 
@@ -918,7 +935,7 @@ function rrandom_ranges(min, max, amount) {
 
 function pickchance(a, amount) {
 	var aa = [];
-	for(e in a) {
+	for(var e in a) {
 		if(!isArray(a[e])) {
 			aa[aa.length] = a[e];
 		} else {
@@ -932,7 +949,7 @@ function pickchance(a, amount) {
 }
 
 function inArray(a, val) {
-	for(k in a) { if(a[k] === val) { return true; } }
+	for(var k in a) { if(a[k] === val) { return true; } }
 	return false
 }
 
@@ -949,10 +966,10 @@ function random_range(_min, _max) {
 
 function array_merge(a1, a2) {
 	var bb = [];
-	for(k in a1) {
+	for(var k in a1) {
 		bb[k] = a1[k];
 	}
-	for(k in a2) {
+	for(var k in a2) {
 		bb[k] = a2[k];
 	}
 	return bb;
@@ -960,7 +977,7 @@ function array_merge(a1, a2) {
 
 function isArray(obj) {
 	if(typeof(obj) === 'object') {
-      for(k in obj) {
+      for(var k in obj) {
 
           if(isNaN(k)) { return false; }
       }
@@ -984,7 +1001,7 @@ function nbtItem(nbt, w) {
 
 function nbtItemArr(nbtArr, w) {
     var itemArr = [];
-	for(itemData in nbtArr as item){
+	for(var itemData in nbtArr as item){
         itemArr.push(nbtItem(item, w));
     }
 

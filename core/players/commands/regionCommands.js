@@ -15,16 +15,35 @@ function Region(name) {
 		"priority": 0,
 		"salePrice": 0,
 		"rentTime": -1,
+		"allInteract": false,
+		"allBuild": false,
+		"allAttack": false,
 		"trusted": [],//
 	};
 
 	/*String player, IScoreboard sb, IData data*/
-	this.can = function(player, sb, data) {
+	this.can = function(player, sb, data, action=null) {
 		var perm = this.getPermission().init(data);
+		var canAction = false;
+
+		switch(action) {
+			case "interact":
+				if(this.data.allInteract) canAction = true;
+				break;
+			case "build":
+				if(this.data.allBuild) canAction = true;
+				break;
+			case "attack":
+				if(this.data.allAttack) canAction = true;
+				break;
+
+		}
+
 		return (
 			this.data.owner == player
 		|| 	this.data.trusted.indexOf(player) > -1
 		||  perm.permits(player, sb, data)
+		||	canAction
 		);
 	}
 	/*Array xyz1, Array xyz2*/
@@ -113,7 +132,7 @@ function normalizePos(pos) {
 		var can = false;
 		var regs = [];
 		var prio = 0;
-		for(ri in regids as regid) {
+		for(var ri in regids as regid) {
 			var reg = new Region(regid).init(data);
 			if(reg.hasCoord(normalizePos((e.target==null?e.player:e.target).getPos()))) {
 				checkregs++;
@@ -123,7 +142,7 @@ function normalizePos(pos) {
 				}
 			}
 		}
-		for(r in regs as reg) {
+		for(var r in regs as reg) {
 			if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
 				can = true;
 				break;
@@ -147,7 +166,7 @@ function normalizePos(pos) {
 		var can = false;
 		var regs = [];
 		var prio = 0;
-		for(ri in regids as regid) {
+		for(var ri in regids as regid) {
 			var reg = new Region(regid).init(data);
 			if(reg.hasCoord(normalizePos(e.block.getPos()))) {
 				checkregs++;
@@ -157,7 +176,7 @@ function normalizePos(pos) {
 				}
 			}
 		}
-		for(r in regs as reg) {
+		for(var r in regs as reg) {
 			if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
 				can = true;
 				break;
@@ -182,7 +201,7 @@ if(!e.isCanceled()) {
 	var can = false;
 	var regs = [];
 	var prio = 0;
-	for(ri in regids as regid) {
+	for(var ri in regids as regid) {
 		var reg = new Region(regid).init(data);
 		if(reg.hasCoord(normalizePos(e.target.getPos().offset(rayt.getSideHit())))) {
 			checkregs++;
@@ -192,7 +211,7 @@ if(!e.isCanceled()) {
 			}
 		}
 	}
-	for(r in regs as reg) {
+	for(var r in regs as reg) {
 		if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
 			can = true;
 			break;
@@ -242,7 +261,7 @@ if(!e.isCanceled()) {
 				if(region.data.positions.length > 0) {
 					//Cache positions for undo
 					tellPlayer(pl, "&ePosition List:&r (&cClear{run_command:!region removePos "+region.name+" "+Object.keys(region.data.positions).join(" ")+"}&r)");
-					for(ri in region.data.positions as regpos) {
+					for(var ri in region.data.positions as regpos) {
 						tellPlayer(pl, "&5&l"+ri+"&r - &eXYZ1 &r(&b"+(regpos.xyz1||[]).join(", ")+"&r) &eXYZ2 &r(&b"+(regpos.xyz2||[]).join(", ")+"&r) (&c - Remove{run_command:!region removePos "+region.name+" "+ri+"}&r)");
 					}
 				} else {
@@ -395,7 +414,7 @@ if(!e.isCanceled()) {
 				tellPlayer(pl, getTitleBar("Region List"));
 				var tellIds = [];
 				var pagenum = Math.floor(minShow/showLen)+1;
-				for(i in ids as id) {
+				for(var i in ids as id) {
 					if((args.matches.length == 0 || arrayOccurs(id, args.matches, false, false))) {
 						if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
 							tellIds.push(id)
@@ -420,7 +439,7 @@ if(!e.isCanceled()) {
 					"[&cShow 15{run_command:!region list "+args.matches.join(" ")+" -show:15}&r] "+
 					"[&cShow 20{run_command:!region list "+args.matches.join(" ")+" -show:25}&r]"
 				);
-				for(i in tellIds as id) {
+				for(var i in tellIds as id) {
 					tellPlayer(pl, "&e - &b&l"+id+"&r (&6:sun: Info{run_command:!region info "+id+"}&r) (&c:cross: Remove{run_command:!region remove "+id+"}&r)");
 				}
 			} else {

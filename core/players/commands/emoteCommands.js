@@ -21,7 +21,7 @@ function Emote(name) {
     var pl = e.player;
     var w = pl.world;
     var data = w.getStoreddata();
-    for(c in CHAT_EMOTES as ce) {
+    for(var c in CHAT_EMOTES as ce) {
       var ec = new Emote(c);
       if(!ec.exists(data)) {
         ec.save(data);

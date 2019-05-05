@@ -10,7 +10,7 @@ function ChatChannel(name) {
 		"desc": "",
 	};
 	this.addPlayers = function(players){
-		for(p in players as player) {
+		for(var p in players as player) {
 			this.data.players.push(player);
 		}
 		return this;
@@ -28,7 +28,7 @@ function ChatChannel(name) {
 	};
 	this.removePlayers = function(players) {
 		var np = [];
-		for(p in this.data.players as player) {
+		for(var p in this.data.players as player) {
 			if(players.indexOf(player) == -1) {
 				np.push(player);
 			}
@@ -39,7 +39,7 @@ function ChatChannel(name) {
 	this.getPlayers = function(world) { //returns all online IPlayers
 		var plr = world.getAllPlayers();
 		var plrs = [];
-		for(p in plr as pl) {
+		for(var p in plr as pl) {
 			if(this.data.players.indexOf(pl.getName()) > -1) {
 				plrs.push(pl);
 			}
@@ -49,7 +49,7 @@ function ChatChannel(name) {
 	this.broadcast = function(w, msg, exc) {
 		if(typeof(exc) == typeof(undefined)) { exc = []; }
 		var plrs = w.getAllPlayers();
-		for(p in plrs as pl) {
+		for(var p in plrs as pl) {
 			if(this.data.players.indexOf(pl.getName()) > -1 && exc.indexOf(pl.getName()) == -1) {
 				tellPlayer(pl, msg);
 			}
@@ -79,14 +79,14 @@ function getColorPermId(colorId) {
 			"chat.command",
 			"chat.hover",
 		];
-		for(i in _RAWCOLORS as rawc) {
+		for(var i in _RAWCOLORS as rawc) {
 			playerperms.push('chat.color.'+rawc);
 		}
-		for(i in _RAWEFFECTS as rawc) {
+		for(var i in _RAWEFFECTS as rawc) {
 			playerperms.push('chat.color.'+rawc);
 		}
 		//Register if not exists
-		for(p in playerperms as plperm) {
+		for(var p in playerperms as plperm) {
 			var pperm = new Permission(plperm);
 			if(!pperm.exists(data)) {
 				pperm.save(data);
@@ -140,10 +140,10 @@ function getColorPermId(colorId) {
 		['!chat list [...matches]', function(pl, args, data){
 			var cids = new ChatChannel().getAllDataIds(data);
 			tellPlayer(pl, "&l[=======] &6&lGramados Chat Channels&r &l[=======]");
-			for(ci in cids as cid) {
+			for(var ci in cids as cid) {
 				var cc = new ChatChannel(cid);
 				if(args.matches.length == 0 || arrayOccurs(cid, args.matches) > 0) {
-					if(cc.load(data) && cc.getPermission(data).permits(pl.getName(), pl.world.getScoreboard(), data)) {
+					if(cc.load(data) && cc.getPermission().init(data).permits(pl.getName(), pl.world.getScoreboard(), data)) {
 						var onlinePlayers = [];
 						var offPlayers = []
 						for(var cpli in cc.data.players as cpl) {
