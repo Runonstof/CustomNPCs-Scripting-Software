@@ -1,5 +1,5 @@
 
-{%set SERVER_CONFIG=gramados%}
+{%set SERVER_CONFIG=minerim%}
 
 import core\config\%SERVER_CONFIG%\*.js;
 

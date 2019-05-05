@@ -1,4 +1,4 @@
-
+#template ServerScript data\players;
 {%set SERVER_CONFIG=gramados%}
 
 import core\config\%SERVER_CONFIG%\*.js;
