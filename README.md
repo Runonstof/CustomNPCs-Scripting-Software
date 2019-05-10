@@ -1,4 +1,4 @@
-# Gramados Server Script
+# Slaro Server Script
 Script for Custom NPCs 1.12.2
 
 **Useful info**    
