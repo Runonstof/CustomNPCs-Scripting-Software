@@ -159,7 +159,7 @@ function Job(name) {
 		['!jobs list [...matches]', function(pl, args){
 			var data = pl.world.getStoreddata();
 			var dkeys = data.getKeys();
-			tellPlayer(pl, "&l[=======]&r&6&lGramados Job List&r&l[=======]");
+			tellPlayer(pl, getTitleBar("Job List"));
 			for(var d in dkeys as dkey) {
 				if( ( dkey.match(/job_(\w.)/g) || [] ).length > 0 ) {
 					var job = new Job(dkey.replace(/job_(\w.)/g, '$1'));
@@ -183,7 +183,7 @@ function Job(name) {
 			var job = new Job(args.name);
 			var data = pl.world.getStoreddata();
 			job.load(data);
-			tellPlayer(pl, "&l[=======]&r&6&lGramados Job Info&r&l[=======]");
+			tellPlayer(pl, getTitleBar("Job Info"));
 			tellPlayer(pl, "&eName: &9&o"+job.name);
 			tellPlayer(pl, "&eDisplay Name: &r"+job.getStatusColor(data)+escCcs(job.getDisplayName()));
 			tellPlayer(pl, "&eCompany: &c"+job.data.companyId);
@@ -203,7 +203,7 @@ function Job(name) {
 			var job = new Job(args.name);
 			var data = pl.world.getStoreddata();
 			job.load(data);
-			tellPlayer(pl, "&l[=======] &r&6&lGramados Job Player List &r&l[=======]");
+			tellPlayer(pl, getTitleBar("Job Player List"));
 			tellPlayer(pl, "&eJob: &9&o"+args.name);
 			var pls = job.getPlayers(data);
 			for(var p in pls as plr) {

@@ -191,7 +191,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
 		['!debug', function(pl, args){
-
+			print(getMCModList().join(",\n"));
 		}, 'debug'],
 		['!thunder [player]', function(pl, args, data){
 			var target = (args.player == null ? pl:pl.world.getPlayer(args.player));

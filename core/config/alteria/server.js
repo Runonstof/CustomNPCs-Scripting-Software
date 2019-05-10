@@ -10,7 +10,8 @@ var DEFAULT_MONEY = 0;
 
 var DEFAULT_TEAMS = [ //Default scoreboard teams that gets added when permission is created
 	"Owner",
-	"Developer"
+	"Developer",
+	"Admin",
 ];
 var DEFAULT_PLAYERS = [ //Default players that gets added when permission is created
 

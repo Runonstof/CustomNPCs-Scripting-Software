@@ -142,7 +142,7 @@ function GiftCode(name) {
     ['!giftcode setCode <name> [code]', function(pl, args, data){
         var giftcode = new GiftCode(args.name);
         giftcode.load(data);
-        if(args.code != null) {
+        if(typeof(args.code) === "string") {
             giftcode.data.code = args.code;
         } else {
             giftcode.generateCode();

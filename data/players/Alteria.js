@@ -64,8 +64,8 @@ function kill(e) {
 function login(e) {
 	yield login_event;
 	var pl = e.player;
-	tellPlayer(pl, "["+SERVER_TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://www.dropbox.com/s/m1va7k2zeixgry0/GramadosResources.zip?dl=0|show_text$e$oDownload Resource Pack}&r&e to download.");
-	tellPlayer(e.player, "[&6&lGramados&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
+	tellPlayer(pl, "["+SERVER_TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://drive.google.com/file/d/1hCfvORqn0ghXVV8I_mToDTsvpSSnFups/view?usp=sharing|show_text$e$oDownload Resource Pack}&r&e to download.");
+	tellPlayer(e.player, "["+SERVER_TITLE+"&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/Mrjh9s}&r &9server!");
 
 }
 

@@ -368,7 +368,7 @@ function Player(name) {
 			var w = pl.world;
 			var sb = w.getScoreboard();
 			var tm = sb.getPlayerTeam(args.player);
-			tellPlayer(pl, "&l[=======] &6&lGramados Player Perms&r &l[=======]");
+			tellPlayer(pl, getTitleBar("Player Perms"));
 			tellPlayer(pl, "&ePermissions for player:&r "+args.player);
 			var shownperms = 0;
 			for(var p in permids as pid) {
@@ -545,7 +545,7 @@ function Player(name) {
 		['!player income <player>', function(pl, args, data){
 			var p = new Player(args.player).init(data);
 			var sb = pl.world.getScoreboard();
-			tellPlayer(pl, "&l[=======] &r&6&lGramados Income&r &l[=======]");
+			tellPlayer(pl, getTitleBar("Player Income"));
 			tellPlayer(pl, "&ePlayer: &r"+p.getNameTag(sb));
 			tellPlayer(pl, "&eBasic income: &6&o"+getAmountCoin(p.data.pay)+"&r&e per &6&o"+getTimeString(p.data.payTime));
 			var tleft = (p.data.lastPayed+p.data.payTime) - new Date().getTime();
@@ -661,7 +661,7 @@ function Player(name) {
 			{
 				"argname": "amount",
 				"type": "currency",
-				"min": getCoinAmount("1G"),
+				"min": getCoinAmount("5K"),
 			},
 		]],
 		['!topBounty', function(pl, args, data){
@@ -771,7 +771,7 @@ function Player(name) {
 		['!myIncome', function(pl, args, data){
 			var p = new Player(pl.getName());
 			p.load(data);
-			tellPlayer(pl, "&l[=======] &r&6&lGramados Income&r &l[=======]");
+			tellPlayer(pl, getTitleBar("Income"));
 			tellPlayer(pl, "&eBasic income: &6&o"+getAmountCoin(p.data.pay)+"&r&e per &6&o"+getTimeString(p.data.payTime));
 			var tleft = (p.data.lastPayed+p.data.payTime) - new Date().getTime();
 			tellPlayer(pl, "&6&o"+getTimeString(tleft, ['ms'])+"&r&e until next pay.");
@@ -960,7 +960,7 @@ function Player(name) {
 			var data = pl.world.getStoreddata();
 			plo.load(data);
 			if(Object.keys(plo.data.homes).length > 0) {
-				tellPlayer(pl, "&l[=======] &6&lGramados Homes &r&l[=======]");
+				tellPlayer(pl, getTitleBar("Homes"));
 				var maxHomeStr = " - &e"+Object.keys(plo.data.homes).length+"/"+(plo.data.maxHomes == -1 ? "&aInfinite":plo.data.maxHomes)+"&e Homes used";
 				tellPlayer(pl, "[&a:check: Add{suggest_command:!setHome }&r]"+maxHomeStr);
 				for(var i in plo.data.homes as home) {
@@ -1007,6 +1007,7 @@ function Player(name) {
 		['!heal', function(pl, args){
 			pl.setHealth(parseFloat(pl.getMaxHealth()));
 			pl.setHunger(20);
+			pl.getMCEntity().func_71024_bL().func_75119_b(20);
 			tellPlayer(pl, "&aYou have been healed!");
 		}, 'heal'],
 	]);

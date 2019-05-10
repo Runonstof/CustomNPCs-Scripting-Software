@@ -679,6 +679,7 @@ function executeXCommand(str, player) {
 				if(cmdperm.permits(player.getName(), sb, data)) {
 					//Check arguments
 					for(var a in args as arg) {
+						if(arg == null) { continue; }
 
 						for(var b in cmd.rules as rule) {
 

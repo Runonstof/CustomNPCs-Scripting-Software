@@ -1,16 +1,16 @@
 //===== CONFIG
 var SERVER_NAME = "Gramados";
-var SERVER_PREFIX = "&6&l"; //Color for output
+var SERVER_PREFIX = "&6&l"; //Colorcode for output for like the name, 
 var SERVER_BAR_OPEN = "&r&l<-=======] &r"; //For output
-var SERVER_BAR_CLOSE = "&r&l [=======->&r";
-var BAR_OPEN = "&l[";
+var SERVER_BAR_CLOSE = "&r&l [=======->&r";//also for output
+var BAR_OPEN = "&l["; //For a small bar
 var BAR_CLOSE = "&l]";
 
-var DEFAULT_MONEY = 5000000;
+var DEFAULT_MONEY = 5000000; //Starters money in the smallest units set in currency.js
 
 var DEFAULT_TEAMS = [ //Default scoreboard teams that gets added when permission is created
 	"Owner",
-	"Developer"
+	"Developer",
 ];
 var DEFAULT_PLAYERS = [ //Default players that gets added when permission is created
 
@@ -18,7 +18,10 @@ var DEFAULT_PLAYERS = [ //Default players that gets added when permission is cre
 //Team that player autojoins when player has no team
 //set to null to disable
 var DEFAULT_TEAM_JOIN = "Player";
-//var DEFAULT_TEAM_JOIN = null;
+//var DEFAULT_TEAM_JOIN = null; //Do this to disable auto-join
+
+
+
 
 //Configure your own time units!
 var msTable = {

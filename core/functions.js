@@ -4,8 +4,9 @@ var ASSET_MOD_ID = "adventureassets";
 
 //Java import
 var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
-var UItem = Java.type("brad16840.common.UniqueItem");
-var UItemInv = Java.type('brad16840.common.UniqueItemInventory');
+var HAS_MOD_BACKPACKS = hasMCMod("backpacks16840");
+var UItem = (HAS_MOD_BACKPACKS ? Java.type("brad16840.common.UniqueItem") : null);
+var UItemInv = (HAS_MOD_BACKPACKS ? Java.type('brad16840.common.UniqueItemInventory') : null);
 
 function objMerge(obj1, obj2, inheritNewProps=true){
     var obj3 = {};
@@ -94,8 +95,10 @@ function hasMCMod(name) {
 //Used to get backpack IInventory (to get/set items array you can use `getBackpackInv(pl, items).items` )
 function getBackpackInv(pl, item){
 	//If backpack item wasn't been opened yet
+    if(HAS_MOD_BACKPACKS) {
 	if(UItem.hasIdentifier(item.getMCItemStack()))
 		return UItemInv.getInventory(pl.getMCEntity(), UItem.getIdentifier(item.getMCItemStack()));
+    }
 	return;
 }
 

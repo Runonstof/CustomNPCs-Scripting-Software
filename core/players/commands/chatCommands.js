@@ -139,7 +139,7 @@ function getColorPermId(colorId) {
 		]],
 		['!chat list [...matches]', function(pl, args, data){
 			var cids = new ChatChannel().getAllDataIds(data);
-			tellPlayer(pl, "&l[=======] &6&lGramados Chat Channels&r &l[=======]");
+			tellPlayer(pl, getTitleBar("Chat Channels"));
 			for(var ci in cids as cid) {
 				var cc = new ChatChannel(cid);
 				if(args.matches.length == 0 || arrayOccurs(cid, args.matches) > 0) {
