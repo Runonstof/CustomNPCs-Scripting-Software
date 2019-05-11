@@ -579,6 +579,7 @@ function Player(name) {
 			tellPlayer(pl, getTitleBar("Player Info", false));
 			tellPlayer(pl, "&6&lPlayer Info For: &r"+p.getNameTag(sb));
 			var now = new Date().getTime();
+			tellPlayer(pl, "&6UUID: &e"+p.data.UUID);
 			tellPlayer(pl, "&6First Login: &e&o"+getTimeString(now - p.data.firstLogin, ['ms'])+"&r &eago.");
 			tellPlayer(pl, "&6Last Login: &e&o"+getTimeString(now - p.data.lastLogin, ['ms'])+"&r &eago.");
 			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(p.data.money));
@@ -688,16 +689,19 @@ function Player(name) {
 				tellPlayer(pl, " - "+pnum+". "+spl.getNameTag(sb)+"&r :money:&e"+getAmountCoin(score.value));
 			}
 		}, 'topBounty', []],
-		['!withdraw <amount>', function(pl, args, data){
+		['!withdraw <amount> [times]', function(pl, args, data){
 			var p = new Player(pl.getName()).init(data);
 			var w = pl.world;
+			var times = args.times||1;
 			var wamount = getCoinAmount(args.amount);
-			if(wamount <= p.data.money) {
-				var moneyItems = genMoney(w, wamount);
-				p.data.money -= wamount;
-				givePlayerItems(pl, moneyItems);
+			if(p.data.money >= wamount*times) {
+				for(var i = 0; i < times; i++) {
+					var moneyItems = genMoney(w, wamount);
+					p.data.money -= wamount;
+					givePlayerItems(pl, moneyItems);
+				}
 				p.save(data);
-				tellPlayer(pl, "&aWithdrawed &r:money:&e"+getAmountCoin(wamount)+"&r&a from money pouch!");
+				tellPlayer(pl, "&aWithdrawed &r:money:&e"+getAmountCoin(wamount*times)+"&r&a from money pouch!");
 				return true;
 			} else {
 				tellPlayer(pl, "&cYou dont have that much money in your pouch!");
@@ -707,6 +711,11 @@ function Player(name) {
 			{
 				"argname": "amount",
 				"type": "currency",
+				"min": 1,
+			},
+			{
+				"argname": "times",
+				"type": "number",
 				"min": 1,
 			}
 		]],
@@ -762,8 +771,8 @@ function Player(name) {
 
 			//tellPlayer(pl, "&6Arcade Tokens: &d:money:A"+getAmountCoin(p.data.armoney));
 			//tellPlayer(pl, "&6Vote Tokens: &b:money:V"+getAmountCoin(p.data.vmoney));
-			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(mp)+"&r [&aWithdraw{suggest_command:!withdraw }&r]");
-			tellPlayer(pl, "&6Inventory: &r:money:&e"+getAmountCoin(mi)+"&r [&aDeposit{run_command:!deposit}&r]");
+			tellPlayer(pl, "&6Money Pouch: &r:money:&e"+getAmountCoin(mp)+"&r [&aWithdraw{suggest_command:!withdraw }&r] [&aWithdraw All{run_command:!withdraw "+getAmountCoin(mp)+"}&r]");
+			tellPlayer(pl, "&6Inventory: &r:money:&e"+getAmountCoin(mi)+"&r [&aDeposit{run_command:!depositAll|show_text:$6Click to deposit all money from inventory.}&r]");
 			tellPlayer(pl, "&cYou carry a total of &r:money:&e"+getAmountCoin(total));
 			tellPlayer(pl, "&9You will lose &r:money:&e"+getAmountCoin(mi+Math.round(mp/2))+"&9 on death!");
 			return true;
