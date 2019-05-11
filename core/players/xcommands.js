@@ -313,12 +313,19 @@ function CommandFactory(datahandler, cmdtree){
 			['!'+this.cmdtree+' create <name>', function(pl, args, data, cdata){
 				var dht = getDataHandler(cdata.datatype);
 				var dh = new dht(args.name);
+				var payload = {
+					"cancel": false,
+				};
 				for(var o in cdata.self.onFns['create'] as onFn) {
-					onFn(dh, pl, args, data, cdata);
+					onFn(dh, pl, args, data, cdata, payload);
 				}
-				dh.save(data);
-				tellPlayer(pl, "&aCreated "+dh.type+" &2'"+dh.name+"'&a!");
-				return true;
+
+				if(!payload.cancel) {
+					dh.save(data);
+					tellPlayer(pl, "&aCreated "+dh.type+" &2'"+dh.name+"'&a!");
+					return true;
+				}
+				return false;
 			}, this.cmdtree+'.create', [
 				{
 					"argname": "name",
@@ -342,7 +349,7 @@ function CommandFactory(datahandler, cmdtree){
 				var dht = getDataHandler(cdata.datatype);
 				var dh = new dht(args.name);
 				for(var o in cdata.self.onFns['remove'] as onFn) {
-					onFn(dh, pl, args, data, cdata);
+					onFn(dh, pl, args, data, cdata, payload);
 				}
 				dh.remove(data);
 				tellPlayer(pl, "&aRemoved "+dh.type+" '"+dh.name+"'!");
@@ -700,7 +707,7 @@ function executeXCommand(str, player) {
 							if('type' in rule) {//Check Arg Type
 								switch(rule.type) {
 									case 'id': {
-										if(arg.replace(/([A-Za-z0-9_\-\.])/g, '') != '') {
+										if(arg.replace(/([\w\-\.]+)/g, '') != '') {
 											tellPlayer(player, errpref+_MSG["argNotValid"].fill({
 												"argName": rulename,
 												"allowed": "A-Za-z0-9_-:D"
@@ -710,6 +717,13 @@ function executeXCommand(str, player) {
 										//Run case 'string'
 									}
 									case 'string': {
+										if(arg.replace(/([\w\-\.]+)/g, '') != '') {
+											tellPlayer(player, errpref+_MSG["argNotValid"].fill({
+												"argName": rulename,
+												"allowed": "&cA-Za-z0-9_-"
+											})+errsuff);
+											return false;
+										}
 										if('minlen' in rule) {
 											if(arg.toString().length < rule.minlen) {
 												tellPlayer(player, errpref+"&c'"+rulename+"' is too short! (Min. "+rule.minlen+" characters)"+errsuff);
