@@ -190,9 +190,46 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
-		['!debug', function(pl, args){
-			print(getMCModList().join(",\n"));
+		['!debug', function(pl, args, data){
+			var dkeys = data.getKeys();
+			for(var d in dkeys as dkey) {
+				if(occurrences(dkey, "clan_") > 0) {
+					print(dkey+ "== "+(dkey.replace(/([\w]+)/g, '') == "").toString());
+
+				}
+			}
 		}, 'debug'],
+		['!fakemsg <player> <team> <team_color> [...message]', function(pl, args, data){
+			var ccode = getColorId(args.team_color);
+			var newmsg = "&l&"+ccode+"[&o&"+ccode+args.team+"&r &"+ccode+args.player+"&l&"+ccode+"] -> &r"+args.message.join(" ");
+			executeCommand(pl, "/tellraw @a "+parseEmotes(strf(newmsg,true)));
+		}, 'fakemsg', [
+			{
+				"argname": "team_color",
+				"type": "color"
+			}
+		]],
+		['!scare [player] [type]', function(pl, args, data){
+			var tpl = args.player||pl.getName();
+			var type = args.type||"creeper";
+			var snds = {
+				"creeper": "minecraft:entity.creeper.primed",
+				"ghast": "minecraft:entity.ghast.hurt"
+			};
+
+			if(tpl != null) {
+				executeCommand(pl, "/playsound "+snds[type]+" hostile "+tpl, tpl);
+			}
+		}, 'scare', [
+			{
+				"argname": "type",
+				"type": "enum",
+				"values": [
+					"creeper",
+					"ghast"
+				]
+			}
+		]],
 		['!thunder [player]', function(pl, args, data){
 			var target = (args.player == null ? pl:pl.world.getPlayer(args.player));
 			if(target != null) {
@@ -403,7 +440,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 		}, 'listSkills'],
 		['!tellraw <player> <...message>', function(pl, args){
 			var msg = args.message.join(' ');
-			executeCommand(pl, '/tellraw '+args.player+' '+strf(msg, true));
+			executeCommand(pl, '/tellraw '+args.player+' '+parseEmotes(strf(msg, true)));
 			return true;
 		}, 'tellraw'],
 		['!tellaction <player> <...message>', function(pl, args, data){
