@@ -1,4 +1,4 @@
-# Slaro Server Script
+# Custom NPCs Server Scripting Software
 Script for Custom NPCs 1.12.2
 
 **Useful info**    
