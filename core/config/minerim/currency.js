@@ -1,5 +1,5 @@
 
-
+//config for gramados
 
 //Configure your own currency units
 //Units of currency, with own names, with lowest unit being 1
@@ -36,9 +36,9 @@ var _COINITEM_PREFIX = '&e'; //Prefix showing before money value lore (used for 
 
 //Your money items, and their values in money syntax
 //"value": "item_id",
-var LOWVALUE_ID = "minecraft:gold_nugget";
+var LOWVALUE_ID = "minecraft:iron_nugget";
 var MIDVALUE_ID = "minecraft:gold_nugget";
-var HIGHVALUE_ID = "minecraft:gold_nugget";
+var HIGHVALUE_ID = "bno:nugget_copper";
 
 
 //Coin Items for the physical currency
