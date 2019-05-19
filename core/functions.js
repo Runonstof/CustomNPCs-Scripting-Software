@@ -722,8 +722,7 @@ function data_get(data, keys) {
 }
 
 function data_register(data, vals) {
-	for(var k in vals) {
-		var val = vals[k];
+	for(var k in vals as val) {
 		if(data.get(k) == null) { data.put(k, val); }
 	}
 }
