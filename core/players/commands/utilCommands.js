@@ -190,15 +190,24 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
-		['!debug', function(pl, args, data){
-			var dkeys = data.getKeys();
-			for(var d in dkeys as dkey) {
-				if(occurrences(dkey, "clan_") > 0) {
-					print(dkey+ "== "+(dkey.replace(/([\w]+)/g, '') == "").toString());
-
-				}
+		['!debug [player] [rows]', function(pl, args, data){
+			var player = args.player||pl.getName();
+			var rows = args.rows||1;
+			if(playerIsOnline(pl.world, player)) {
+				var wpl = pl.world.getPlayer(player);
+				wpl.showChestGui(parseInt(rows));
+			} else {
+				tellPlayer(pl, "&c"+player+" is not online!");
 			}
-		}, 'debug'],
+
+		}, 'debug', [
+			{
+				"argname": "rows",
+				"type": "number",
+				"min": 1,
+				"max": 6,
+			}
+		]],
 		['!fakemsg <player> <team> <team_color> [...message]', function(pl, args, data){
 			var ccode = getColorId(args.team_color);
 			var newmsg = "&l&"+ccode+"[&o&"+ccode+args.team+"&r &"+ccode+args.player+"&l&"+ccode+"] -> &r"+args.message.join(" ");
@@ -278,7 +287,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 
 				//==TEMPORARY: force block update
 				//==Removed when Noppes includes updating in setTileEntityNBT
-				meta = rtb.getMetadata();
+				var meta = rtb.getMetadata();
 				rtb.setMetadata(0);
 				rtb.setMetadata(1);
 				rtb.setMetadata(meta);
