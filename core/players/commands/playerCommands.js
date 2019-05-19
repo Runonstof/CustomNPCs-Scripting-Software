@@ -91,7 +91,7 @@ function Player(name) {
 	this.getJobs = function(data) {
 		var jobs = [];
 		for(var i in this.data.jobs as job) {
-			pjob = new Job(i);
+			var pjob = new Job(i);
 			if(pjob.load(data)) {
 				jobs.push(pjob);
 			}
@@ -183,7 +183,7 @@ function Player(name) {
 	this.getBounty = function(sb){
 		var sbo = sb.getObjective("bounty");
 		if(sbo != null) {
-			sbs = sbo.getScore(this.name);
+			var sbs = sbo.getScore(this.name);
 			if(sbs != null) {
 				return sbs.getValue();
 			}
@@ -359,7 +359,16 @@ function Player(name) {
 @endblock
 
 @block register_commands_event
+
+
 	//REGISTER PLAYER COMMANDS
+	var playerCommands = new CommandFactory("player");
+
+	playerCommands
+		.genDefault(["create", "info"])
+		.register();
+
+
 	registerXCommands([
 		//PLAYER MANAGE
 		['!player perms <player> [...matches]', function(pl, args, data){
@@ -1020,4 +1029,5 @@ function Player(name) {
 			tellPlayer(pl, "&aYou have been healed!");
 		}, 'heal'],
 	]);
+
 @endblock
