@@ -143,7 +143,7 @@ function normalizePos(pos) {
 			}
 		}
 		for(var r in regs as reg) {
-			if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
+			if(reg.data.priority == prio && reg.can(pl.getName(), sb, data, "interact")) {
 				can = true;
 				break;
 			}
@@ -177,7 +177,7 @@ function normalizePos(pos) {
 			}
 		}
 		for(var r in regs as reg) {
-			if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
+			if(reg.data.priority == prio && reg.can(pl.getName(), sb, data, "build")) {
 				can = true;
 				break;
 			}
@@ -212,7 +212,7 @@ if(!e.isCanceled()) {
 		}
 	}
 	for(var r in regs as reg) {
-		if(reg.data.priority == prio && reg.can(pl.getName(), sb, data)) {
+		if(reg.data.priority == prio && reg.can(pl.getName(), sb, data, "build")) {
 			can = true;
 			break;
 		}
@@ -258,6 +258,19 @@ if(!e.isCanceled()) {
 						"&c:cross: No&r (&aPut for sale{run_command:!region setForSale "+region.name+" true}&r)")
 				);
 				tellPlayer(pl, "&ePriority: &6"+region.data.priority+"&r [&6&lEDIT{suggest_command:!region setPrio "+region.name+" }&r]");
+				var openVals = [
+					"Interact",
+					"Build",
+				];
+				for(var i in openVals as opv) {
+					var rov = region.data['all'+opv];
+					tellPlayer(pl,
+						"&eOpen "+opv+": &b"+(rov ? "&a:check: Yes":"&c:cross: No")+
+						"&r [&"+(rov ? "cDisable":"aEnable")+
+						"{run_command:!region setOpen "+region.name+" "+opv.toLowerCase()+" "+(!rov).toString()+"}&r]"
+					);
+				}
+				//tellPlayer(pl, "&eAll Interact: &6"+region.data.allInteract.toString());
 				if(region.data.positions.length > 0) {
 					//Cache positions for undo
 					tellPlayer(pl, "&ePosition List:&r (&cClear{run_command:!region removePos "+region.name+" "+Object.keys(region.data.positions).join(" ")+"}&r)");
@@ -298,6 +311,29 @@ if(!e.isCanceled()) {
 				"type": "datahandler",
 				"datatype": "region",
 				"exists": true,
+			},
+		]],
+		['!region setOpen <name> <action> <value>', function(pl, args, data){
+			var reg = new Region(args.name).init(data);
+			var rdatakey = 'all'+args.action.toLowerCase().rangeUpper(0, 1);
+			var newval = (args.value == "true");
+			reg.data[rdatakey] = newval;
+			tellPlayer(pl, "&a"+(newval ? "Enabled" : "Disabled")+" open "+args.action+" of region '"+args.name+"'");
+			reg.save(data);
+		}, 'region.setOpen', [
+			{
+				"argname": "name",
+				"type": "datahandler",
+				"exists": true,
+			},
+			{
+				"argname": "action",
+				"type": "enum",
+				"values": ["interact", "build", "attack"],
+			},
+			{
+				"argname": "value",
+				"type": "bool",
 			},
 		]],
 		['!region setPrio <name> <priority>', function(pl, args, data){
@@ -428,7 +464,7 @@ if(!e.isCanceled()) {
 				}
 				tellPlayer(pl, "&6&lResults: &c"+curShow);
 				var maxpages = Math.ceil(curShow/showLen);
-				nxtPage = page+2;
+				var nxtPage = page+2;
 				var navBtns =
 					" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!region list "+args.matches.join(" ")+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
 					" "+(pagenum < maxpages ? "[&aNext >>{run_command:!region list "+args.matches.join(" ")+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
@@ -452,7 +488,7 @@ if(!e.isCanceled()) {
 			region.remove(data);
 			tellPlayer(pl, "&aRemoved region '"+region.name+"'!");
 			return true;
-		}, 'region.list', [
+		}, 'region.remove', [
 			{
 				"argname": "name",
 				"type": "datahandler",
