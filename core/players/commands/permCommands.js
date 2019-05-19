@@ -139,7 +139,9 @@ function Permission(name) {
 			}
 
 			infoText += "&6&lPermitted Players: &r(&a:check: Add Players{suggest_command:!perms addPlayers "+perm.name+" }&r)\n";
-
+			for(var p in perm.data.players as permpl) {
+				infoText += "&e - &r"+permpl+"&r (&c:cross: Remove{run_command:!perms removePlayers "+perm.name+" "+permpl+"}&r)";
+			}
 			return infoText;
 		})
 		.genDefault()
