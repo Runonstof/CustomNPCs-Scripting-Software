@@ -1,6 +1,10 @@
+{%set SERVER_CONFIG=gramados%}
+
+import core\config\%SERVER_CONFIG%\*.js;
 import core\functions.js;
 import core\players\executeCommand.js;
 import core\players\tell.js;
+
 
 
 function init(e){
@@ -88,7 +92,7 @@ function role(e){
 				if(canTrade) {
 					for(var c in currency as crncy) {
 						if(crncy != null) {
-						
+
 							e.player.removeItem(crncy, crncy.getStackSize());
 
 						}

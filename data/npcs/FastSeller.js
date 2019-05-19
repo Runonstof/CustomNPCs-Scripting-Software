@@ -1,4 +1,6 @@
+{%set SERVER_CONFIG=gramados%}
 
+import core\config\%SERVER_CONFIG%\*.js;
 import core\npcs\moreEvents.js;
 import core\functions.js;
 import core\players\commands\utilCommands.js;
@@ -47,7 +49,7 @@ function interact(event){
 					mult = Math.floor(mult);
 				}
 			}
-			
+
 			//Adding to profit variable how much does it cost
 			profit += getCoinAmount(trader.getSold(i).getLore()[0].replace(/\s+/g, '')) * trader.getSold(i).getStackSize() * mult;
 			if(!trader.getCurrency1(i).isEmpty())

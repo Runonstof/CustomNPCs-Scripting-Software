@@ -1,3 +1,6 @@
+{%set SERVER_CONFIG=gramados%}
+
+import core\config\%SERVER_CONFIG%\*.js;
 import core\config\*.js;
 import core\npcs\makeInvulnerable.js;
 import core\players\chatEmotes.js;
