@@ -1,4 +1,16 @@
 var CUSTOM_MENUS = {};
+var MENU_TIMER_ID = 499;
+var MENU_TIMER_EXEC = null;
+var MENU_TIMER_PAYLOAD = {};
+
+@block timer_event
+    if(e.id == MENU_TIMER_ID) {
+        if(MENU_TIMER_EXEC != null) {
+            MENU_TIMER_EXEC(e.player, MENU_TIMER_PAYLOAD);
+            MENU_TIMER_EXEC = null;
+        }
+    }
+@endblock
 
 function reloadCustomMenusFromDisk() {
     CUSTOM_MENUS = {};
@@ -73,6 +85,14 @@ function reloadCustomMenusFromDisk() {
                     switch(action.type) {
                         case "close_menu":
                             e.player.closeGui();
+                            break;
+                        case "open_menu":
+                            e.player.closeGui();
+                            MENU_TIMER_PAYLOAD["menu"] = action.value||"";
+                            MENU_TIMER_EXEC = function(player, payload){
+                                executeXCommand("!menu open "+payload.menu, player);
+                            };
+                            e.player.timers.forceStart(MENU_TIMER_ID, 1, false);
                             break;
                         case "command":
                             if("value" in action) {
