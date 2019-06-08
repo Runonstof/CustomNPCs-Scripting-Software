@@ -38,7 +38,7 @@ var _COINITEM_PREFIX = '&e'; //Prefix showing before money value lore (used for 
 //"value": "item_id",
 var LOWVALUE_ID = "minecraft:iron_nugget";
 var MIDVALUE_ID = "minecraft:gold_nugget";
-var HIGHVALUE_ID = "bno:nugget_copper";
+var HIGHVALUE_ID = "minecraft:gold_nugget";
 
 
 //Coin Items for the physical currency
