@@ -4,6 +4,7 @@ var ASSET_MOD_ID = "adventureassets";
 
 //Java import
 var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
+var INbt = Java.type('noppes.npcs.api.INbt');
 var HAS_MOD_BACKPACKS = hasMCMod("backpacks16840");
 var UItem = (HAS_MOD_BACKPACKS ? Java.type("brad16840.common.UniqueItem") : null);
 var UItemInv = (HAS_MOD_BACKPACKS ? Java.type('brad16840.common.UniqueItemInventory') : null);
@@ -87,6 +88,20 @@ function progressBar(value, max, length, fillColor="&a", leftColor="&c"){
 		if(i >= progress) skillBar += "&c:box:";
 	}
 	return skillBar += "&r&l]";
+}
+
+function getChatMessage(player, team, color, message) {
+	//time
+	var curTimeStr = new Date().toLocaleTimeString("fr-FR").split(":");
+	curTimeStr.pop();
+	curTimeStr = curTimeStr.join(":");
+	var ccode = getColorId(color);
+	return "["+curTimeStr+"] &l&"+ccode+"[&"+ccode+team+"&r &"+ccode+player+"&l&"+ccode+"] -> &r"+message;
+}
+
+function getChatTag(player, team, color) {
+	var ccode = getColorId(color);
+	return "&"+ccode+"&l[&"+ccode+"&o"+team+"&r &"+ccode+player+"&"+ccode+"&l]";
 }
 
 function playerIsOnline(world, player) {
