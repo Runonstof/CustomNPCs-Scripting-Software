@@ -1,5 +1,6 @@
 
-{%set SERVER_CONFIG=alteria%}
+
+{%set SERVER_CONFIG=gramados%}
 
 import core\config\%SERVER_CONFIG%\*.js;
 
@@ -15,6 +16,7 @@ import core\players\executeCommand.js;
 import core\players\tell.js;
 import core\players\xcommands.js;
 import core\players\moreEvents.js;
+import core\players\chat\bots\*.js;
 import packages\CompatSkills\compatskills.js;
 
 var SCRIPT_VERSION = "2.0b";
@@ -61,11 +63,21 @@ function kill(e) {
 	yield kill_event;
 }
 
+function customChestClicked(e){
+	yield customChestClicked_event;
+}
+
+function customChestClosed(e){
+	yield customChestClosed_event;
+}
+
+
+
 function login(e) {
 	yield login_event;
 	var pl = e.player;
-	tellPlayer(pl, "["+SERVER_TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://drive.google.com/file/d/1hCfvORqn0ghXVV8I_mToDTsvpSSnFups/view?usp=sharing|show_text$e$oDownload Resource Pack}&r&e to download.");
-	tellPlayer(e.player, "["+SERVER_TITLE+"&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/Mrjh9s}&r &9server!");
+	tellPlayer(pl, "["+SERVER_TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://www.dropbox.com/s/m1va7k2zeixgry0/GramadosResources.zip?dl=0|show_text$e$oDownload Resource Pack}&r&e to download.");
+	tellPlayer(e.player, "[&6&l"+SERVER_TITLE+"&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
 
 }
 
@@ -123,9 +135,7 @@ function chat(e) {
 	//@ - Player
 	//$ - Team
 	//# - Chatchannel
-	var notifySounds = [
-		'animania:cluck3',
-	];
+
 	var players = w.getAllPlayers();
 	var teams = sb.getTeams();
 	var allChats = new ChatChannel().getAllDataIds(data);
@@ -191,10 +201,17 @@ function chat(e) {
 	if(pobj != null) {
 		pbounty = pobj.getScore(e.player.getName()).getValue();
 	}
+	//time
+	var curTimeStr = new Date().toLocaleTimeString("fr-FR").split(":");
+	curTimeStr.pop();
+	curTimeStr = curTimeStr.join(":");
+
 	//Concat new message
-	var newmsg = parseEmotes(dpl.getNameTag(sb, ' -> ', '{suggest_command:/msg '+dpl.name+' |show_text:$6$lBounty: $r:money:$e'+getAmountCoin(pbounty)+'}'))+prefcol+escmsg;
+	var hoverInfo = '$6$lBounty: $r:money:$e'+getAmountCoin(pbounty)+"\n";
+	var newmsg = "["+curTimeStr+"] "+parseEmotes(dpl.getNameTag(sb, ' -> ', '{suggest_command:@'+dpl.name+' |show_text:'+hoverInfo+'}'))+prefcol+escmsg;
 	var toldPlayers = [];
 	var wp = w.getAllPlayers();
+
 
 	if(chats.length > 0) {
 		for(var c in chats as ch) {
@@ -206,7 +223,7 @@ function chat(e) {
 						wchats.push(wchat.getTag('', '$'));
 						wcnames.push(wchat.name);
 					});
-					var ccpref = parseEmotes('&l[:lang:]{run_command:!chat list '+wcnames.join(" ")+'|show_text:'+wchats.join("\n")+'}&r ');
+					var ccpref = parseEmotes('['+curTimeStr+']&l[:lang:]{run_command:!chat list '+wcnames.join(" ")+'|show_text:'+wchats.join("\n")+'}&r ');
 					executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(ccpref+newmsg));
 					toldPlayers.push(wpl.getName());
 				}

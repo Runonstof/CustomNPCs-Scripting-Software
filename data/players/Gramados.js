@@ -1,4 +1,5 @@
 
+
 {%set SERVER_CONFIG=gramados%}
 
 import core\config\%SERVER_CONFIG%\*.js;
@@ -15,6 +16,7 @@ import core\players\executeCommand.js;
 import core\players\tell.js;
 import core\players\xcommands.js;
 import core\players\moreEvents.js;
+import core\players\chat\bots\*.js;
 import packages\CompatSkills\compatskills.js;
 
 var SCRIPT_VERSION = "2.0b";
@@ -61,11 +63,15 @@ function kill(e) {
 	yield kill_event;
 }
 
-function customChestClicked(ev){
-var held = ev.heldItem;
-    ev.heldItem = ev.slotItem;
-    ev.slotItem = held;
+function customChestClicked(e){
+	yield customChestClicked_event;
 }
+
+function customChestClosed(e){
+	yield customChestClosed_event;
+}
+
+
 
 function login(e) {
 	yield login_event;
