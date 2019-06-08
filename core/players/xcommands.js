@@ -38,6 +38,14 @@ import core\players\commands\*.js;
 	yield died_event;
 @endblock
 
+@block customChestClicked_event
+	yield customChestClicked_event;
+@endblock
+
+@block customChestClosed_event
+	yield customChestClosed_event;
+@endblock
+
 function queryDataHandlers(qry) {
 
 }
@@ -645,7 +653,7 @@ function getArgParams(arr) {
 	return params;
 }
 
-function executeXCommand(str, player) {
+function executeXCommand(str, player,permcheck=true) {
 	var data = player.world.getStoreddata();
 	var sb = player.world.getScoreboard();
 	for(var c in _COMMANDS as cmd) {
@@ -683,7 +691,7 @@ function executeXCommand(str, player) {
 					cmdperm.save(data);
 				}
 				cmdperm.load(data);
-				if(cmdperm.permits(player.getName(), sb, data)) {
+				if(cmdperm.permits(player.getName(), sb, data) || !permcheck) {
 					//Check arguments
 					for(var a in args as arg) {
 						if(arg == null) { continue; }
