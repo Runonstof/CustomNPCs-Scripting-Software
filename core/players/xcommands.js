@@ -14,6 +14,10 @@ import core\players\commands\*.js;
 	yield tick_event;
 @endblock
 
+@block timer_event
+	yield timer_event;
+@endblock
+
 @block interact_event
 	yield interact_event;
 @endblock
