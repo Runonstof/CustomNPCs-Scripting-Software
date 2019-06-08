@@ -854,6 +854,13 @@ function Player(name) {
 			tellPlayer(pl, getTitleBar('Emotes'));
 			tellPlayer(pl, "&6"+unlocked.length+"/"+showEmotes.length+" Unlocked.");
 			tellPlayer(pl, "&eHover emoji for info.");
+			tellPlayer(pl, "[&9&l? Help{*|show_text:"+
+				"$e$o$lI see chinese symbols!$r\n"+
+				"You dont have the resourcepack installed, contact server admins!\n"+
+				"$e$o$lHow do I unlock emotes?$r\n"+
+				"Some are unlocked by default, some can be bought, some are permitted to certain teams and some require a specific task."+
+				"}&r]"
+			);
 			var tellStr = "";
 			for(var i in showEmotes as em) {
 				var plHas = plo.hasEmote(em.name, sb, data);
