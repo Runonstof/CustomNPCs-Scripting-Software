@@ -209,9 +209,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 			}
 		]],
 		['!fakemsg <player> <team> <team_color> [...message]', function(pl, args, data){
-			var ccode = getColorId(args.team_color);
-			var newmsg = "&l&"+ccode+"[&o&"+ccode+args.team+"&r &"+ccode+args.player+"&l&"+ccode+"] -> &r"+args.message.join(" ");
-			executeCommand(pl, "/tellraw @a "+parseEmotes(strf(newmsg,true)));
+			executeCommand(pl, "/tellraw @a "+parseEmotes(strf(getChatMessage(args.player, args.team, args.team_color, args.message.join(" ")))));
 		}, 'fakemsg', [
 			{
 				"argname": "team_color",
