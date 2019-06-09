@@ -94,6 +94,26 @@ function reloadCustomMenusFromDisk() {
                             };
                             e.player.timers.forceStart(MENU_TIMER_ID, 1, false);
                             break;
+                        case "give":
+                            var items = action.items||[];
+                            for(var it in items as gitem) {
+                                var witem = e.player.world.createItem(gitem.id, gitem.damage||0, gitem.count||1);
+                                if("name" in gitem) {
+                                    witem.setCustomName(parseEmotes(ccs(gitem.name)));
+                                }
+                                if("lore" in gitem) {
+                                    var ilore = [];
+                                    for(var il in gitem.lore as ilo) {
+                                        ilore.push(parseEmotes(ccs("&r"+ilo)));
+                                    }
+                                    witem.setLore(ilore);
+                                }
+                                if("nbt" in gitem) {
+                                    witem.getNbt().merge(e.API.stringToNbt(JSON.stringify(gitem.nbt)));
+                                }
+                                e.player.giveItem(witem);
+                            }
+                            break;
                         case "command":
                             if("value" in action) {
                                 executeCommand(e.player, action.value);
@@ -108,6 +128,29 @@ function reloadCustomMenusFromDisk() {
                             var scr = action.value||"";
                             var scrFunc = new Function('e', scr);
                             scrFunc(e);
+                            break;
+                        case "run_file":
+                            var scrPath = action.value||"";
+                            var scrFile = new File(scrPath);
+                            if(scrFile.exists()) {
+                                var scr = Java.from( readFile(scrPath) ).join("\n").replace(/\t/g, "  ");
+                                var scrFunc = new Function('e', 'payload', scr);
+                                var payl = objMerge({
+                                    "displayItem": {
+                                        "id": e.slotItem.getId(),
+                                        "count": e.slotItem.getStackSize(),
+                                    }
+                                }, action.payload||{});
+                                
+                                try {
+                                    scrFunc(e, payl);
+                                } catch(exc) {
+                                    tellPlayer(e.player, "&cScript errored! ("+scrPath+":"+exc.lineNumber+") (Error printed in console)");
+                                    print("Error in "+scrPath+":"+exc.lineNumber+"\n"+exc.message);
+                                }
+                            } else {
+                                tellPlayer(e.player, "&cFile '"+scrPath+"' doesn't exist!");
+                            }
                             break;
                     }
                 }
@@ -128,13 +171,22 @@ function reloadCustomMenusFromDisk() {
                 var container = pl.showChestGui(menu.rows);
                 container.setName(parseEmotes(ccs(menu.displayName)));
                 for(var i in menu.items as menitem) {
-                    var item = pl.world.createItem(menitem.id, menitem.damage, menitem.count);
-                    item.setCustomName(parseEmotes(ccs(menitem.name)));
-                    var ilore = [];
-                    for(var il in menitem.lore as ilo) {
-                        ilore.push(parseEmotes(ccs("&r"+ilo)));
+                    var item = pl.world.createItem(menitem.id, menitem.damage||0, menitem.count||1);
+                    if("name" in menitem) {
+                        item.setCustomName(parseEmotes(ccs(menitem.name)));
                     }
-                    item.setLore(ilore);
+                    if("lore" in menitem) {
+                        var ilore = [];
+                        var lores = menitem.lore.concat(menitem.displayLore||[]);
+                        for(var il in lores as ilo) {
+                            ilore.push(parseEmotes(ccs("&r"+ilo)));
+                        }
+                        item.setLore(ilore);
+                    }
+                    if("nbt" in menitem) {
+                        item.getNbt().merge(API.stringToNbt(JSON.stringify(menitem.nbt)));
+                    }
+
                     var itemNbt = item.getNbt();
 
                     var passNbtData = [
