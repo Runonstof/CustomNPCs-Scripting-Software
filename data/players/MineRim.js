@@ -242,6 +242,8 @@ function chat(e) {
 			}
 		}
 	}
+
+	Logger.info(newmsg);
 	e.setCanceled(true); //Cancel real message
 }
 
