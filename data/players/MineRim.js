@@ -10,10 +10,12 @@ import core\config\%SERVER_CONFIG%\*.js;
 var SERVER_TITLE = SERVER_PREFIX+SERVER_NAME;
 var SERVER_TAG = BAR_OPEN+"&r"+SERVER_TITLE+"&r"+BAR_CLOSE;
 
+import core\math.js;
 import core\functions.js;
 import core\players\chatEmotes.js;
 import core\players\executeCommand.js;
 import core\players\tell.js;
+
 import core\players\xcommands.js;
 import core\players\moreEvents.js;
 import core\players\chat\bots\*.js;
@@ -202,7 +204,7 @@ function chat(e) {
 		pbounty = pobj.getScore(e.player.getName()).getValue();
 	}
 	//time
-	var curTimeStr = new Date().toLocaleTimeString("fr-FR").split(":");
+	var curTimeStr = new Date().toLocaleTimeString("nl-NL").split(":");
 	curTimeStr.pop();
 	curTimeStr = curTimeStr.join(":");
 
