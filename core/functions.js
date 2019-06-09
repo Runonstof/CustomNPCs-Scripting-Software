@@ -1,10 +1,16 @@
 import core\JavaScript\*.js;
 
+var SERVER_NAME = SERVER_NAME||"";
+
+
 var ASSET_MOD_ID = "adventureassets";
 
 //Java import
 var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
 var INbt = Java.type('noppes.npcs.api.INbt');
+var LogManager = Java.type('org.apache.logging.log4j.LogManager');
+var Logger = LogManager.getLogger(SERVER_NAME);
+
 var HAS_MOD_BACKPACKS = hasMCMod("backpacks16840");
 var UItem = (HAS_MOD_BACKPACKS ? Java.type("brad16840.common.UniqueItem") : null);
 var UItemInv = (HAS_MOD_BACKPACKS ? Java.type('brad16840.common.UniqueItemInventory') : null);
@@ -114,6 +120,12 @@ function playerIsOnline(world, player) {
 		}
 	}
 	return isOnline;
+}
+
+//sspeed = side speed, + = right, - = left
+//fspeed = forward speed, + = forward, - = backwards
+function entitySetMotion(entity, sspeed, fspeed, angle) {
+
 }
 
 var ForgeLoader = Java.type("net.minecraftforge.fml.common.Loader").instance();
@@ -497,6 +509,8 @@ var _ITEMATTR = [
 ];
 
 
+
+
 var _RAWCOLORS = {
 	'0': 'black',
 	'1': 'dark_blue',
@@ -725,6 +739,7 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 
 }
 
+
 function data_get(data, keys) {
 	var get = {};
 	for(var k in keys) {
@@ -803,9 +818,7 @@ function posdir(pos, dir=0, pitch=0, len=1, flying=false) {
 
 
 function fixAngle(angle) {
-	angle = Math.abs(angle);
-	if(angle >= 360) { angle -= 360; }
-	return angle;
+	return angle % 359;
 }
 
 function lengthpitch_y(pitch, length) {
