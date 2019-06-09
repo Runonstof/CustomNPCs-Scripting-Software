@@ -423,11 +423,6 @@ function arrayTakeRange(arr, start, end=null) {
 }
 
 
-function sign(num=0) {
-	if(num > 0) { return 1; }
-	if(num < 0) { return -1; }
-	return 0;
-}
 
 function g(obj, grp_props) {
 	for(var j in grp_props) {
@@ -817,23 +812,12 @@ function posdir(pos, dir=0, pitch=0, len=1, flying=false) {
 }
 
 
-function fixAngle(angle) {
-	return angle % 359;
-}
 
 function lengthpitch_y(pitch, length) {
 	return Math.round(pitch/-90)*length;
 }
 
 
-function lengthdir_x(angle, length=1) {
-	return Math.round((getQuartRotation(angle)/90)*length);
-}
-
-function lengthdir_z(angle, length=1) {
-	angle = fixAngle(angle+270);
-	return -lengthdir_x(angle, length);
-}
 
 function pick(a, amount=1) {
 	var index = Math.floor(Math.random() * a.length);
