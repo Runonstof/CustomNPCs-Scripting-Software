@@ -630,6 +630,27 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 				"min": 1
 			}
 		]],
+		['!takeMoney <amount> [...players]', function(pl, args, data){
+			var w = pl.world;
+			var plrs = [];
+			objArray(w.getAllPlayers()).forEach(function(wp){
+				plrs.push(wp.getName());
+			});
+			var am = getCoinAmount(args.amount);
+			if(args.players.length == 0) { args.players = [pl.getName()]; }
+
+			for(var i in args.players as ap) {
+				var apo = new Player(ap).init(data);
+				apo.data.money -= am;
+				apo.save(data);
+			}
+		}, 'takeMoney', [
+			{
+				"argname": "amount",
+				"type": "currency",
+				"min": 1
+			}
+		]],
 		['!giveVMoney <amount> [...players]', function(pl, args, data){
 			var w = pl.world;
 
