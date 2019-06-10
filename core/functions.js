@@ -6,10 +6,7 @@ var SERVER_NAME = SERVER_NAME||"";
 var ASSET_MOD_ID = "adventureassets";
 
 //Java import
-var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
-var INbt = Java.type('noppes.npcs.api.INbt');
-var LogManager = Java.type('org.apache.logging.log4j.LogManager');
-var Logger = LogManager.getLogger(SERVER_NAME);
+import core\mods\noppes\Java.js;
 
 var HAS_MOD_BACKPACKS = hasMCMod("backpacks16840");
 var UItem = (HAS_MOD_BACKPACKS ? Java.type("brad16840.common.UniqueItem") : null);
