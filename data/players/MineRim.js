@@ -12,6 +12,7 @@ var SERVER_TAG = BAR_OPEN+"&r"+SERVER_TITLE+"&r"+BAR_CLOSE;
 
 import core\math.js;
 import core\functions.js;
+import core\mods\noppes\*.js;
 import core\players\chatEmotes.js;
 import core\players\executeCommand.js;
 import core\players\tell.js;
