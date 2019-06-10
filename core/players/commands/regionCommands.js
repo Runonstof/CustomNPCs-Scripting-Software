@@ -113,13 +113,6 @@ function Region(name) {
 	}
 }
 
-function normalizePos(pos) {
-	return [
-		pos.getX(),
-		pos.getY(),
-		pos.getZ(),
-	];
-}
 
 @block blockinteract_event
 	if(!e.isCanceled()) {
