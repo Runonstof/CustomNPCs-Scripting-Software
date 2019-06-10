@@ -136,17 +136,15 @@ function reloadCustomMenusFromDisk() {
                                 var scr = Java.from( readFile(scrPath) ).join("\n").replace(/\t/g, "  ");
                                 var scrFunc = new Function('e', 'payload', scr);
                                 var payl = objMerge({
-                                    "displayItem": {
-                                        "id": e.slotItem.getId(),
-                                        "count": e.slotItem.getStackSize(),
-                                    }
+                                    //defaults
                                 }, action.payload||{});
-                                
+
                                 try {
                                     scrFunc(e, payl);
                                 } catch(exc) {
-                                    tellPlayer(e.player, "&cScript errored! ("+scrPath+":"+exc.lineNumber+") (Error printed in console)");
-                                    print("Error in "+scrPath+":"+exc.lineNumber+"\n"+exc.message);
+                                    var errtxt = "$6Error in "+scrPath+":"+exc.lineNumber+"\n$e"+exc.message+"\n\n$r"+exc.stack;
+                                    tellPlayer(e.player, "&cScript errored! ("+scrPath+":"+exc.lineNumber+") (Error Here){*|show_text:"+errtxt.replaceAll("&", "")+"}");
+                                    print(exc.stack);
                                 }
                             } else {
                                 tellPlayer(e.player, "&cFile '"+scrPath+"' doesn't exist!");
@@ -184,7 +182,7 @@ function reloadCustomMenusFromDisk() {
                         item.setLore(ilore);
                     }
                     if("nbt" in menitem) {
-                        item.getNbt().merge(API.stringToNbt(JSON.stringify(menitem.nbt)));
+                        item.getNbt().merge(new ENbt(menitem.nbt).copy().nbt);
                     }
 
                     var itemNbt = item.getNbt();
@@ -192,7 +190,8 @@ function reloadCustomMenusFromDisk() {
                     var passNbtData = [
                         "clickActions",
                         "clickFailedActions",
-                        "requirements"
+                        "requirements",
+                        "displayLore",
                     ];
 
                     for(var pp in passNbtData as pd) {
@@ -201,7 +200,7 @@ function reloadCustomMenusFromDisk() {
                         }
                     }
 
-                    container.setSlot(parseInt(36+menitem.slot), item);
+                    container.setSlot(parseInt(36+(menitem.slot||0)), item);
 
                 }
             } else {
