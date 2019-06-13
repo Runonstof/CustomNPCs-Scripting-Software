@@ -17,7 +17,7 @@ import packages\CompatSkills\compatskills.js;
 
 //
 
-var SCRIPT_VERSION = "2.0b";
+var SCRIPT_VERSION = "%__FILENAME__%";
 var SLOWTICK_TIMER_ID = 1;
 var SLOWTICK_TIMER = 100;
 
