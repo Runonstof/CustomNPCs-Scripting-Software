@@ -1,57 +1,8 @@
 //To-Do: Comment this file
-
+import core\DataHandler.js;
 
 var _COMMANDS = [];
 var _DATAHANDLERS = {};
-import core\players\commands\*.js;
-
-@block init_event
-	yield init_event;
-@endblock
-
-@block login_event
-	yield login_event;
-@endblock
-
-@block tick_event
-	yield tick_event;
-@endblock
-
-@block timer_event
-	yield timer_event;
-@endblock
-
-@block interact_event
-	yield interact_event;
-@endblock
-
-@block blockinteract_event
-	yield blockinteract_event;
-@endblock
-
-@block broken_event
-	yield broken_event;
-@endblock
-
-@block build_event
-	yield build_event;
-@endblock
-
-@block attack_event
-	yield attack_event;
-@endblock
-
-@block died_event
-	yield died_event;
-@endblock
-
-@block customChestClicked_event
-	yield customChestClicked_event;
-@endblock
-
-@block customChestClosed_event
-	yield customChestClosed_event;
-@endblock
 
 function queryDataHandlers(qry) {
 
