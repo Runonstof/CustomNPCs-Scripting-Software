@@ -127,6 +127,7 @@ $GLOBALS['config'] = [
 	],
 	'addons' => []
 ];
+
 $GLOBALS['vars'] = [
 	'npcs' => 'data\npcs',
 	'blocks' => 'data\blocks',
@@ -306,7 +307,7 @@ function getTabs($j, $filler="\t", $filler_last=null) {
 	return $t;
 }
 
-function getBlocks($string, $tabIndex) {
+function getBlocks($string, &$imported) {
 	$syn = &$GLOBALS['config']['syntaxRegex'];
 	$getBlockRegex = $syn['defineBlock'];
 	$bMatches = [];
@@ -316,7 +317,6 @@ function getBlocks($string, $tabIndex) {
 	preg_match_all($getBlockRegex, $string, $bMatches);
 
 	foreach($bMatches[1] as $i=>$match) {
-		if($GLOBALS['config']['compileOutput']) echo getTabs($tabIndex, "\t", "|-------")."Adding blockcode '$match'...\n";
 		$blockname = $match;
 		$blockcode = $bMatches[0][$i];
 		$blockcontents = $bMatches[2][$i];
@@ -333,7 +333,7 @@ function getBlocks($string, $tabIndex) {
 }
 
 
-function getIgnited($filepath, $tabIndex) {
+function getIgnited($filepath, &$imported) {
 		$ifilescript = file_get_contents($filepath);
 		$syn = &$GLOBALS['config']['syntaxRegex'];
 
@@ -401,25 +401,29 @@ function getIgnited($filepath, $tabIndex) {
 			}
 
 
-			$tabIndex += 1;
 			$ignPath = __DIR__ . '\\' . $subIgnPath;
 			$addIgn = '';
 
 			foreach(glob($ignPath) as $gIgnPath) {
-				$importContent = getIgnited($gIgnPath, $tabIndex);
-				$importBlocks = getBlocks($importContent, $tabIndex);
+				if(!in_array($gIgnPath, $imported)) {
+					$importContent = getIgnited($gIgnPath, $imported);
+					$importBlocks = getBlocks($importContent, $imported);
 
 
-				foreach($importBlocks as $iblock) {
-					$importContent = str_replace($iblock['code'], '', $importContent);
-					if(!isset($allBlocks[$iblock['name']])) { $allBlocks[$iblock['name']] = ''; }
-					$allBlocks[strval($iblock['name'])] .= $iblock['contents'];
+					foreach($importBlocks as $iblock) {
+						$importContent = str_replace($iblock['code'], '', $importContent);
+						if(!isset($allBlocks[$iblock['name']])) { $allBlocks[$iblock['name']] = ''; }
+						$allBlocks[strval($iblock['name'])] .= $iblock['contents'];
 
 
+					}
+
+					$addIgn .= $importContent;
+
+					array_push($imported, $gIgnPath);
+				} else {
+					echo "Skipped import of file \033[33m".$gIgnPath."\033[0m in file \033[33m".$filepath."\033[0m.\n";
 				}
-
-				$addIgn .= $importContent;
-
 
 
 
@@ -438,10 +442,8 @@ function getIgnited($filepath, $tabIndex) {
 
 		$c = 0;
 		foreach($ym[1] as $i=>$getblock) {
-			if($c == 0) { if($GLOBALS['config']['compileOutput']) echo getTabs($tabIndex, "\t", "|\t")."\n"; }
 
 			$rcode = '';
-			if($GLOBALS['config']['compileOutput']) echo getTabs($tabIndex, "\t", "|-------").'Yielding '.$getblock."...\n";
 			if(isset($allBlocks[$getblock])) { $rcode = $allBlocks[$getblock]; }
 
 			$ifilescript = str_replace($ym[0][$i], $rcode, $ifilescript);
@@ -449,7 +451,6 @@ function getIgnited($filepath, $tabIndex) {
 			if($c == count($ym[1])-1) { if($GLOBALS['config']['compileOutput'])echo getTabs($tabIndex)."\n"; }
 			$c++;
 		}
-		$tabIndex += 1;
 		return $ifilescript;
 }
 
@@ -468,6 +469,7 @@ $ii = 0;
 
 
 //$dFiles = $GLOBALS['config']['defaultFiles'];
+//loop given arguments, filter options and files out
 foreach($args as $key_arg=>$arg) {
 	$gPath = is_array($args[$key_arg]) ? $key_arg : $arg;
 	$doesMinify = $GLOBALS['config']['minify'];
@@ -478,7 +480,7 @@ foreach($args as $key_arg=>$arg) {
 		$outputDirs = isset($arg['outputDirs']) ? $arg['outputDirs'] : $outputDirs;
 		$outputName = isset($arg['outputName']) ? $arg['outputName'] : $outputName;
 	}
-
+	//Loop compile files
 	foreach(glob(__DIR__ .'\\'. $gPath) as $curpath) {
 
 
@@ -507,14 +509,16 @@ foreach($args as $key_arg=>$arg) {
 
 			$odirs = $GLOBALS['config']['outputDirPrefix'];
 			if(is_string($odirs)) { $odirs = [$odirs]; }
-
+			//Loop output dirs
 			foreach($odirs as $io=>$iodir) {
 				$nf = $iodir . '\\' . $outputDirs . $newName;
 
-
+				$imported = [
+					$curpath
+				];
 				$newFile = fopen($nf, 'w+');
 
-				$scr = getIgnited($curpath, $tabIndex);
+				$scr = getIgnited($curpath, $imported);
 				//Addons
 				foreach($GLOBALS['config']['addons'] as $addon) {
 					if(function_exists($addon)) {
@@ -545,6 +549,7 @@ foreach($args as $key_arg=>$arg) {
 				echo "Saving\033[33m $v\033[0m to\033[33m $nf\033[0m...\n";
 				fwrite($newFile, $scr);
 				fclose($newFile);
+				//echo json_encode($imported);
 			}
 		}
 	}
@@ -552,8 +557,6 @@ foreach($args as $key_arg=>$arg) {
 	$ii++;
 }
 
-
-if($GLOBALS['config']['compileOutput'])echo "\n";
 
 function putClosing($cc, $open='(', $close=')') {
 
