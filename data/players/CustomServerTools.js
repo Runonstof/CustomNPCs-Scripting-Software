@@ -1,15 +1,4 @@
-import core\config\default\*.js;
-import core\utils\FileUtils.js;
-
-//Check config file
-var SERVER_TITLE = SERVER_PREFIX+SERVER_NAME;
-var SERVER_TAG = BAR_OPEN+"&r"+SERVER_TITLE+"&r"+BAR_CLOSE;
-
-var configFile = new File("CSTServerSettings.json");
-if(!configFile.exists()) {
-
-}
-
+import core\utils\ServerConfigHandler.js;
 import core\math.js;
 import core\functions.js;
 import core\mods\noppes\*.js;
@@ -26,10 +15,13 @@ import core\players\chat\bots\*.js;
 import packages\CompatSkills\compatskills.js;
 
 
+//
 
 var SCRIPT_VERSION = "2.0b";
 var SLOWTICK_TIMER_ID = 1;
 var SLOWTICK_TIMER = 100;
+
+reloadConfiguration();
 
 function init(e) {
 	yield init_event;
@@ -37,13 +29,12 @@ function init(e) {
 	var sb = w.getScoreboard();
 	//e.player.getTimers().forceStart(SLOWTICK_TIMER_ID, SLOWTICK_TIMER, true);
 
-	if(DEFAULT_TEAM_JOIN != null) {
+	if(CONFIG_SERVER.DEFAULT_TEAM_JOIN != null) {
 		var t = sb.getPlayerTeam(e.player.getName());
-		if(t == null && sb.hasTeam(DEFAULT_TEAM_JOIN)) {
-			sb.getTeam(DEFAULT_TEAM_JOIN).addPlayer(e.player.getName());
+		if(t == null && sb.hasTeam(CONFIG_SERVER.DEFAULT_TEAM_JOIN)) {
+			sb.getTeam(CONFIG_SERVER.DEFAULT_TEAM_JOIN).addPlayer(e.player.getName());
 		}
 	}
-
 
 }
 
@@ -84,8 +75,8 @@ function customChestClosed(e){
 function login(e) {
 	yield login_event;
 	var pl = e.player;
-	tellPlayer(pl, "["+SERVER_TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://www.dropbox.com/s/m1va7k2zeixgry0/GramadosResources.zip?dl=0|show_text$e$oDownload Resource Pack}&r&e to download.");
-	tellPlayer(e.player, "[&6&l"+SERVER_TITLE+"&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
+	tellPlayer(pl, "["+CONFIG_SERVER.TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://www.dropbox.com/s/m1va7k2zeixgry0/GramadosResources.zip?dl=0|show_text$e$oDownload Resource Pack}&r&e to download.");
+	tellPlayer(e.player, "[&6&l"+CONFIG_SERVER.TITLE+"&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
 
 }
 

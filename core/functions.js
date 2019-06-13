@@ -1,8 +1,5 @@
 import core\JavaScript\*.js;
 
-var SERVER_NAME = SERVER_NAME||"";
-
-var ASSET_MOD_ID = "adventureassets";
 
 //Java import
 import core\mods\noppes\Java.js;
