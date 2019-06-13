@@ -1,24 +1,18 @@
 //===== CONFIG
-var SERVER_NAME = "MineRim";
-var SERVER_PREFIX = "&b&l"; //Color for output
-var SERVER_BAR_OPEN = "&r&l[=======] &r"; //For output
-var SERVER_BAR_CLOSE = "&r&l [=======]&r";
-var BAR_OPEN = "&l[";
-var BAR_CLOSE = "&l]";
+var CONFIG_SERVER = {
+	"NAME": "YourServerName",
+	"TITLE": "&a&lYourServerName",
+	"BAR_OPEN": "&r&l[=======] &r",
+	"BAR_CLOSE": "&r&l [=======]&r",
+	"DEFAULT_PERM_TEAMS": [
+		"Owner",
+		"Developer"
+	],
+	"DEFAULT_PERM_PLAYERS": [],
+	"DEFAULT_TEAM_JOIN": "Player",
+};
 
 var DEFAULT_MONEY = 0;
-
-var DEFAULT_TEAMS = [ //Default scoreboard teams that gets added when permission is created
-	"Owner",
-	"Developer"
-];
-var DEFAULT_PLAYERS = [ //Default players that gets added when permission is created
-
-];
-//Team that player autojoins when player has no team
-//set to null to disable
-var DEFAULT_TEAM_JOIN = "Player";
-//var DEFAULT_TEAM_JOIN = null;
 
 //Configure your own time units for in arguments etc!
 var msTable = {
