@@ -118,6 +118,9 @@ $GLOBALS['config'] = [
 		'players' => [
 			'data\players\*.js', '-w:$outputDirs$=players\\'
 		],
+		'server' => [
+			'data\players\CustomServerTools.js', '-w:$outputDirs$=players\\'
+		],
 		'items' => [
 			'data\items\*.js', '-w:$outputDirs$=items\\'
 		],
