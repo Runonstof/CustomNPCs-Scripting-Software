@@ -310,6 +310,7 @@ foreach($arg_opts as $a=>$o) {
 	}
 }
 
+
 if($GLOBALS['config']['syntaxRegex'] == null) {
 	require(__DIR__ . '\\config\\syntax\\js.php');
 }
@@ -513,6 +514,8 @@ foreach($args as $key_arg=>$arg) {
 			foreach($replaces as $replace_what=>$replace_to) {
 				$newName = str_replace('{'.$replace_what.'}', $replace_to, $newName);
 			}
+
+			$GLOBALS['vars']['__FILENAME__'] = $newName;
 
 			$odirs = $GLOBALS['config']['outputDirPrefix'];
 			if(is_string($odirs)) { $odirs = [$odirs]; }
