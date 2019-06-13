@@ -110,19 +110,19 @@ $GLOBALS['config'] = [
 	'defaultFiles' => [],
 	'profiles' => [
 		'npcs' => [
-			['data\npcs\*.js', '-w:$outputDirs$:npcs\\']
+			'data\npcs\*.js', '-w:$outputDirs$=npcs\\'
 		],
 		'blocks' => [
-			['data\blocks\*.js', '-w:$outputDirs$:blocks\\']
+			'data\blocks\*.js', '-w:$outputDirs$=blocks\\'
 		],
 		'players' => [
-			['data\players\*.js', '-w:$outputDirs$:players\\']
+			'data\players\*.js', '-w:$outputDirs$=players\\'
 		],
 		'items' => [
-			['data\items\*.js', '-w:$outputDirs$:items\\']
+			'data\items\*.js', '-w:$outputDirs$=items\\'
 		],
 		'forge' => [
-			['data\forge\*.js', '-w:$outputDirs$:forge\\']
+			'data\forge\*.js', '-w:$outputDirs$=forge\\'
 		]
 	],
 	'addons' => []
@@ -138,6 +138,16 @@ $GLOBALS['vars'] = [
 	'forge' => 'data\forge',
 ];
 require(__DIR__ . '\config\outputDirectories.php');
+
+//replace args with profiles
+$argvstring = implode(" ", $argv);
+$profiles = &$GLOBALS['config']['profiles'];
+
+foreach($profiles as $k=>$profile) {//Loop profiles
+	$argvstring = str_replace("@".$k, implode(" ", $profile), $argvstring);
+}
+
+$argv = explode(" ", $argvstring);
 
 
 //Arg options
@@ -166,6 +176,15 @@ $arg_opts = [
 		}
 		return $argv;
 	},
+	'-fname' => function($argv, $i, $arg) {
+		array_splice($argv, $i, 1);
+		$a = explode(":", $arg);
+		if(isset($a[1])) {
+			$GLOBALS['config']['outputName'] = $a[1];
+		}
+		return $argv;
+
+	},
 	/*'-clear-cache' => function($argv, $i) {
 		//Clear compile cache
 		$dirs = $GLOBALS['config']['outputDirPrefix'];
@@ -180,8 +199,8 @@ $arg_opts = [
 	'-x' => function(){exit;},
 	'-w' => function($argv, $i, $arg) {
 		$vars = substr($arg, 3, strlen($arg)-3);
-		$varsReg = '/(?:([%\w]+):([:%$.\/*+\-\/\w]+))*/';
-		$fileOptReg = '/(?:\$([\w]+)\$:([:{}%$.\/*+\-\w\\\]+))*/';
+		$varsReg = '/(?:([%\w]+)=([:%$.\/*+\-\/\w]+))*/';
+		$fileOptReg = '/(?:\$([\w]+)\$=([:{}%$.\/*+\-\w\\\]+))*/';
 		$allowedOptions = [
 			'outputDirs',
 			'outputDirPrefix',
@@ -241,6 +260,7 @@ if(count($argv) == 1) {
 }
 
 //Add arg profiles
+/*
 $profiles = &$GLOBALS['config']['profiles'];
 foreach($profiles as $k=>$profile) {//Loop profiles
 	if(indexOf($argv, '@'.$k) != -1) {//Has current profile in argument
@@ -271,11 +291,10 @@ foreach($profiles as $k=>$profile) {//Loop profiles
 		}
 	}
 }
-
+*/
 //Handle Arguments
 foreach($arg_opts as $a=>$o) {
 	foreach($argv as $i=>$arg) {
-
 		if(explode(':', $arg)[0] == $a) {
 
 			if(is_callable($o)) {
