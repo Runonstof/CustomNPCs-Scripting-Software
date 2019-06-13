@@ -377,7 +377,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 		}, 'fakejoin'],
 		['!version', function(pl, args){
 			tellPlayer(pl, getTitleBar("Server Software"));
-			tellPlayer(pl, "&e&l"+SERVER_NAME+" Version: &c&l"+SCRIPT_VERSION);
+			tellPlayer(pl, "&e&l"+CONFIG_SERVER.NAME+" Version: &c&l"+SCRIPT_VERSION);
 			tellPlayer(pl, "&e&lSubscription: &9&lPrototype Edition");
 			tellPlayer(pl, "&e&lProgrammed by: &r&lRunonstof&e and &r&lslava_110");
 			tellPlayer(pl, "&e&lMade by: &r&lTheOddlySeagull&r&e and &r&lRunonstof");

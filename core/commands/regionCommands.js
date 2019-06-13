@@ -129,7 +129,7 @@ if(!e.isCanceled()) {
 				tellPlayer(pl, "&ePermission ID: &9&l"+regperm.name+"&r (&6:sun: Perm Info{run_command:!perms info "+regperm.name+"}&r)");
 				var rpermname = region.getPermission().name;
 				//tellPlayer(pl, "&eRegion Permission: &b&l"+rpermname+"&r "+(region.getPermission().exists(data) ? "(&6:sun: Info{run_command:!perms info "+rpermname+"}&r)"));
-				tellPlayer(pl, "&eOwner: &r&o"+(region.data.owner == null ? SERVER_TITLE:region.data.owner+"&r (&c:cross: Kick{run_command:!region setOwner "+region.name+"|show_text:Kick "+region.data.owner+" from "+region.name+"}&r)")+"&r (&a+ Set{suggest_command:!region setOwner "+region.name+" |show_text:Set new owner for "+region.name+"}&r)");
+				tellPlayer(pl, "&eOwner: &r&o"+(region.data.owner == null ? CONFIG_SERVER.TITLE:region.data.owner+"&r (&c:cross: Kick{run_command:!region setOwner "+region.name+"|show_text:Kick "+region.data.owner+" from "+region.name+"}&r)")+"&r (&a+ Set{suggest_command:!region setOwner "+region.name+" |show_text:Set new owner for "+region.name+"}&r)");
 				tellPlayer(pl, "&eFor Sale: "+
 					(region.data.forSale ?
 						"&a:check: Yes&r (&cPull off sale{run_command:!region setForSale "+region.name+" false}&r)"

@@ -3,7 +3,7 @@ function Permission(name) {
 
 	this.data = {
 		"enabled": true,
-		"teams": DEFAULT_TEAMS,
+		"teams": CONFIG_SERVER.DEFAULT_PERM_TEAMS,
 		"players": [],
 		"jobs": [],
 		"meta": {}
