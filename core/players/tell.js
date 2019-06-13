@@ -1,3 +1,5 @@
+import core\utils\TellrawFormat.js;
+
 //Send player formatted message
 function tellPlayer(player, rawtext) {
 	return executeCommand(player, "/tellraw "+player.getName()+" "+parseEmotes(strf(rawtext)));
