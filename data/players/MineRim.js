@@ -14,7 +14,10 @@ import core\players\chatEmotes.js;
 import core\players\executeCommand.js;
 import core\players\tell.js;
 
-import core\players\xcommands.js;
+import core\xcommandsAPI.js;
+import core\datahandlers\*.js;
+import core\commands\*.js;
+
 import core\players\moreEvents.js;
 import core\players\chat\bots\*.js;
 import packages\CompatSkills\compatskills.js;
