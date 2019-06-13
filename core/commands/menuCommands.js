@@ -1,10 +1,13 @@
+import core\xcommandsAPI.js;
 
+import core\CustomMenuHandler.js;
 
 @block init_event
     reloadCustomMenusFromDisk();
 @endblock
 
 @block register_commands_event
+
     registerXCommands([
         ["!menu reload", function(pl, args, data){
             var output = reloadCustomMenusFromDisk();
@@ -29,7 +32,7 @@
                         item.setLore(ilore);
                     }
                     if("nbt" in menitem) {
-                        item.getNbt().merge(new ENbt(menitem.nbt).copy().nbt);
+                        item.getNbt().merge(API.stringToNbt(JSON.stringify(menitem.nbt)));
                     }
 
                     var itemNbt = item.getNbt();
