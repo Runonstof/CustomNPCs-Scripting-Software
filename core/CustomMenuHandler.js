@@ -138,9 +138,7 @@ function reloadCustomMenusFromDisk() {
                                 try {
                                     scrFunc(e, payl);
                                 } catch(exc) {
-                                    var errtxt = "$6Error in "+scrPath+":"+exc.lineNumber+"\n$e"+exc.message+"\n\n$r"+exc.stack;
-                                    tellPlayer(e.player, "&cScript errored! ("+scrPath+":"+exc.lineNumber+") (Error Here){*|show_text:"+errtxt.replaceAll("&", "")+"}");
-                                    print(exc.stack);
+                                    handleError(exc, false, e.player.getName());
                                 }
                             } else {
                                 tellPlayer(e.player, "&cFile '"+scrPath+"' doesn't exist!");
