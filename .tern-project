@@ -1,0 +1,15 @@
+{
+  "ecmaVersion": "5",
+  "libs": [],
+  "loadEagerly": [],
+  "dontLoad": [
+    "node_modules/**"
+  ],
+  "plugins": {
+    "doc_comment": {
+      "fullDocs": true,
+      "strong": false
+    },
+    "es_modules": {}
+  }
+}

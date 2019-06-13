@@ -20,3 +20,27 @@ function ENbt(nbtObject) {
     this.toJsonString = function() { return this.nbt.toJsonString(); }
     this.toJsonObj = function() { return JSON.parse(this.toJsonString()); }
 }
+
+function nbtCopy(nbt, api) {
+	return api.stringToNbt(nbt.toJsonString());
+}
+
+function nbtItem(nbt, w) {
+	if(typeof(nbt) == 'string') { nbt = API.stringToNbt(nbt); }
+	var item = w.createItemFromNbt(nbt);
+	return item;
+}
+
+//Turn String[] with item nbts to IItemStack[]
+function nbtItemArr(nbtArr, w) {
+    var itemArr = [];
+	for(var itemData in nbtArr as item){
+        itemArr.push(nbtItem(item, w));
+    }
+
+    return itemArr;
+}
+
+function isNbtEqual(nbt, otherNbt) {
+    return nbt.toJsonString() == otherNbt.toJsonString();
+}

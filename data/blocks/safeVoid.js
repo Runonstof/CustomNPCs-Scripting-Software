@@ -1,6 +1,10 @@
-#template Block data\blocks;
+import core\blocks\blockTextured.js;
+import core\blocks\blockConfigurable.js;
 
 function init(e){
+	var config = {
+		"ignorePlayer": "bool|true"
+	};
 	yield init_event;
 }
 
@@ -22,6 +26,8 @@ function clicked(e){
 
 function collide(e){
 	yield collide_event;
+    if( !JSON.parse(e.block.getStoreddata().get("config")).ignorePlayer || e.entity.getType()!=EntityType_PLAYER )
+        e.entity.kill();
 }
 
 function doorToggle(e){

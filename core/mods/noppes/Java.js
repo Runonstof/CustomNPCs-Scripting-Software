@@ -2,6 +2,7 @@ var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
 var INbt = Java.type('noppes.npcs.api.INbt');
 var LogManager = Java.type('org.apache.logging.log4j.LogManager');
 var Logger = LogManager.getLogger(SERVER_NAME);
+var ForgeLoader = Java.type("net.minecraftforge.fml.common.Loader").instance();
 
 var NbtTypes = {
     "Byte": 1,
@@ -22,4 +23,19 @@ function getNbtType(num) {
         if(nbtType === num) { return n; }
     }
     return null;
+}
+
+function getMCModList() {
+    var modlist = [];
+    var loadmods = Java.type("net.minecraftforge.fml.common.Loader").instance().getModList();
+
+    for(var mid in loadmods as lmod) {
+        modlist.push(lmod.getModId());
+    }
+
+    return modlist;
+}
+
+function hasMCMod(name) {
+    return getMCModList().indexOf(name) > -1;
 }

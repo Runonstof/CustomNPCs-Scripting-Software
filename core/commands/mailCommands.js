@@ -1,0 +1,1 @@
+registerDataHandler("mail", Mail);

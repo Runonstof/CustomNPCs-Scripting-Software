@@ -1,6 +1,11 @@
-#template Block data\blocks;
+import core\blocks\blockTextured.js;
+import core\blocks\blockConfigurable.js;
+import core\players\commands\menuCommands.js;
 
 function init(e){
+	var config = {
+		"effect": "string|25|2|15"
+	};
 	yield init_event;
 }
 
@@ -22,6 +27,8 @@ function clicked(e){
 
 function collide(e){
 	yield collide_event;
+	var effectInfo = JSON.parse(e.block.getStoreddata().get("config")).effect.split("|");
+    e.entity.addPotionEffect(effectInfo[0], effectInfo[1], effectInfo[2], true);
 }
 
 function doorToggle(e){
@@ -54,8 +61,4 @@ function redstone(e){
 
 function timer(e){
 	yield timer_event;
-}
-
-function customChestClicked(e) {
-    yield customChestClicked_event;
 }
