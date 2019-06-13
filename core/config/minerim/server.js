@@ -1,6 +1,6 @@
 //===== CONFIG
-var SERVER_NAME = "MineRim";
-var SERVER_PREFIX = "&b&l"; //Color for output
+var SERVER_NAME = "YourServerName";
+var SERVER_PREFIX = "&a&l"; //Color for output
 var SERVER_BAR_OPEN = "&r&l[=======] &r"; //For output
 var SERVER_BAR_CLOSE = "&r&l [=======]&r";
 var BAR_OPEN = "&l[";
