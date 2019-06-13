@@ -15,6 +15,8 @@ function readDir(dirPath){
 	return res;
 }
 
+function readFileAsString(filePath) { return Java.from( readFile(filePath) ).join("\n").replace(/\t/g, "  "); }
+
 function readFile(filePath){
 	var path = Paths.get(filePath);
 	try{
@@ -30,7 +32,7 @@ function writeToFile(filePath, text, offset=null, length=null) {
 	try {
 		var writer = Files.newBufferedWriter(path, CHARSET_UTF_8);
 		writer.write(text, offset||0, length||text.length);
-
+		writer.close();
 		return true;
 	} catch (exc) {
 		return false
