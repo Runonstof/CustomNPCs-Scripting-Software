@@ -1,3 +1,5 @@
+import core\utils\ErrorHandler.js;
+
 var CUSTOM_MENUS = {}; //Menus
 var MENU_TIMER_ID = 499; //Timer id for menus
 var MENU_TIMER_EXEC = null; //Timer function
