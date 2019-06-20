@@ -8,6 +8,6 @@ function executeCommand(player, command, as_player=null) {
 
 }
 
-function executeCommandGlobal(command) {
-	return API.createNPC(API.getIWorld(0).getMCWorld()).executeCommand(command);
+function executeCommandGlobal(command, dim=0) {
+	return API.createNPC(API.getIWorld(dim).getMCWorld()).executeCommand(command);
 }
