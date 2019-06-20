@@ -711,17 +711,26 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 				"min": 1
 			}
 		]],
-		['!sayas <player> <...message>', function(pl, args, data){
-			var w = pl.world;
-			var ap = args.player;
-			var apo = new Player(ap);
-			apo.load(data);
-			var msg = args.message.join(" ");
-			var nmsg = getPlayerMessage(pl, msg, w, ap, true);
-			executeCommand(pl, "/tellraw @a "+strf(nmsg, true, apo.getAllowedColors(data, w.getScoreboard())));
-			return true;
+		['!copyCoords [player]', function(pl, args, data){
+			var pname = args.player||pl.getName();
+			if(playerIsOnline(pl.world, pname)) {
+				var telltxt = getTitleBar("Coords", false)+"\n\n"+
+				"&aX: &c{XCOORD} &aY: &c{YCOORD} &aZ: &c{ZCOORD}\n\n"+
+				"&rCopy coords as:\n"+
+				" - &a[TP Command]{suggest_command:/tp @p {XCOORD} {YCOORD} {ZCOORD}|show_text:$aClick to get coords as /tp command.}&r\n"+
+				" - &a[Formatted XYZ]{suggest_command:X:{XCOORD} Y:{YCOORD} Z:{ZCOORD}|show_text:$aClick to get coords nicely formatted.}&r\n"+
+				" - &a[Numbers Only]{suggest_command:{XCOORD} {YCOORD} {ZCOORD}|show_text:$aClick to get coords numbers only.}&r\n";
 
-		}, 'sayas'],
+				tellPlayer(pl, telltxt.fill({
+					"XCOORD": Math.floor(pl.getX()),
+					"YCOORD": Math.floor(pl.getY()),
+					"ZCOORD": Math.floor(pl.getZ()),
+				}));
+
+			} else {
+				tellPlayer(pl, "&cPlayer is not online!");
+			}
+		}, 'copyCoords'],
 		//Inventory load/save
 		['!inv save <name>', function(pl, args, data){
 			var apo = new Player(pl.getName());
