@@ -14,6 +14,8 @@ import core\players\moreEvents.js;
 import core\players\chat\bots\*.js;
 import packages\CompatSkills\compatskills.js;
 
+import core\PluginLoader.js;
+
 
 //
 
