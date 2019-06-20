@@ -1,5 +1,4 @@
 <?php
-
 /*
 Created By: Runonstof
 
@@ -437,13 +436,15 @@ function getIgnited($filepath, &$imported) {
 
 			foreach(glob($ignPath) as $gIgnPath) {
 				if(!in_array($gIgnPath, $imported)) {
+					array_push($imported, $gIgnPath);
 					$importContent = getIgnited($gIgnPath, $imported);
+
 					$importContent = getBlocks($importContent);
 
 
 					$addIgn .= $importContent;
 
-					array_push($imported, $gIgnPath);
+
 				} else {
 					echo "Skipped import of file \033[33m".$gIgnPath."\033[0m in file \033[33m".$filepath."\033[0m.\n";
 				}
