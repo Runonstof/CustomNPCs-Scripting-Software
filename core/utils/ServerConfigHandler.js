@@ -1,5 +1,7 @@
 import core\config\default\*.js;
+import core\utils\ErrorHandler.js;
 import core\utils\FileUtils.js;
+
 
 
 //Check config file
@@ -12,11 +14,16 @@ function reloadConfiguration() {
     	configFile.createNewFile();
     	writeToFile(CONFIG_FILEPATH, JSON.stringify(CONFIG_SERVER, null, 4));
     }
-    CONFIG_SERVER = JSON.parse(readFileAsString(CONFIG_FILEPATH));
+
+    try {
+        CONFIG_SERVER = objMerge(CONFIG_SERVER, JSON.parse(readFileAsString(CONFIG_FILEPATH)));
+    } catch (exc) {
+        handleError(exc);
+    }
 
 }
 
-
+reloadConfiguration();
 
 @block register_commands_event
     registerXCommands([
