@@ -2,6 +2,7 @@
 var CONFIG_SERVER = {
 	"NAME": "YourServerName",
 	"TITLE": "&a&lYourServerName",
+	"PREFIX": "&a&l",
 	"BAR_OPEN": "&r&l[=======] &r",
 	"BAR_CLOSE": "&r&l [=======]&r",
 	"DEFAULT_PERM_TEAMS": [
