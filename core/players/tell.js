@@ -15,7 +15,7 @@ function storytellPlayer(player, ar) {
 //Get server title bar for displaying
 //TO-DO: Placeholders instead of multiple variables
 function getTitleBar(title, showServerName=true) {
-	return CONFIG_SERVER.BAR_OPEN+(showServerName?CONFIG_SERVER.TITLE+" ":SERVER_PREFIX)+title+CONFIG_SERVER.BAR_CLOSE;
+	return CONFIG_SERVER.BAR_OPEN+(showServerName?CONFIG_SERVER.TITLE+" ":"")+title+CONFIG_SERVER.BAR_CLOSE;
 }
 
 function getUndoBtn(undo_cmds, hoverText=null) {
