@@ -188,16 +188,10 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
-		['!debug [player] [rows]', function(pl, args, data){
-			var player = args.player||pl.getName();
-			var rows = args.rows||1;
-			if(playerIsOnline(pl.world, player)) {
-				var wpl = pl.world.getPlayer(player);
-				wpl.showChestGui(parseInt(rows));
-			} else {
-				tellPlayer(pl, "&c"+player+" is not online!");
+		['!debug', function(pl, args, data){
+			if(!pl.getMainhandItem().isEmpty()) {
+				worldOut(getItemType(pl.getMainhandItem(), pl.getMCEntity()));
 			}
-
 		}, 'debug', [
 			{
 				"argname": "rows",
@@ -719,7 +713,8 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 				"&rCopy coords as:\n"+
 				" - &a[TP Command]{suggest_command:/tp @p {XCOORD} {YCOORD} {ZCOORD}|show_text:$aClick to get coords as /tp command.}&r\n"+
 				" - &a[Formatted XYZ]{suggest_command:X:{XCOORD} Y:{YCOORD} Z:{ZCOORD}|show_text:$aClick to get coords nicely formatted.}&r\n"+
-				" - &a[Numbers Only]{suggest_command:{XCOORD} {YCOORD} {ZCOORD}|show_text:$aClick to get coords numbers only.}&r\n";
+				" - &a[Numbers Only]{suggest_command:{XCOORD} {YCOORD} {ZCOORD}|show_text:$aClick to get coords numbers only.}&r\n"+
+				" - &a[Selector]{suggest_command:x={XCOORD},y={YCOORD},z={ZCOORD}|show_text:$aClick to get coords as selector.}&r\n";
 
 				tellPlayer(pl, telltxt.fill({
 					"XCOORD": Math.floor(pl.getX()),
