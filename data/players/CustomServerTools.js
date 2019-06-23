@@ -2,6 +2,7 @@ import core\utils\ServerConfigHandler.js;
 import core\math.js;
 import core\functions.js;
 import core\mods\noppes\*.js;
+import core\mods\minecraft\*.js;
 import core\players\chatEmotes.js;
 import core\players\executeCommand.js;
 import core\players\tell.js;
@@ -15,7 +16,7 @@ import core\players\chat\bots\*.js;
 import packages\CompatSkills\compatskills.js;
 
 import core\PluginLoader.js;
-
+import core\CustomEnchantsLoader.js;
 
 //
 
@@ -27,14 +28,18 @@ reloadConfiguration();
 
 function init(e) {
 	yield init_event;
-	var w = e.player.world;
-	var sb = w.getScoreboard();
-	//e.player.getTimers().forceStart(SLOWTICK_TIMER_ID, SLOWTICK_TIMER, true);
 
-	if(CONFIG_SERVER.DEFAULT_TEAM_JOIN != null) {
-		var t = sb.getPlayerTeam(e.player.getName());
-		if(t == null && sb.hasTeam(CONFIG_SERVER.DEFAULT_TEAM_JOIN)) {
-			sb.getTeam(CONFIG_SERVER.DEFAULT_TEAM_JOIN).addPlayer(e.player.getName());
+	if(e.player != null) {
+
+		var w = e.player.world;
+		var sb = w.getScoreboard();
+		//e.player.getTimers().forceStart(SLOWTICK_TIMER_ID, SLOWTICK_TIMER, true);
+
+		if(CONFIG_SERVER.DEFAULT_TEAM_JOIN != null) {
+			var t = sb.getPlayerTeam(e.player.getName());
+			if(t == null && sb.hasTeam(CONFIG_SERVER.DEFAULT_TEAM_JOIN)) {
+				sb.getTeam(CONFIG_SERVER.DEFAULT_TEAM_JOIN).addPlayer(e.player.getName());
+			}
 		}
 	}
 
@@ -42,6 +47,10 @@ function init(e) {
 
 function interact(e) {
 	yield interact_event;
+}
+
+function scriptCommand(e) {
+	worldOut("Args: "+Java.from(e.arguments).join(" "));
 }
 
 function slowTick(e) {
@@ -72,7 +81,9 @@ function customChestClosed(e){
 	yield customChestClosed_event;
 }
 
-
+function rangedLaunched(e) {
+	print("")
+}
 
 function login(e) {
 	yield login_event;
@@ -253,11 +264,17 @@ function containerOpen(e) {
 }
 
 function containerClose(e) {
-	yield damagedEntity_event;
+	yield containerClose_event;
 }
 
 function damaged(e) {
 	yield damaged_event;
+}
+
+function damagedEntity(e) {
+	yield damagedEntity_event;
+
+
 }
 
 function died(e) {
