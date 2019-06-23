@@ -31,6 +31,10 @@ function nbtItem(nbt, w) {
 	return item;
 }
 
+function nbtGetList(nbt, list) {
+    return nbt.has(list) ? nbt.getList(list, nbt.getListType(list)) : null;
+}
+
 //Turn String[] with item nbts to IItemStack[]
 function nbtItemArr(nbtArr, w) {
     var itemArr = [];
