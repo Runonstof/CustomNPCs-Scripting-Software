@@ -33,6 +33,34 @@
 
 			return false;
 		}, 'item.rename'],
+		['!item addcstEnchant <name> [lvl]', function(pl, args, data){
+			var mItem = pl.getMainhandItem();
+			var ench = getCSTEnchantByIdOrName(args.name);
+			if(!mItem.isEmpty() && ench != null) {
+				addCSTEnchant(mItem, ench.id, args.lvl||1);
+			}
+		}, 'item.addEnchant', [
+			{
+				"argname": "lvl",
+				"type": "number",
+				"min": 1
+			},
+
+		]],
+		['!item removecstEnchant <name>', function(pl, args, data){
+			var mItem = pl.getMainhandItem();
+			var ench = getCSTEnchantByIdOrName(args.name);
+			if(!mItem.isEmpty() && ench != null) {
+				removeCSTEnchant(mItem, ench.id);
+			}
+		}, 'item.removeEnchant', [
+			{
+				"argname": "lvl",
+				"type": "number",
+				"min": 1
+			},
+
+		]],
 		['!item setAttr <slot> <attribute> <value>', function(pl, args){
 			var mItem = pl.getMainhandItem();
 

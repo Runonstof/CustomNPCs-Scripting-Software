@@ -2,19 +2,22 @@ registerDataHandler("player", Player);
 
 @block init_event
 	(function(e){
-		var pl = e.player;
-		var w = pl.world;
-		var data = w.getStoreddata();
-		var plo = new Player(pl.getName()).init(data).sync(pl);
-		var sb = w.getScoreboard();
+		if(e.player != null) {
 
-		if(!sb.hasObjective("bounty")) {
-			sb.addObjective("bounty", "dummy");
-		}
-		var sbbounty = sb.getObjective("bounty");
-		if(!sbbounty.hasScore(pl.getName())) {
-			sbbounty.createScore(pl.getName()).setValue(0);
-		}
+			var pl = e.player;
+			var w = pl.world;
+			var data = w.getStoreddata();
+			var plo = new Player(pl.getName()).init(data).sync(pl);
+			var sb = w.getScoreboard();
+
+			if(!sb.hasObjective("bounty")) {
+				sb.addObjective("bounty", "dummy");
+			}
+			var sbbounty = sb.getObjective("bounty");
+			if(!sbbounty.hasScore(pl.getName())) {
+				sbbounty.createScore(pl.getName()).setValue(0);
+			}
+        }
 	})(e);
 @endblock
 

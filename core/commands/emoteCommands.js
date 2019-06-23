@@ -2,15 +2,17 @@ registerDataHandler("emote", Emote);
 
 @block init_event
   (function(e){
-    var pl = e.player;
-    var w = pl.world;
-    var data = w.getStoreddata();
-    for(var c in CHAT_EMOTES as ce) {
-      var ec = new Emote(c);
-      if(!ec.exists(data)) {
-        ec.save(data);
+      if(e.player != null) {
+          var pl = e.player;
+          var w = pl.world;
+          var data = w.getStoreddata();
+          for(var c in CHAT_EMOTES as ce) {
+              var ec = new Emote(c);
+              if(!ec.exists(data)) {
+                  ec.save(data);
+              }
+          }
       }
-    }
   })(e);
 @endblock
 

@@ -9,28 +9,29 @@ function getColorPermId(colorId) {
 @block init_event
 	//GEN PLAYER PERMISSIONS
 	(function(e){
-		var w = e.player.world;
-		var data = w.getStoreddata();
-		var playerperms = [
-			"chat",
-			"chat.color",
-			"chat.command",
-			"chat.hover",
-		];
-		for(var i in _RAWCOLORS as rawc) {
-			playerperms.push('chat.color.'+rawc);
-		}
-		for(var i in _RAWEFFECTS as rawc) {
-			playerperms.push('chat.color.'+rawc);
-		}
-		//Register if not exists
-		for(var p in playerperms as plperm) {
-			var pperm = new Permission(plperm);
-			if(!pperm.exists(data)) {
-				pperm.save(data);
+		if(e.player != null) {
+			var w = e.player.world;
+			var data = w.getStoreddata();
+			var playerperms = [
+				"chat",
+				"chat.color",
+				"chat.command",
+				"chat.hover",
+			];
+			for(var i in _RAWCOLORS as rawc) {
+				playerperms.push('chat.color.'+rawc);
+			}
+			for(var i in _RAWEFFECTS as rawc) {
+				playerperms.push('chat.color.'+rawc);
+			}
+			//Register if not exists
+			for(var p in playerperms as plperm) {
+				var pperm = new Permission(plperm);
+				if(!pperm.exists(data)) {
+					pperm.save(data);
+				}
 			}
 		}
-
 	})(e);
 
 	//END GEN PLAYER PERMISSIONS
