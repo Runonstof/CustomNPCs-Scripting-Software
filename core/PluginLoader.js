@@ -40,8 +40,14 @@ registerXCommands([
 ]);
 
 @block init_event
-    var hookFn = PluginAPI.Players.hookFns["init"];
-    if(typeof hookFn == "function") { hookFn.apply(null, [e]); }
+    if(e.player != null) {
+        executeCommandGlobal("/tellraw @a "+strf("&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!".fill({
+            "PluginCount": PLUGIN_LIST.length
+        })));
+
+        var hookFn = PluginAPI.Players.hookFns["init"];
+        if(typeof hookFn == "function") { hookFn.apply(null, [e]); }
+    }
 @endblock
 
 //Initialize PLugin Folder
@@ -80,7 +86,3 @@ for(var p in pluginDirs as pluginDir) {
         }
     }
 }
-
-executeCommandGlobal("/tellraw @a "+strf("&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!".fill({
-    "PluginCount": PLUGIN_LIST.length
-})));
