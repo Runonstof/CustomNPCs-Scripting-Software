@@ -24,6 +24,18 @@ function DataHandler(type, name) {
 		return ids;
 	};
 
+	this.getAllDataEntries = function(data) {
+		var ids = this.getAllDataIds(data);
+		var de = [];
+
+		for(var i in ids as id) {
+			var dht = getDataHandler(this.type);
+			de.push(new dht(id).init(data));
+		}
+
+		return de;
+	};
+
 	this.getDataId = function() {
 		return this.type+'_'+this.name;
 	}
