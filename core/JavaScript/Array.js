@@ -91,3 +91,13 @@ function arrayOccurs(string, subArray, allowOverlapping=false, caseSensitive=tru
 
 	return occ;
 }
+
+function arrayFormat(array, format, sep) {
+	var joined = "";
+  	for(var i = 0; i < array.length; i++) {
+    	joined += format.fill({
+        	"VALUE": array[i]
+        })+(i == array.length-1 ? "" : sep||" ");
+    }
+  	return joined;
+}
