@@ -1,3 +1,5 @@
+import core\utils\DataList.js;
+
 function genMoney(w, amount) {
 	var am = amount
 	var coinams = Object.keys(_COINITEMS);
@@ -188,10 +190,30 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 @block register_commands_event
 	//REGISTER UTIL COMMANDS
 	registerXCommands([
-		['!debug', function(pl, args, data){
-			if(!pl.getMainhandItem().isEmpty()) {
-				worldOut(getItemType(pl.getMainhandItem(), pl.getMCEntity()));
-			}
+		['!debug [...matches]', function(pl, args, data){
+			var items = new Permission().getAllDataEntries(data);
+
+			var params = getArgParams(args.matches);
+			var tellStr = getTitleBar("Sample Items")+"\n"+
+				genDataPageList(
+					items,
+					args.matches,
+					parseInt(params.show||10),
+					parseInt(params.page||1),
+					"!debug {MATCHES} -page:{PAGE} -show:{SHOWLEN}",
+					function(item, i){
+						return "&r[&c&l"+item.name+"&r] "+"\n";
+					},
+					function(a, b) {
+						if(a.name < b.name) return -1;
+						if(a.name > b.name) return 1;
+						return 0;
+					},
+					function (item, list) {
+						return arrayOccurs(item.name, list, false, false) > 0;
+					}
+				);
+			tellPlayer(pl, tellStr);
 		}, 'debug', [
 			{
 				"argname": "rows",
@@ -297,15 +319,39 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 				"max": 4,
 			},
 		]],
-		['!command list [...matches]', function(pl, args, data){
-			tellPlayer(pl, getTitleBar('Commands'));
-			for(var c in _COMMANDS as cmd) {
-				var cmdm = getCommandNoArg(cmd.usage).trim();
-				if(args.matches.length == 0 || arrayOccurs(cmdm, args.matches, false, false)) {
-					tellPlayer(pl, "&e - &c"+cmdm+"&r (&6:sun: Info{run_command:!command info "+getCommandName(cmd.usage)+"}&r)");
+		['!help [...matches]', function(pl, args, data){
+			var params = getArgParams(args.matches);
+			var txt = getTitleBar("Commands")+"\n";
+			var cmds = [];
+			//Only get permiited commands
+			for(var c in _COMMANDS as _cmd) {
+				if(new Permission(_cmd.perm).init(data).permits(pl.getName(), pl.world.scoreboard, data)) {
+					cmds.push(_cmd);
 				}
 			}
-		}, 'command.list'],
+			txt += genDataPageList(
+				cmds,
+				args.matches,
+				parseInt(params.show||10),
+				parseInt(params.page||1),
+				"!help {MATCHES} -page:{PAGE} -show:{SHOWLEN} -sort:{SORT}",
+				function(cmd, i) {
+					return "&c"+cmd.usage+"&r\n";
+				},
+				function(a, b) {
+					var aa = getCommandNoArg(a.usage);
+					var bb = getCommandNoArg(b.usage);
+					if(aa < bb) return -1;
+					if(aa > bb) return 1;
+					return 0;
+				},
+				function(cmd, list) {
+					return arrayOccurs(cmd.usage, list, false, false);
+				},
+				(params.sort||"").toLowerCase() == "desc"
+			);
+			tellPlayer(pl, txt);
+		}, 'help'],
 		['!command info <...command>', function(pl, args, data){
 			var argcmd = args.command.join(" ").trim();
 			for(var c in _COMMANDS as cmd) {
