@@ -82,15 +82,11 @@ function customChestClosed(e){
 }
 
 function rangedLaunched(e) {
-	print("")
+
 }
 
 function login(e) {
 	yield login_event;
-	var pl = e.player;
-	tellPlayer(pl, "["+CONFIG_SERVER.TITLE+"&r] &eIf you dont see cookies and cake &r:cookie::cake::cookie:&e you dont have our resourcepack! Click &6here{open_url:https://www.dropbox.com/s/m1va7k2zeixgry0/GramadosResources.zip?dl=0|show_text$e$oDownload Resource Pack}&r&e to download.");
-	tellPlayer(e.player, "[&6&l"+CONFIG_SERVER.TITLE+"&r] &9Make sure to join our &n&9Discord{open_url:https://discord.gg/zcjyXxK}&r &9server!");
-
 }
 
 function logout(e) {
