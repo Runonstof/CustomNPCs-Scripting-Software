@@ -746,14 +746,9 @@ function executeXCommand(str, player,permcheck=true) {
 		aa.splice(-1,1);
 	}
 
-	if(usg.length > 0) {
-		tellPlayer(player, "&eDid you mean:");
-		for(var u in usg) {
-			tellPlayer(player, "&e - &c"+usg[u]+"{suggest_command:"+getCommandNoArg(usg[u])+"}");
-		}
-	} else {
-		tellPlayer(player, "&cCould not find this command!");
-	}
+
+	tellPlayer(player, "&cCould not find this command!\nDo &c&n!help or click here{run_command:!help}&c to see available commands.");
+
 	return false;
 
 }
