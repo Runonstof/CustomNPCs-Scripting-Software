@@ -1,11 +1,12 @@
 import core\deobf\*.js;
 import core\math.js;
-
+import core\utils\World.js;
 
 
 //FLY SETTINGS
 //Pitch is 90 when player looks fully down
-var FLY_MIN_PITCH = 20; //(if on 20, then: when player pitch is above 20 or below -20 the npc will fly up/down)
+var FLY_MIN_PITCH = 10; //(if on 20, then: when player pitch is above 20 or below -20 the npc will fly up/down)
+var FLY_SPEED = 2;
 
 //Without these settings, controlled npc flight is very, very quirky
 	//I tested it all out, some I dont understand why, but tested with on/off and does make the difference
@@ -37,14 +38,6 @@ function updateNpcSettings(npc) {
 			hasChanged = true;
 		}
 	}
-
-	var mcnpc = npc.getMCEntity();
-	var movespd = 15;
-	if(mcnpc[MCP.EntityLivingBase_getAIMoveSpeed]() != movespd) {
-		mcnpc[MCP.EntityLivingBase_setAIMoveSpeed](movespd);
-	}
-
-
 	//tick-friendlyness
 	if(hasChanged) {
 		npc.updateClient();
@@ -85,6 +78,8 @@ function interact(e) {
 		if(e.npc.getRiders().length == 0 && e.player.getMount() == null) {
 			//If npc has no riders and player is not sitting on something
 			e.npc.addRider(e.player);//set the player as rider
+		} else {
+			e.npc.say("OOF");
 		}
 
 	}
@@ -93,21 +88,30 @@ function interact(e) {
 function tick(e) {
 	updateNpcSettings(e.npc);
 	var riders = e.npc.getRiders();
-	for(var r in riders) { //Loop the riders on npc
-var rider = riders[r];
-		if(rider.getType() == 1) { //If the rider is an player
-			e.npc.setPitch(rider.getPitch());
-			e.npc.setRotation(rider.getRotation()); //Set rotation for fly-direction
+	for(var r in riders as rider) { //Loop the riders on npc
 
+		if(rider.getType() == 1) { //If the rider is an player
+			//e.npc.setPitch(rider.getPitch());
+			e.npc.setRotation(rider.getRotation()); //Set rotation for fly-direction
+			var ms = rider.getMoveStrafing();
+			if(ms != 0) {
+				FLY_SPEED = Math.min(Math.max(FLY_SPEED+.25*sign(ms), 1), 8);
+			}
 			var mf = Math.round(rider.getMoveForward()); //Will be 1 when pressed W and -1 when S is pressed (or other key, depends on ur controls config)
-			var mv = Math.round(rider.getPitch()); //-90 when player looks up, 90 when player looks down
+			var mv = rider.getPitch(); //-90 when player looks up, 90 when player looks down
+			var rot = fixAngle(rider.getRotation());
 			if(mf != 0) {
-				e.npc.setMoveForward(rider.getMoveForward());
+				//e.npc.navigateTo(e.npc.getX()+lengthdir_x(4, rot), e.npc.getY(), e.npc.getZ()+lengthdir_z(4, rot), 5);
+				e.npc.setMotionX(-lengthdir_x(FLY_SPEED-(FLY_SPEED/90*Math.abs(mv)), fixAngle(rider.getRotation()+90))*sign(mf));
+				e.npc.setMotionZ(lengthdir_z(FLY_SPEED-(FLY_SPEED/90*Math.abs(mv)), fixAngle(rider.getRotation()+90))*sign(mf));
+
+				//worldOut(e.npc.getMotionX()+" -- "+e.npc.getMotionZ());
+				//e.npc.setMoveForward(rider.getMoveForward());
 
 				//e.npc.setMoveForward(rider.getMoveForward()); //Set moveForward of npc, the npc will moce in direction it looks
 				if(e.npc.getAi().getNavigationType() == 1) {
 					if(Math.abs(mv) > FLY_MIN_PITCH) {
-						e.npc.setMotionY(-sign(mv)/4);
+						e.npc.setMotionY((((FLY_SPEED/2)/90*Math.abs(mv))*-sign(mv))*sign(mf));
 					}
 				}
 			} else if(e.npc.getMoveForward() != 0) {
