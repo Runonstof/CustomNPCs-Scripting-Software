@@ -1,6 +1,6 @@
 function Warp(name) {
-	extends function DataHandler("warp", name);
-	extends function Permittable("warps"); //Use new domain "warps"
+	DataHandler.apply(this, ["warp", name]);
+	Permittable.apply(this, ["warps"]); //Use new domain "warps"
 
 	this.onCreate(function(self, data){
 		var perm = self.getPermission();

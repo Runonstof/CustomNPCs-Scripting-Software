@@ -1,6 +1,6 @@
 function Region(name) {
-	extends function DataHandler('region', name);
-	extends function Permittable('regions'); //Uses custom permission domain 'regions'
+	DataHandler.apply(this, ['region', name]);
+	Permittable.apply(this, ['regions']); //Uses custom permission domain 'regions'
 
 
 	this.data = {

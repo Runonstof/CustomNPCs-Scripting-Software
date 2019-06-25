@@ -1,6 +1,6 @@
 function Emote(name) {
-  extends function DataHandler('emote', name);
-  extends function Permittable('emotes');
+  DataHandler.apply(this, ['emote', name]);
+  Permittable.apply(this, ['emotes']);
 
   this.data = {
     "price": 0,

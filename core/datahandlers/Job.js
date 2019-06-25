@@ -1,5 +1,5 @@
 function Job(name) {
-	extends function DataHandler('job', name);
+	DataHandler.apply(this, ['job', name]);
 	this.data = {
 		"displayName": name,
 		"pay": getCoinAmount('5g'),

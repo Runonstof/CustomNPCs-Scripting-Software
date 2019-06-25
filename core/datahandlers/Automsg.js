@@ -1,5 +1,5 @@
 function AutoMsg(name) {
-    extends function DataHandler('automsg', name);
+    DataHandler.apply(this, ['automsg', name]);
 
     this.data = {
         "msg": "Default AutoMessage",

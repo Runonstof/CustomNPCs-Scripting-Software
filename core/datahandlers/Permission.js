@@ -1,5 +1,5 @@
 function Permission(name) {
-	extends function DataHandler('permission', name);
+	DataHandler.apply(this, ['permission', name]);
 
 	this.data = {
 		"enabled": true,

@@ -1,5 +1,5 @@
 function Player(name) {
-	extends function DataHandler('player', name);
+	DataHandler.apply(this, ['player', name]);
 
 	this.data = {
 		"lastPayed": 0,

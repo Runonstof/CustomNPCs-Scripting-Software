@@ -1,6 +1,6 @@
 function GiftCode(name) {
-	extends function DataHandler('giftcode', name);
-	extends function Permittable('giftcodes');
+	DataHandler.apply(this, ['giftcode', name]);
+	Permittable.apply(this, ['giftcodes']);
 	this.data = {
 		"code": "",
         "uses": 0,

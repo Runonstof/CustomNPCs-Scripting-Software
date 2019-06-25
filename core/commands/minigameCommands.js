@@ -1,6 +1,6 @@
 registerDataHandler("minigame", Minigame);
 function Minigame(name) {
-    extends function DataHandler("minigame", name);
+    DataHandler.apply(this, ["minigame", name]);
 	this.data = {
 		"from": null,
 		"to": [],
@@ -17,7 +17,7 @@ function Minigame(name) {
 }
 
 function MinigameTeam(name) {
-    extends function Minigame(name);
+    Minigame.apply(this, [name]);
 	this.data = {
 		"teams": []
 	};
