@@ -1,5 +1,6 @@
 //To-Do: Comment this file
 import core\DataHandler.js;
+import core\utils\DataList.js;
 
 var _COMMANDS = [];
 var _DATAHANDLERS = {};
@@ -169,8 +170,7 @@ function CommandFactory(datahandler, cmdtree){
 
 		return this;
 	};
-	this.setListTransformer = function(transformString, transformFn) {
-		this.listingTransformer = transformString;
+	this.setListTransformer = function(transformFn) {
 		this.listingTransformerFn = transformFn;
 
 		return this;
@@ -285,96 +285,34 @@ function CommandFactory(datahandler, cmdtree){
 				var dht = getDataHandler(cdata.datatype);
 				var params = getArgParams(args.matches);
 
-				var ids = new dht().getAllDataIds(data);
+				var de = new dht().getAllDataEntries(data);
 				for(var o in cdata.self.onFns['list'] as onFn) {
 					onFn(dh, pl, args, data, cdata);
 				}
-				var page = (parseInt(params.page)||1)-1;
-				var excludes = [];
-				var excludeRgx = /\*([\w]+)/;
-				var newMatches = [];
-				for(var a in args.matches as match) {
-					(match.cmatch(excludeRgx) > 0 ? excludes : newMatches).push(match.replace(excludeRgx, "$1"));
-				}
-				args.matches = newMatches;
-				var defaultShowLen = 10;
-				var minShowLen = 4;
-				var maxShowLen = 32;
+				var txt = getTitleBar(cdata.datatype.rangeUpper(0, 1)+" List")+"\n";
+				txt += genDataPageList(
+					de,
+					args.matches,
+					parseInt(params.show||10),
+					parseInt(params.page||1),
+					"!"+cdata.cmdtree+" list {MATCHES} -page:{PAGE} -show:{SHOWLEN} -sort:{SORT}",
+					function(item) {
+						return cdata.ltfn == null ? ("&e - &b"+item.name+"&r\n") : cdata.ltfn(item, pl, args, data);
+					},
+					function(a, b) {
+						var aa = a.name;
+						var bb = b.name;
+						if(aa < bb) return -1;
+						if(aa > bb) return 1;
+						return 0;
+					},
+					function(cmd, list) {
+						return arrayOccurs(cmd.name, list, false, false);
+					},
+					(params.sort||"").toLowerCase() == "desc"
+				);
 
-				var showLen = Math.max(Math.min((parseInt(params.show)||defaultShowLen), maxShowLen), minShowLen);
-				var minShow = page*showLen;
-				var maxShow = minShow+showLen;
-
-				var curShow = 0;
-
-				if(ids.length > 0) {
-					tellPlayer(pl, getTitleBar(cdata.datatype.rangeUpper(0, 1)+" List"));
-					var tellIds = [];
-					var pagenum = Math.floor(minShow/showLen)+1;
-					for(var i in ids as id) {
-						var excluded = (arrayOccurs(id, excludes, false, false) > 0);
-						if(args.matches.length == 0 || arrayOccurs(id, args.matches, false, false) > 0) {
-							if(!excluded) {
-								if(curShow >= minShow && curShow < maxShow && tellIds.indexOf(id) == -1){
-									tellIds.push(id)
-								}
-								curShow++;
-							}
-						}
-
-					}
-					if(args.matches.length > 0) {
-						tellPlayer(pl, "&6&lSearching for:&e "+args.matches.join(", "));
-					}
-					if(excludes.length > 0) {
-						tellPlayer(pl, "&6&lFiltering out:&e "+excludes.join(", "));
-					}
-					tellPlayer(pl, "&6&lResults: &a"+curShow+"/"+ids.length+"&r &e&o(Showing "+showLen+" results per page.)");
-					var filterArgs = "";
-					for(var ex in excludes as excl) {
-						filterArgs += "*"+excl+" ";
-					}
-
-					var parsedArgs = filterArgs+args.matches.join(" ");
-					var parsedQuery = parsedArgs+" -page:"+page+" -show:"+showLen;
-					var maxpages = Math.ceil(curShow/showLen);
-					var nxtPage = page+2;
-
-					var navBtns =
-						" &r"+(pagenum > 1 ? "[&9<< Previous{run_command:!"+cdata.cmdtree+" list "+parsedArgs+" -page:"+page+" -show:"+showLen+"}&r]" : "")+
-						" "+(pagenum < maxpages ? "[&aNext >>{run_command:!"+cdata.cmdtree+" list "+parsedArgs+" -page:"+nxtPage+" -show:"+showLen+"}&r]" : "");
-					tellPlayer(pl, "&6&lPage: &d&l"+pagenum+"/"+maxpages+navBtns);
-
-					var showResultVals = [
-						5,
-						10,
-						15,
-						20,
-						25
-					];
-					var showResultBtns = "";
-					for(var i in showResultVals as rv) {
-						showResultBtns += "[&3Show "+rv+"{run_command:!"+cdata.cmdtree+" list "+parsedArgs+" -show:"+rv+"|show_text:$bShow "+rv+" results per page.}&r] ";
-					}
-
-					tellPlayer(pl,showResultBtns);
-					var fstr = (cdata.lt||"{LISTITEM} {INFOBTN} {REMOVEBTN}");
-					for(var i in tellIds as id) {
-						var td = new dht(id).init(data,false);
-						var mobj = (cdata.ltfn != null ? cdata.ltfn(td, pl, args, data)||{} : {});
-						var canUseInfo = new Permission(cdata.cmdtree+".info").init(data).permits(pl.getName(), sb, data);
-						var canUseRemove = new Permission(cdata.cmdtree+".remove").init(data).permits(pl.getName(), sb, data);
-						tellPlayer(pl, fstr.fill(objMerge({
-							"ID": id,
-							"CMDTREE": cdata.cmdtree,
-							"LISTITEM": "&e - &b&l"+id+"&r",
-							"INFOBTN": (canUseInfo ? "&r(&6:sun: Info{run_command:!"+cdata.cmdtree+" info "+id+"}&r)" : ""),
-							"REMOVEBTN": (canUseRemove ? "&r(&c:cross: Remove{run_command:!"+cdata.cmdtree+" remove "+id+"}&r)" : "")
-						}, mobj)));
-					}
-				} else {
-					tellPlayer(pl, "&cThere are no registered "+cdata.datatype+"s!");
-				}
+				tellPlayer(pl, txt);
 				return true;
 			}, this.cmdtree+'.list', [],
 			{
