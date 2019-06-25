@@ -1,4 +1,4 @@
-registerCSTEnchant(null, 10, "cst:berserker", "Berserker", function(id, e, lvl, type){
+registerCSTEnchant("cst:berserker", "Berserker", 10, function(id, e, lvl, type){
     switch(type) {
         case "damagedEntity":
             var chance = 5+2*lvl;

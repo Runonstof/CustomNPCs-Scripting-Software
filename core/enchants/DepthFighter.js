@@ -1,4 +1,4 @@
-registerCSTEnchant(null, 10, "cst:depth_fighter", "Depth Fighter", function(id, e, lvl, type){
+registerCSTEnchant("cst:depth_fighter", "Depth Fighter", 10, function(id, e, lvl, type){
     switch(type) {
         case "damagedEntity":
             var xpChance = Math.min(5+4*(lvl-1), 100);

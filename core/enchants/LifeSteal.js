@@ -1,4 +1,4 @@
-registerCSTEnchant(null, 10, "cst:life_steal", "Life Steal", function(id, e, lvl, type){
+registerCSTEnchant("cst:life_steal", "Life Steal", 10, function(id, e, lvl, type){
     switch(type) {
         case "damagedEntity":
             var stealChance = Math.min(5+4*(lvl-1), 100);

@@ -1,4 +1,4 @@
-registerCSTEnchant(null, 10, "cst:paralyze", "Paralyze", function(id, e, lvl, type){
+registerCSTEnchant("cst:paralyze", "Paralyze", 10, function(id, e, lvl, type){
     switch(type) {
         case "damagedEntity":
             var parChance = Math.min(5+(2*(lvl-1)), 100);
