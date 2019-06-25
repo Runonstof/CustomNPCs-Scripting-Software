@@ -20,7 +20,6 @@ registerDataHandler("warp", Warp);
 			return "&aX: &c"+wpos.x+"&a Y: &c"+wpos.y+"&a Z: &c"+wpos.z;
 		})
 		.setListTransformer(
-			"{LISTITEM} {PRICE} {TPBTN} {INFOBTN} {REMOVEBTN}",
 			function(warp, pl, args, data){
 				var sb = pl.world.getScoreboard();
 				var wperm = warp.getPermission().init(data).permits(pl.getName(), sb, data);
@@ -30,7 +29,7 @@ registerDataHandler("warp", Warp);
 					"TPBTN": (canUseTp && wperm ? "(&9Teleport{run_command:!warp tp "+warp.name+"}&r)" : ""),
 				};
 
-				return tdata;
+				return ("&e - &b"+warp.name+"&r {PRICE} {TPBTN}\n").fill(tdata);
 			}
 		)
 		.genDefault()

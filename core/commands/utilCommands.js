@@ -1,5 +1,6 @@
 import core\utils\DataList.js;
 
+
 function genMoney(w, amount) {
 	var am = amount
 	var coinams = Object.keys(_COINITEMS);
