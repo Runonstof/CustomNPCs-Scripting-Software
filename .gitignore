@@ -1,3 +1,4 @@
 config/outputDirectories.php
-build
+build/**
+!build/players/*
 process-palette.json
