@@ -7,9 +7,9 @@ var CSTENCH_TAG = "CSTEnch";
 
 import core\enchants\*.js;
 
-function getCSTEnchantByIdOrName(name_id) {
+function getCSTEnchantByName(name_id) {
     for(var i in _ENCHANTS as ench) {
-        if( ench[(typeof name_id == "string" ? "name" : "id")] == name_id ) {
+        if( ench.name == name_id ) {
             return ench;
         }
     }
@@ -25,7 +25,7 @@ function getCSTEnchantsFromItem(itemstack) {
     var itemenchs = nbtGetList(nbt, CSTENCH_TAG)||[];
     for(var i in itemenchs as itemench) {
         enchs.push({
-            "id": parseInt(itemench.getShort("id")),
+            "name": itemench.getString("name"),
             "lvl": parseInt(itemench.getShort("lvl")),
         });
     }
@@ -38,7 +38,7 @@ function hasCSTEnchant(item, id, lvl=0) {
     var itemnbt = item.getNbt();
     var cstenchs = nbtGetList(itemnbt, CSTENCH_TAG);
     for(var i in cstenchs as cstench) {
-        if(parseInt(cstench.getShort("id")) == id) {
+        if(cstench.getString("name") == id) {
             if(lvl > 0) {
                 return parseInt(cstench.getShort("lvl")) >= lvl;
             }
@@ -57,14 +57,14 @@ function removeCSTEnchant(item, id) {
         var newLore = [];
         var remLore = [];
         for(var i in cstenchs as cstench) {
-            var ench = getCSTEnchantByIdOrName(parseInt(cstench.getShort("id")));
+            var ench = getCSTEnchantByName(cstench.getString("name"));
             var lvl = parseInt(cstench.getShort("lvl"));
 
 
-            if(ench.id != id) {
+            if(ench.name != id) {
                 newench.push(cstench);
             } else {
-                remLore.push(ccs(getCSTEnchantDisplay(ench.id, lvl)));
+                remLore.push(ccs(getCSTEnchantDisplay(ench.name, lvl)));
             }
         }
         itemnbt.setList(CSTENCH_TAG, newench);
@@ -80,38 +80,37 @@ function removeCSTEnchant(item, id) {
     return false;
 }
 
-function runCSTEnchant(id, event, lvl, type) {
-    var ench = getCSTEnchantByIdOrName(id);
+function runCSTEnchant(id, event, lvl, type, slot) {
+    var ench = getCSTEnchantByName(id);
     if(ench != null) {
-        return ench.func(id, event, lvl, type);
+        return ench.func(id, event, lvl, type, slot);
     }
     return null;
 }
 
 function addCSTEnchant(item, id, lvl) {
     var itemNbt = item.getNbt();
-    var addench = getCSTEnchantByIdOrName(id);
+    var addench = getCSTEnchantByName(id);
     var newench = Java.from(nbtGetList(itemNbt, CSTENCH_TAG))||[];
     if(hasCSTEnchant(item, id)) {
         removeCSTEnchant(item, id);
     }
-    newench.push(API.stringToNbt('{"id":'+id+'s,"lvl":'+lvl+'s}'));
+    newench.push(API.stringToNbt('{"name":"'+id+'","lvl":'+lvl+'s}'));
     itemNbt.setList(CSTENCH_TAG, newench);
     item.setLore(Java.from(item.getLore()).concat([ccs(getCSTEnchantDisplay(id, lvl))]))
 }
 
 function getCSTEnchantDisplay(id, lvl) {
-    var ench = getCSTEnchantByIdOrName(id);
+    var ench = getCSTEnchantByName(id);
     if(ench != null) {
         return "&7"+ench.displayName+(ench.showLvl ? " "+romanize(lvl) : "");
     }
     return "";
 }
 
-function registerCSTEnchant(id, maxlvl, name, displayName, func, showLvl=true) {
+function registerCSTEnchant(name, displayName, maxLvl, func, showLvl=true) {
     _ENCHANTS.push({
-        "id": id||_ENCHANTS.length,
-        "maxlvl": maxlvl,
+        "maxlvl": maxLvl,
         "name": name,
         "displayName": displayName,
         "func": func,
@@ -121,27 +120,10 @@ function registerCSTEnchant(id, maxlvl, name, displayName, func, showLvl=true) {
 
 
 @block damagedEntity_event
-/*
-    if(e.target.getHealth()-e.damage <= 0) {
-        worldOut(e.target.getEntityName()+" dede");
-    }
-    var mitem = e.player.getMainhandItem();
-    if(mitem != null) {
-        var mitemdata = mitem.getNbt();
-        if(mitemdata.has(CSTENCH_TAG)) {
-            var mench = mitemdata.getList(CSTENCH_TAG, mitemdata.getListType(CSTENCH_TAG));
-            for(var m in mench as mch) {
-                var mid = parseInt(mch.getShort("id"));
-                var mlvl = parseInt(mch.getShort("lvl")||1);
-                runCSTEnchant(mid, e, mlvl, "damagedEntity");
-            }
-        }
-    }
-*/
 
     var mItemEnch = getCSTEnchantsFromItem(e.player.getMainhandItem());
     for(var m in mItemEnch as mench) {
-        runCSTEnchant(mench.id, e, mench.lvl, "damagedEntity");
+        runCSTEnchant(mench.name, e, mench.lvl, "damagedEntity");
     }
 
 @endblock
@@ -149,7 +131,7 @@ function registerCSTEnchant(id, maxlvl, name, displayName, func, showLvl=true) {
 @block damaged_event
     var mItemEnch = getCSTEnchantsFromItem(e.player.getMainhandItem());
     for(var m in mItemEnch as mench) {
-        runCSTEnchant(mench.id, e, mench.lvl, "damaged");
+        runCSTEnchant(mench.name, e, mench.lvl, "damaged");
     }
 
 @endblock
