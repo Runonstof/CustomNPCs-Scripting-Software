@@ -1,20 +1,14 @@
 function lengthdir_x(length, angle) {
-	var ang = fixAngle(Math.abs(angle)+90)-180;
-	var sang = fixAngle(Math.abs(angle))-180;
-
-	var qang = Math.abs((Math.abs(ang)-90));
-	//print("qang:"+qang.toString());
-	return -((qang/90)*length)*sign(sang);
+	return length * Number(Math.cos(toRadians(angle))).toFixed(2) * -1;
 }
+
 function lengthdir_z(length, angle) {
-	var ang = fixAngle(Math.abs(angle)+180)-180;
-	var sang = fixAngle(Math.abs(angle)+90)-180;
-
-	var qang = Math.abs((Math.abs(ang)-90));
-	//print("qang:"+qang.toString());
-	return -(((qang/90)*length)*sign(sang));
+	return length * Number(Math.sin(toRadians(angle))).toFixed(2);
 }
 
+function toRadians(angle) {
+  return angle * (Math.PI / 180);
+}
 
 function sign(num=0) {
 	if(num > 0) { return 1; }
@@ -23,7 +17,7 @@ function sign(num=0) {
 }
 
 function fixAngle(angle) {
-	return angle % 359;
+	return Number((Math.abs(angle) % 360) * sign(angle)).toFixed(2);
 }
 
 function posdir(pos, dir=0, pitch=0, len=1, flying=false) {
@@ -46,7 +40,7 @@ function lengthpitch_y(pitch, length) {
 
 function getQuartRotation(dir) {
 	dir = getHalfRotation(dir);
-	
+
 	if(Math.abs(dir) > 90) {
 		dir = (180-Math.abs(dir))*sign(dir);
 	}
