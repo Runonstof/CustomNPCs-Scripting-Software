@@ -1,3 +1,5 @@
+import core\Economy.js;
+
 registerDataHandler("player", Player);
 
 @block init_event
