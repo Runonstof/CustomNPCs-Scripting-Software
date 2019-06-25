@@ -1,7 +1,7 @@
 var API = Java.type('noppes.npcs.api.NpcAPI').Instance();
 var INbt = Java.type('noppes.npcs.api.INbt');
 var LogManager = Java.type('org.apache.logging.log4j.LogManager');
-var Logger = LogManager.getLogger(CONFIG_SERVER.NAME);
+var Logger = LogManager.getLogger(typeof CONFIG_SERVER != typeof undefined ? CONFIG_SERVER.NAME : "");
 var ForgeLoader = Java.type("net.minecraftforge.fml.common.Loader").instance();
 
 var NbtTypes = {
