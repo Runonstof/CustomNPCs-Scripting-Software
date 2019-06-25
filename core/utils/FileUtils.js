@@ -3,6 +3,7 @@ var Files = Java.type("java.nio.file.Files");
 var Paths = Java.type("java.nio.file.Paths");
 var CHARSET_UTF_8 = Java.type("java.nio.charset.StandardCharsets").UTF_8;
 
+
 function readDir(dirPath){
 	var res = [];
 	var files = new File(dirPath).listFiles();
