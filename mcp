@@ -1,0 +1,39 @@
+<?php
+require_once(__DIR__ . '\bin\functions.php');
+
+$matches = array_take($argv, 1, count($argv));
+
+$files = [
+	"fields.csv",
+	"methods.csv",
+	"params.csv",
+];
+
+foreach($files as $file) {
+	echo "[=========] $file [=========]\n";
+	$filefields = file_get_contents(__DIR__ . '\bin\MCP\\'.$file);
+
+
+
+	$fields = explode("\n", $filefields);
+	$show = 0;
+	foreach($fields as $field) {
+		$f = explode(",", $field);
+		if(isset($f[0], $f[1])) {
+			foreach($matches as $match) {
+				if(strpos($f[1], $match) !== false) {
+					echo str_pad($f[1], 30).": ".$f[0]."\n";
+					$show++;
+				}
+			}
+		}
+	}
+	if($show == 0) {
+		echo "No Results found.\n";
+	} else {
+		
+		echo "\nLooked in ".count($fields)." results.\n";
+	}
+	
+}
+
