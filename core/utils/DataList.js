@@ -26,18 +26,16 @@ function genDataPageList(items, matches=[], showLen=10, curPage=1, navCmd=null, 
 
     var tellItems = [];
     //Sort items
-    if(sortFn != null) {
-        items.sort(typeof sortFn === "function" ? sortFn : function(a,b){
-            var al = a.toLowerCase();
-            var bl = b.toLowerCase();
+    items.sort(typeof sortFn === "function" ? sortFn : function(a,b){
+        var al = a.toLowerCase();
+        var bl = b.toLowerCase();
 
-            if(al < bl) return -1;
-            if(al > bl) return 1;
+        if(al < bl) return -1;
+        if(al > bl) return 1;
 
-            return 0;
-        });
+        return 0;
+    });
 
-    }
 
     if(sortDesc) {
         items.reverse();
