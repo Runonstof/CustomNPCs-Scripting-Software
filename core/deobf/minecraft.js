@@ -7,5 +7,5 @@ var MCP = {
     "EntityLivingBase_setAIMoveSpeed": "func_70659_e",
     "EntityLivingBase_getAIMoveSpeed": "func_70689_ay",
     "EntityLiving_getMoveHelper": "func_70605_aq",
-    "EntityMoveHelper_strafe": "func_188488_a"
+    "EntityMoveHelper_strafe": "func_188488_a",
 };
