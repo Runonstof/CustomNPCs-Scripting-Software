@@ -1,3 +1,7 @@
+import core\utils\DataList.js;
+import core\CustomEnchantsLoader.js;
+//
+
 @block register_commands_event
 	registerXCommands([
 		['!item renameLore <slot> [...lore]', function(pl, args){
@@ -35,9 +39,9 @@
 		}, 'item.rename'],
 		['!item addcstEnchant <name> [lvl]', function(pl, args, data){
 			var mItem = pl.getMainhandItem();
-			var ench = getCSTEnchantByIdOrName(args.name);
+			var ench = getCSTEnchantByName(args.name);
 			if(!mItem.isEmpty() && ench != null) {
-				addCSTEnchant(mItem, ench.id, args.lvl||1);
+				addCSTEnchant(mItem, ench.name, args.lvl||1);
 			}
 		}, 'item.addEnchant', [
 			{
@@ -49,9 +53,9 @@
 		]],
 		['!item removecstEnchant <name>', function(pl, args, data){
 			var mItem = pl.getMainhandItem();
-			var ench = getCSTEnchantByIdOrName(args.name);
+			var ench = getCSTEnchantByName(args.name);
 			if(!mItem.isEmpty() && ench != null) {
-				removeCSTEnchant(mItem, ench.id);
+				removeCSTEnchant(mItem, ench.name);
 			}
 		}, 'item.removeEnchant', [
 			{
@@ -61,11 +65,42 @@
 			},
 
 		]],
+		['!listCstEnchants [...matches]', function(pl,args){
+			var params = getArgParams(args.matches);
+			var txt = getTitleBar("Custom Server Tools Enchants", false)+"\n";
+
+			txt += genDataPageList(
+				_ENCHANTS,
+				args.matches,
+				parseInt(params.show||10),
+				parseInt(params.page||1),
+				"!listCstEnchants {MATCHES} -show:{SHOWLEN} -page:{PAGE} -sort:{SORT}",
+				function(ench) {
+					return "&e - &c&l"+ench.name+"&r\n";
+				},
+				function(a,b) {
+					var al = a.name.toLowerCase();
+			        var bl = b.name.toLowerCase();
+
+			        if(al < bl) return -1;
+			        if(al > bl) return 1;
+
+			        return 0;
+				},
+				function(ench, list) {
+					 return arrayOccurs(ench.name, list, false, false) > 0
+				},
+				(params.sort||"").toLowerCase() == "desc"
+			);
+
+			tellPlayer(pl, txt);
+
+		}, "listCstEnchants"],
 		['!item setAttr <slot> <attribute> <value>', function(pl, args){
 			var mItem = pl.getMainhandItem();
 
 			if(!mItem.isEmpty()) {
-				mItem.setAttribute(args.attribute, parseFloat(args.value/1000), parseInt(args.slot));
+				mItem.setAttribute(args.attribute, parseFloat(args.value), parseInt(args.slot));
 				tellPlayer(pl, "&aSet "+args.attribute+" to "+args.value+"%!");
 				return true;
 			} else {
