@@ -72,7 +72,7 @@ function genDataPageList(items, matches=[], showLen=10, curPage=1, navCmd=null, 
     if(excludes.length > 0) {
         output += "&6&lExcluding: &e"+excludes.join(", ")+"\n";
     }
-    output += "&6&lSorting: &e"+(sortDesc?"De":"A")+"scending&r &b[Toggle]{run_command:"+genNavCmd(curPage, showLen, !sortDesc)+"|show_text:$3Click to toggle sorting.}\n";
+    output += "&6&lSorting: &e"+(sortDesc?"De":"A")+"scending&r &b[Toggle]{run_command:"+genNavCmd(curPage, showLen, !sortDesc)+"|show_text:$3Click to toggle sorting type (asc/desc).}\n";
     output += "&6&lResults Found: &a"+curShow+" &eof &a"+items.length+"\n";
 
     var maxPages = Math.ceil(curShow/showLen);
