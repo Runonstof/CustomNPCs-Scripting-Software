@@ -1,5 +1,7 @@
 import core\utils\StringFormat.js;
 
+//
+
 registerDataHandler("chatchannel", ChatChannel);
 
 function getColorPermId(colorId) {
