@@ -4,6 +4,7 @@ function strf(str, toRaw=true, allowed=null) {
 	return strrawformat(str, toRaw, allowed);
 }
 var CHAT_CMD_RGX = /{[\s]*(?:([\w]+)[\s]*\:[\s]*([\w\W\/]+?)|\*)(?:[\s]*\|[\s]*([\w]+)[\s]*\:[\s]*([\w\W\/]+?[\s]*))?}/;
+var CHAT_CMD_RGX_G = /{[\s]*(?:([\w]+)[\s]*\:[\s]*([\w\W\/]+?)|\*)(?:[\s]*\|[\s]*([\w]+)[\s]*\:[\s]*([\w\W\/]+?[\s]*))?}/g;
 
 
 function strrawformat(str, toRaw=false, allowed) {
