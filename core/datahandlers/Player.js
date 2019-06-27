@@ -169,15 +169,11 @@ function Player(name) {
 				ac.push(getColorId(rc));
 			}
 		}
-		if(new Permission('chat.command').init(data).permits(this.name, sb, data)) {
-			ac.push('x');
-		}
-		if(new Permission('chat.hover').init(data).permits(this.name, sb, data)) {
-			ac.push('y');
-		}
-
 
 		return ac;
+	};
+	this.canCreateCommandText = function(data, sb) {
+		return new Permission('chat.command').init(data).permits(this.name, sb, data);
 	};
 	this.getBounty = function(sb){
 		var sbo = sb.getObjective("bounty");
