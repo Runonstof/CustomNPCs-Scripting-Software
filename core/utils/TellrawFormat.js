@@ -3,7 +3,7 @@ import core\utils\StringFormat.js;
 function strf(str, toRaw=true, allowed=null) {
 	return strrawformat(str, toRaw, allowed);
 }
-var trg = /{[\s]*(?:([\w]+)[\s]*\:[\s]*([\w\W\/]+?)|\*)(?:[\s]*\|[\s]*([\w]+)[\s]*\:[\s]*([\w\W\/]+?[\s]*))?}/;
+var CHAT_CMD_RGX = /{[\s]*(?:([\w]+)[\s]*\:[\s]*([\w\W\/]+?)|\*)(?:[\s]*\|[\s]*([\w]+)[\s]*\:[\s]*([\w\W\/]+?[\s]*))?}/;
 
 
 function strrawformat(str, toRaw=false, allowed) {
@@ -97,7 +97,7 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 	for(var i in str_pieces) {
 		var p = str_pieces[i];
 		var ntext = p[0].replace(/\"/g, '\\"');
-		var nm =  ntext.match(trg) || [];
+		var nm =  ntext.match(CHAT_CMD_RGX) || [];
 		if(nm.length > 0) {
 			p[7] = nm[1];
 			p[8] = nm[2];
