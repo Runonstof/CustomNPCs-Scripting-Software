@@ -16,7 +16,6 @@ function getColorPermId(colorId) {
 				"chat",
 				"chat.color",
 				"chat.command",
-				"chat.hover",
 			];
 			for(var i in _RAWCOLORS as rawc) {
 				playerperms.push('chat.color.'+rawc);
