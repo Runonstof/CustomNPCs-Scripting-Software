@@ -139,6 +139,10 @@ function chat(e) {
 	var prefcol = dpl.getChatColorPref(sb, data);
 	var chats = dpl.getChats(data);
 
+	if(!dpl.canCreateCommandText(data, sb)) {
+		escmsg = escmsg.replace(CHAT_CMD_RGX_G, '');
+	}
+
 	//Check @, $ and # mentions
 	//@ - Player
 	//$ - Team
