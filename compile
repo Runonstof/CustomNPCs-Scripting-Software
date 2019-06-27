@@ -132,13 +132,15 @@ $GLOBALS['config'] = [
 
 $GLOBALS['blocks'] = [];
 
-$GLOBALS['vars'] = [
+$defVars = [
 	'npcs' => 'data\npcs',
 	'blocks' => 'data\blocks',
 	'players' => 'data\players',
 	'items' => 'data\items',
 	'forge' => 'data\forge',
 ];
+
+$GLOBALS['vars'] = $defVars;
 require(__DIR__ . '\config\outputDirectories.php');
 
 //replace args with profiles
@@ -491,8 +493,8 @@ foreach($args as $key_arg=>$arg) {
 	}
 	//Loop compile files
 	foreach(glob(__DIR__ .'\\'. $gPath) as $curpath) {
-
-
+		$GLOBALS['blocks'] = [];
+		$GLOBALS['vars'] =  $defVars;
 		$ev = explode('\\', $curpath);
 		$v = $ev[count($ev)-1];
 		echo "Compiling\033[33m $v\033[0m...\n";
