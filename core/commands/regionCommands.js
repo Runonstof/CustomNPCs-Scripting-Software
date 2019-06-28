@@ -240,25 +240,20 @@ if(!e.isCanceled()) {
 			var region = new Region(args.name).init(data);
 			//Cache pos for undo
 			var undocmds = [];
+			var newPos = [];
 
-			if(args.posNumbers.length > 0) {
-				for(var pn in args.posNumbers as apn) {
-					apn = parseInt(apn);
-					var pos = region.data.positions[apn];
-					//undocmds.push("!region setPos "+region.name+" "+apn+" 1 "+pos.xyz1[0]+" "+pos.xyz1[1]+" "pos.xyz1[2]);
-					//undocmds.push("!region setPos "+region.name+" "+apn+" 2 "+pos.xyz2[0]+" "+pos.xyz2[1]+" "pos.xyz2[2]);
-				}
-				region.data.positions = removeFromArrayByKey(region.data.positions, args.posNumbers);
-				tellPlayer(pl, "&aRemoved positions '"+args.posNumbers.join(", ")+"' from region '"+region.name+"'&r [&5&lUndo{run_command:!chain "+undocmds.join(";")+"}&r]");
-			} else {
-
-				for(var i in region.data.positions as rpos) {
+			for(var i in region.data.positions as rpos) {
+				if(args.posNumbers.indexOf(i.toString()) > -1) {
 					undocmds.push("!region setPos "+region.name+" "+i+" 1 "+rpos.xyz1[0]+" "+rpos.xyz1[1]+" "+rpos.xyz1[2]);
 					undocmds.push("!region setPos "+region.name+" "+i+" 2 "+rpos.xyz2[0]+" "+rpos.xyz2[1]+" "+rpos.xyz2[2]);
+				} else {
+					newPos.push(rpos);
 				}
-				region.data.positions = [];
-				tellPlayer(pl, "&aCleared all positions from region '"+region.name+"'&r [&5&l:recycle: Undo{run_command:!chain "+undocmds.join(";")+";}&r]");
 			}
+			region.data.positions = newPos;
+
+			tellPlayer(pl, "&aRemoved positions '"+args.posNumbers.join(" ")+"' of region '"+region.name+"'! &5[Undo]{run_command:!chain "+undocmds.join(";")+"}&r");
+
 			region.save(data);
 			return true;
 		}, 'region.removePos', [
