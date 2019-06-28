@@ -27,6 +27,21 @@ import core\players\Permittable.js;
 			}
 			return infoText;
 		})
+		.setListTransformer(
+			function(perm, pl, args, data){
+				var sb = pl.world.getScoreboard();
+
+				var canInfo = new Permission("perms.info").init(data).permits(pl.getName(), sb, data);
+				var canRemove = new Permission("perms.remove").init(data).permits(pl.getName(), sb, data);
+
+				var tdata = {
+					"INFOBTN": canInfo ? "&5[Info]{run_command:!perms info "+perm.name+"|show_text:$dClick to show permission info.}&r" : "",
+					"REMOVEBTN": canRemove ? "&c[Remove]{run_command:!perms remove "+perm.name+"|show_text:$cClick to remove permission.}&r" : "",
+				}
+
+				return ("&e - &b"+perm.name+"&r {INFOBTN} {REMOVEBTN}\n").fill(tdata);
+			}
+		)
 		.genDefault()
 		.addSettable("enabled", function(enabled){
 			return (enabled.toString() === "true");
@@ -39,6 +54,7 @@ import core\players\Permittable.js;
 			"val": "{enabled}"
 		})
 		.register();
+
 	registerXCommands([
 		['!perms addTeams <permission_id> <...teams>', function(pl, args, data){
 			var w = pl.world;
