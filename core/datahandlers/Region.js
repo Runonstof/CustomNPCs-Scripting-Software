@@ -1,3 +1,5 @@
+registerDataHandler("region", Region);
+
 function Region(name) {
 	DataHandler.apply(this, ['region', name]);
 	Permittable.apply(this, ['regions']); //Uses custom permission domain 'regions'
@@ -14,6 +16,9 @@ function Region(name) {
 		"priority": 0,
 		"salePrice": 0,
 		"rentTime": -1,
+		"flags": {
+			"noFallDamage": false,
+		},
 		"allInteract": false,
 		"allBuild": false,
 		"allAttack": false,
