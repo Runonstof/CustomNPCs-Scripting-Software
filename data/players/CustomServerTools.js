@@ -6,6 +6,7 @@ import core\mods\minecraft\*.js;
 import core\players\chatEmotes.js;
 import core\players\executeCommand.js;
 import core\players\tell.js;
+import core\players\bots\*.js;
 
 import core\xcommandsAPI.js;
 import core\datahandlers\*.js;
@@ -214,7 +215,9 @@ function chat(e) {
 		pbounty = pobj.getScore(e.player.getName()).getValue();
 	}
 	//time
-	var curTimeStr = new Date().toLocaleTimeString("nl-NL").split(":");
+	var curTimeStr = new Date().toLocaleTimeString("us-US", {
+		timeZone: "America/New_York"
+	}).split(":");
 	curTimeStr.pop();
 	curTimeStr = curTimeStr.join(":");
 
