@@ -17,8 +17,8 @@ String.prototype.getCapsPercentage = function(){
     return Math.round(100/str.length*caps);
 }
 @block chat_event
-    if(!e.isCanceled()) {
-        if(e.message.length >= 9) {
+    if(!e.isCanceled() && CONFIG_SERVER.ENABLE_BOT_MEE6) {
+        if(e.message.length >= 9 && e.message.substr(0, 1) != "!") {
             if(e.message.getCapsPercentage() >= 55) {
                 executeCommand(e.player, "/tellraw @a "+strf(getChatMessage("MEE6", "Bot", "dark_aqua", "&9&o@"+e.player.getName()+"&r&b has been warned for capital letters!")));
                 e.player.sendNotification(ccs("&9&o@"+e.player.getName()), ccs(getChatTag("MEE6", "Bot", "dark_aqua")), 2)
