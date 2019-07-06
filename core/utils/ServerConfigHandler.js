@@ -16,7 +16,13 @@ function reloadConfiguration() {
     }
 
     try {
-        CONFIG_SERVER = objMerge(CONFIG_SERVER, JSON.parse(readFileAsString(CONFIG_FILEPATH)));
+        var loadConf = JSON.parse(readFileAsString(CONFIG_FILEPATH))
+        CONFIG_SERVER = objMerge(CONFIG_SERVER, loadConf);
+
+        if(Object.keys(CONFIG_SERVER).length != Object.keys(loadConf).length) {
+            writeToFile(CONFIG_FILEPATH, JSON.stringify(CONFIG_SERVER, null, 4));
+        }
+
     } catch (exc) {
         handleError(exc);
     }
