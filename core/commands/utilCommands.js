@@ -337,7 +337,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 				parseInt(params.page||1),
 				"!help {MATCHES} -page:{PAGE} -show:{SHOWLEN} -sort:{SORT}",
 				function(cmd, i) {
-					return "&c"+cmd.usage+"&r\n";
+					return "&c"+cmd.usage+"{suggest_command:"+getCommandNoArg(cmd.usage)+"}&r\n";
 				},
 				function(a, b) {
 					var aa = getCommandNoArg(a.usage);
@@ -421,8 +421,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 			tellPlayer(pl, "&e&l"+CONFIG_SERVER.NAME+" Version: &c&l"+SCRIPT_VERSION);
 			tellPlayer(pl, "&e&lSubscription: &9&lPrototype Edition");
 			tellPlayer(pl, "&e&lProgrammed by: &r&lRunonstof&e and &r&lslava_110");
-			tellPlayer(pl, "&e&lMade by: &r&lTheOddlySeagull&r&e and &r&lRunonstof");
-			tellPlayer(pl, "&6Contact Runonstof for further questions.");
+			tellPlayer(pl, "&6Contact Runonstof for further questions. Or visit the &6&nDiscord Server&r");
 		}, "version"],
 		['!listEnchants [...matches]', function(pl, args){
 			var ENCHANTS = REGISTRY.ENCHANTMENTS.getValues();
@@ -491,7 +490,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 		}, 'tellraw'],
 		['!tellaction <player> <...message>', function(pl, args, data){
 			var msg = args.message.join(' ');
-			executeCommand(pl, "/title "+pl.getName()+" actionbar "+strf(msg));
+			executeCommand(pl, "/title "+pl.getName()+" actionbar "+parseEmotes(strf(msg)));
 			return true;
 		}, 'tellaction'],
 		['!setMagAmmo <amount>', function(pl, args){
@@ -515,129 +514,6 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 				"min": 0
 			}
 		]],
-		['!convertNpcLoot <radius>', function(pl, args){
-			var w = pl.world;
-			var ents = w.getNearbyEntities(pl.getPos(), args.radius, 2);
-			for(var ee in ents as ent) {
-				if(ent.getType() == 2) {//Is NPC
-					var entnbt = ent.getEntityNbt();
-					var entinv = ent.getInventory();
-					for(var i = 0; i < 9; i++) {
-						var dc = getDropChance(entnbt, i);
-						var di = entinv.getDropItem(i);
-						if(di != null) {
-							var diLore = di.getLore();
-							if(diLore.length > 0) {
-								var diAmount = getCoinAmount(diLore[0].replace(/\s+/g, ''));
-								if(diAmount > 0) {
-									di.setCustomName(ccs("&2&lMoney&r"));
-									di.setLore([ccs('&e'+getAmountCoin(diAmount))]);
-
-									entinv.setDropItem(i, di, dc);
-								}
-							}
-						}
-					}
-				}
-			}
-			tellPlayer(pl, "&aAffected "+ents.length+" entities.");
-			return true;
-		}, 'convertNpcLoot', [
-			{
-				"argname": "radius",
-				"type": "number"
-			}
-		]],
-		['!convertTrader <radius>', function(pl, args){
-			var radius = parseInt(args.radius) || null;
-			var ppos = pl.getPos();
-			var ents = pl.world.getNearbyEntities(ppos, radius, 2);
-			var entcnt = 0; //Affected entity count
-			for(var en in ents as ent) {
-				//print(ent.getPos().normalize());
-				if(ent.getType() == 2) {//Is NPC
-					var entrole = ent.getRole();
-					if(entrole != null) {
-						if(entrole.getType() == 1) {//Is Trader
-							//Loop sellItems
-							var newTrades = [];
-							for(var i = 0; i < 18; i++) {
-								newTrades.push([
-									entrole.getCurrency1(i),
-									entrole.getCurrency2(i),
-									entrole.getSold(i),
-								]);
-
-								entrole.remove(i);
-							}
-							for(var i = 0; i < 18; i++) {
-								//print('SLOT: '+i);amount
-
-								for(var ii in newTrades[i] as nItem) {
-									if(!nItem.isEmpty()) {
-										var nLore = nItem.getLore();
-										if(nLore.length > 0) {
-											var nAmount = getCoinAmount(nLore[0].replace(/\s+/g, ''));
-											if(nAmount > 0) {
-												nItem.setCustomName(ccs('&2&lMoney&r'));
-												nItem.setLore([ccs('&e'+getAmountCoin(nAmount))]);
-											}
-										}
-									}
-									newTrades[i][ii] = nItem;
-								}
-								/*newTrades[i].forEach(function(nt){
-											//print(nt.getItemNbt().toJsonString());
-										});*/
-
-								entrole.set(
-									i,
-									newTrades[i][0].isEmpty() ? null : newTrades[i][0],
-									newTrades[i][1].isEmpty() ? null : newTrades[i][1],
-									newTrades[i][2]
-								);
-							}
-							//Add affected
-							entcnt++;
-						}
-					}
-				}
-			}
-			if(entcnt > 0) {
-				tellPlayer(pl, "&aAffected "+entcnt+" NPC Traders in a radius of "+radius+" !")
-			} else {
-				tellPlayer(pl, "&cNo NPC Traders found in a radius of "+radius+" blocks.");
-			}
-		}, 'convertTrader', [
-			{
-				"argname": "radius",
-				"type": "number",
-				"min": 4,
-				"max": 32
-			}
-		]],
-		['!convertMoney', function(pl, args){
-			var mItem = pl.getMainhandItem();
-			if(!mItem.isEmpty()) {
-				var mL = mItem.getLore();
-				if(mL.length > 0) {
-					var cAm = getCoinAmount(mL[0].replace(/\s/g, ''));
-					if(cAm > 0) {
-						mItem.setCustomName(ccs('&2&lMoney&r'));
-						mItem.setLore([
-							ccs('&e'+getAmountCoin(cAm))
-						]);
-						tellPlayer(pl, "&aConverted money!");
-						return true;
-					}
-				}
-				tellPlayer(pl, "&cYou don't have valid money in hand!");
-			} else {
-				tellPlayer(pl, "&cYou don't have anything in your hand!");
-			}
-
-			return false;
-		}, 'convertMoney'],
 		['!giveMoney <amount> [...players]', function(pl, args){
 			var w = pl.world;
 			var plrs = [];
