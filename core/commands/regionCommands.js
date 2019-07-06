@@ -1,4 +1,40 @@
-registerDataHandler("region", Region);
+@block damaged_event
+	/*
+	if(!e.isCanceled()) {
+		var pl = e.player;
+		var w = pl.world;
+		var data = w.getStoreddata();
+		var regids = new Region().getAllDataEntries(data);
+		var regs = [];
+		var srcType = e.damageSource.getType();
+		var prio = 0;
+
+		regids.forEach(function(reg, i){
+			if(reg.hasCoord(normalizePos(pl.getPos()))) {
+				if(reg.data.priority > prio) {
+					prio = reg.data.priority;
+				}
+				regs.push(reg);
+			}
+		});
+
+
+
+		switch(srcType) {
+			case "fall": {
+				for(var i in regs as reg) {
+					//Check fallDamage flag
+					if(reg.data.priority == prio && reg.data.flags.noFallDamage) {
+						e.setCanceled(true);
+					}
+				}
+
+				break;
+			}
+		}
+	}
+	*/
+@endblock
 
 @block blockinteract_event
 	if(!e.isCanceled()) {
