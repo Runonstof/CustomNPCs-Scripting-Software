@@ -97,12 +97,9 @@ registerDataHandler("player", Player);
 
 		if(new Date().getTime() > (plo.data.lastPayed+plo.data.payTime)) {
 			if(plo.data.pay > 0) {
-				var pm = genMoney(pl.world, plo.data.pay);
-				for(var p in pm as pii) {
-					pl.giveItem(pii);
-				}
 				tellPlayer(pl, "&aYou have earned &r:money:&e"+getAmountCoin(plo.data.pay)+"&a!");
 				plo.data.lastPayed = new Date().getTime();
+				plo.data.money += plo.data.pay;
 				plo.save(data);
 			}
 		}
