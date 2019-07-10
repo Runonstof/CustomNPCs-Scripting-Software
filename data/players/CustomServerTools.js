@@ -198,7 +198,7 @@ function chat(e) {
 			chat = new ChatChannel(chat).init(data);
 			var cmm = cmt.replace(crgx, '$1');
 			var cmp = chat.getPermission(data);
-			if(chat.getPermission(data).permits(e.player.getName(), sb, data)) {
+			if(cmp.permits(e.player.getName(), sb, data)) {
 				if(occurrences(chat.name.toLowerCase(), cmm.toLowerCase()) > 0 || occurrences(chat.data.displayName.toLowerCase(), cmm.toLowerCase()) > 0) {
 					escmsg = escmsg.replace(cmt, '&'+getColorId(chat.data.color)+'&l#'+chat.data.displayName+'{run_command:!chat list '+chat.name+'}'+prefcol);
 				}
@@ -223,7 +223,7 @@ function chat(e) {
 
 	//Concat new message
 	var hoverInfo = '$6$lBounty: $r:money:$e'+getAmountCoin(pbounty)+"\n";
-	var newmsg = "["+curTimeStr+"] "+parseEmotes(dpl.getNameTag(sb, ' -> ', '{suggest_command:@'+dpl.name+' |show_text:'+hoverInfo+'}'))+prefcol+escmsg;
+	var newmsg = "["+curTimeStr+"] "+parseEmotes(dpl.getNameTag(sb, ' -> ', '{suggest_command:@'+dpl.name+' |show_text:'+hoverInfo+'}', '', '&', data))+prefcol+escmsg;
 	var toldPlayers = [];
 	var wp = w.getAllPlayers();
 
