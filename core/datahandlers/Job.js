@@ -1,3 +1,4 @@
+registerDataHandler("job", Job);
 function Job(name) {
 	DataHandler.apply(this, ['job', name]);
 	this.data = {

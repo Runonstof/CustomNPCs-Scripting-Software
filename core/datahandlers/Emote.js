@@ -1,3 +1,4 @@
+registerDataHandler("emote", Emote);
 function Emote(name) {
   DataHandler.apply(this, ['emote', name]);
   Permittable.apply(this, ['emotes']);

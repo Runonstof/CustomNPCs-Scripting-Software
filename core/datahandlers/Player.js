@@ -1,9 +1,10 @@
+registerDataHandler("player", Player);
 function Player(name) {
 	DataHandler.apply(this, ['player', name]);
 
 	this.data = {
 		"lastPayed": 0,
-		"pay": getCoinAmount('5g'),
+		"pay": CONFIG_SERVER.DEFAULT_PAY,
 		"payTime": getStringTime('20min'),
 		"maxJobs": 2,
 		"maxHomes": 2,
@@ -15,7 +16,7 @@ function Player(name) {
 		"chatcolors": [],//Unlockables for color coding
 		"chatcolor": null,//Default chatcolor (NOT FOR UNLOCKS)
 		"badges": [],
-		"showbadge": null,
+		"showbadges": [],
 		"chateffect": null,
 		"firstLogin": new Date().getTime(),
 		"lastLogin": 0,
@@ -23,6 +24,11 @@ function Player(name) {
 		"UUID": null,
 		"money": DEFAULT_MONEY,
 	};
+	if(PluginAPI) {
+		PluginAPI.DataHandlers.run("player", this);
+	}
+
+
 	for(var v in VIRTUAL_CURRENCIES as crncy) {
 		this.data[crncy.name] = crncy.default||0;
 	}
@@ -46,18 +52,18 @@ function Player(name) {
 				prefeff = '&'+getColorId(td.data.chateffect);
 			}
 		}
-		//chatcolor can be null
-		if(pref == "" || (this.data.chatcolor != null && pref != "")) {
-			pref = '&'+getColorId(this.data.chatcolor);
+
+		if(this.data.chatcolor != null) {
+			pref = '&'+getColorId(this.data.chatColor);
 		}
 
-		if((prefeff == "" && this.data.chateffect != null) || (this.data.chateffect != null && prefeff != "")) {
-			prefeff = '&'+getCo+lorId(this.data.chateffect);
+
+		if(this.data.chateffect != null) {
+			prefeff = '&'+getColorId(this.data.chateffect);
 		}
-		//print("PREF: "+prefeff.toString()+pref.toString());
 		return pref+prefeff;
 	};
-	this.getNameTag = function(sb, prefix, namesuff, teamsuff, ccChar) {
+	this.getNameTag = function(sb, prefix, namesuff, teamsuff, ccChar, data=null) {
 		var t = sb.getPlayerTeam(this.name);
 		var dc = ccChar||'&';
 		var ccol = '';
@@ -72,9 +78,31 @@ function Player(name) {
 		if(t != null) {
 			ctm = ccol+dc+'o'+t.getDisplayName()+' ';
 		}
-		return ccol+dc+'l['+ccol+ctm+(teamsuff||'')+dc+'r'+ccol+this.name+(namesuff||'')+ccol+dc+'l'+']'+(prefix||'')+dc+'r';
-	};
 
+		var badgestr = "";
+		var badges = data != null ? this.getBadges(data) : [];
+		var st;
+		for(var i in badges as badge) {
+			if(i < 3) {
+				st = (badge.data.displayName+"&r\n"+badge.data.desc).replaceAll("&", "$");
+				badgestr += ":"+badge.data.emote+":{*|show_text:"+st+"}&r";
+			}
+		}
+
+		return ccol+dc+'l['+ccol+ctm+(teamsuff||'')+dc+'r'+badgestr+ccol+this.name+(namesuff||'')+ccol+dc+'l'+']'+(prefix||'')+dc+'r';
+	};
+	this.getBadges = function(data) {
+		var badges = new Badge().getAllDataEntries(data);
+		var retbadges = [];
+		for(var i in badges as badge) {
+			if(this.data.badges.indexOf(badge.name) > -1) {
+				//has badge
+				retbadges.push(badge);
+			}
+		}
+
+		return retbadges;
+	};
 	this.delJob = function(name) {
 		if(this.hasJob(name)) {
 			delete this.data.jobs[name];
@@ -159,13 +187,13 @@ function Player(name) {
 		//Check individual colors
 		for(var i in _RAWCOLORS as rc) {
 			var cp = new Permission(getColorPermId(getColorId(rc))).init(data);
-			if(cp.permits(this.name, sb, data)) {
+			if(cp.permits(this.name, sb, data, true, false)) {
 				ac.push(getColorId(rc));
 			}
 		}
 		for(var i in _RAWEFFECTS as rc) {
 			var cp = new Permission(getColorPermId(getColorId(rc))).init(data);
-			if(cp.permits(this.name, sb, data)) {
+			if(cp.permits(this.name, sb, data, true, false)) {
 				ac.push(getColorId(rc));
 			}
 		}

@@ -1,3 +1,4 @@
+registerDataHandler("team", Team);
 function Team(name) {
 	DataHandler.apply(this, ['team', name]);
 	this.data = {

@@ -1,3 +1,4 @@
+registerDataHandler("warp", Warp);
 function Warp(name) {
 	DataHandler.apply(this, ["warp", name]);
 	Permittable.apply(this, ["warps"]); //Use new domain "warps"

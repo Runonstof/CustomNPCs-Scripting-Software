@@ -1,3 +1,5 @@
+registerDataHandler("clan", Clan);
+
 function Clan(name) {
     extends function  DataHandler("clan", name);
     this.data = {

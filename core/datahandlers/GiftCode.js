@@ -1,3 +1,5 @@
+registerDataHandler("giftcode", GiftCode);
+
 function GiftCode(name) {
 	DataHandler.apply(this, ['giftcode', name]);
 	Permittable.apply(this, ['giftcodes']);

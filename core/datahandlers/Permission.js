@@ -1,3 +1,4 @@
+registerDataHandler("permission", Permission);
 function Permission(name) {
 	DataHandler.apply(this, ['permission', name]);
 
@@ -55,7 +56,7 @@ function Permission(name) {
 		this.data.players = nplayers;
 		return this;
 	};
-	this.permits = function(player, sb, data) {
+	this.permits = function(player, sb, data, listenToDisabled=true) {
 		///String player
 		///IScoreboard sb
 		///IData data
@@ -65,7 +66,7 @@ function Permission(name) {
 		p.load(data);
 
 		//Check enabled
-		if(!this.data.enabled) { return true; }
+		if(!this.data.enabled && listenToDisabled) { return true; }
 
 		//Check team
 		if(team != null) {
@@ -85,28 +86,33 @@ function Permission(name) {
 			}
 		}
 
-
-		return permitted;
-	};
-	this.getParentPerms = function(data) {
-		var parents = [];
-		var permids = this.getAllDataIds(data);
-		var idarr = this.name.split(".");
-		for(var pid in permids as permid) {
-			var pidarr = permid.split(".");
-			if(idarr.length > pidarr.length && permid != this.name) {
-				var pidmatch = true;
-				for(var pai in pidarr as piditem) {
-					if(piditem != idarr[pai]) {
-						pidmatch = false;
-					}
-				}
-				if(pidmatch && parents.indexOf(permid) == -1) {
-					parents.push(permid);
-				}
+		//Check parents
+		var ppar = getParentPerms(this.name||"", data);
+		for(var p in ppar as par) {
+			if(par.permits(player, sb, data, false)) {
+				permitted = true;
+				break;
 			}
 		}
 
-		return parents;
+
+
+		return permitted;
+	};
+}
+
+function getParentPerms(name, data) {
+	var ps = (name+"").split(".");
+		var par = [];
+		var cs = "";
+		for(var i = 0; i < ps.length; i++) {
+		if(i < ps.length-1) {
+			cs += (cs != "" ? ".":"")+ps[i];
+			if(new Permission(cs).exists(data)) {
+				par.push(new Permission(cs).init(data));
+			}
+		}
 	}
+	return par;
+
 }
