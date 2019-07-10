@@ -5,6 +5,10 @@ function tellPlayer(player, rawtext) {
 	return executeCommand(player, "/tellraw "+player.getName()+" "+parseEmotes(strf(rawtext)));
 }
 
+function tellPlayerAction(player, txt) {
+	return executeCommand(player, "/tell")
+}
+
 //Send player multiple formatted messages from array
 function storytellPlayer(player, ar) {
 	for(var i in ar as ari) {
