@@ -1,3 +1,4 @@
+registerDataHandler("automsg", AutoMsg);
 function AutoMsg(name) {
     DataHandler.apply(this, ['automsg', name]);
 
