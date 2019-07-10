@@ -1,11 +1,15 @@
-{%set SERVER_CONFIG=gramados%}
+import core\utils\ServerConfigHandler.js;
+//
 
-import core\config\%SERVER_CONFIG%\*.js;
 import core\functions.js;
+
 import core\players\executeCommand.js;
+
 import core\players\tell.js;
 
+import core\mods\noppes\*.js;
 
+//
 
 function init(e){
 	yield init_event;
@@ -16,9 +20,11 @@ function load(e) {
 }
 
 function interact(e){
+	//
 	yield interact_event;
+	//
 	if(e.npc.getRole().getType() == 1 && e.player.getGamemode() == 1) {
-		tellPlayer(e.player, "&cYou cannot trade with this trader in creative mode!");
+		tellPlayer(e.player, "&cYou cannot trade with this trader in creative mode! &4[Why?]{*|show_text:$cThis is an patched trader to work with items from mods like $c$oAnimania$r$c and $c$oHarvestCraft$r$c and adds more functionalities to traders. Those functionalities don't work to well if player is in creative}&r");
 		e.setCanceled(true);
 	}
 }
@@ -97,7 +103,16 @@ function role(e){
 
 						}
 					}
-					e.player.giveItem(e.sold);
+					var sNbt = e.sold.getNbt();
+					if(sNbt.has("CSTSellItems")) {
+						var items = Java.from(sNbt.getList("CSTSellItems", sNbt.getListType("CSTSellItems")));
+						var giveIndex = Math.floor(Math.random() * items.length);
+
+						e.player.giveItem(e.player.world.createItemFromNbt(items[giveIndex]));
+
+					} else {
+						e.player.giveItem(e.sold);
+					}
 				}
 
 				e.setCanceled(true);
