@@ -1,6 +1,8 @@
 import core\Economy.js;
 
-registerDataHandler("player", Player);
+//
+
+
 
 @block init_event
 	(function(e){
@@ -179,6 +181,29 @@ registerDataHandler("player", Player);
 				tellPlayer(pl, "&cNo permissions found for player "+args.player);
 			}
 		}, 'player.perms'],
+		['!player setColor <player> [color]', function(pl, args, data){
+			var plo = new Player(args.player).init(data);
+			plo.data.color = args.color;
+			plo.save(data);
+
+			if(args.color != null) {
+				tellPlayer(pl, "&aSet color of player '"+args.player+"' to '"+args.color+"'");
+			} else {
+				tellPlayer(pl, "&aReset color of player '"+args.player+"'!");
+			}
+
+		}, "player.setColor", [
+			{
+				"argname": "player",
+				"type": "datahandler",
+				"datatype": "player",
+				"exists": true,
+			},
+			{
+				"argname": "color",
+				"type": "color"
+			}
+		]],
 		['!player setPay <player> <amount>', function(pl, args, data){
 			var am = getCoinAmount(args.amount);
 			var p = new Player(args.player).init(data);
@@ -375,6 +400,8 @@ registerDataHandler("player", Player);
 			var jc = Object.keys(p.data.jobs).length;
 			tellPlayer(pl, "&6Max Homes: &e"+hc+"/"+(mh == -1 ? "&aInfinite" : mh)+"&r [&a:check: Set{suggest_command:!player setMaxHomes "+p.name+" }&r] [&dView{run_command:!player homes "+p.name+"}&r]");
 			tellPlayer(pl, "&6Max Jobs: &e"+jc+"/"+(mj == -1 ? "&aInfinite" : mj)+"&r [&a:check: Set{suggest_command:!player setMaxJobs "+p.name+" }&r] [&dView{run_command:!player income "+p.name+"}&r]");
+			var badgetxt = arrayFormat(p.data.badges, "&e - &b{VALUE}", "\n");
+			tellPlayer(pl, "&6&lBadges:&r\n"+badgetxt);
 			return true;
 		}, 'player.info', [
 			{

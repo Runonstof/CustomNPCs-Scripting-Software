@@ -1,5 +1,5 @@
 var PERMISSION_REGEX = /permission_([\w.\-]+)/g;
-registerDataHandler("permission", Permission);
+
 import core\players\Permittable.js;
 
 @block register_commands_event

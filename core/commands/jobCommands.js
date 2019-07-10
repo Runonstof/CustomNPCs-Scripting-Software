@@ -1,4 +1,3 @@
-registerDataHandler("job", Job);
 
 @block register_commands_event
 	registerXCommands([

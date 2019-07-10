@@ -490,9 +490,14 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 		}, 'tellraw'],
 		['!tellaction <player> <...message>', function(pl, args, data){
 			var msg = args.message.join(' ');
-			executeCommand(pl, "/title "+pl.getName()+" actionbar "+parseEmotes(strf(msg)));
+			executeCommand(pl, "/title "+args.player+" actionbar "+parseEmotes(strf(msg)));
 			return true;
 		}, 'tellaction'],
+		['!telltitle <player> <...message>', function(pl, args, data){
+			var msg = args.message.join(' ');
+			executeCommand(pl, "/title "+args.player+" title "+parseEmotes(strf(msg)));
+			return true;
+		}, 'telltitle'],
 		['!setMagAmmo <amount>', function(pl, args){
 			var mItem = pl.getMainhandItem();
 			if(!mItem.isEmpty()) {

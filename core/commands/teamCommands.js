@@ -1,4 +1,4 @@
-registerDataHandler("team", Team);
+
 
 @block register_commands_event
 	//REGISTER TEAM COMMANDS
@@ -23,6 +23,6 @@ registerDataHandler("team", Team);
 					"type": "bool"
 				}
 			]
-		]
+		],
 	]);
 @endblock

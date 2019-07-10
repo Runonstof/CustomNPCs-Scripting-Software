@@ -1,1 +1,0 @@
-registerDataHandler("mail", Mail);

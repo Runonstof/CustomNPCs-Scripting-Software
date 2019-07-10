@@ -1,4 +1,3 @@
-registerDataHandler("giftcode", GiftCode);
 
 @block register_commands_event
   registerXCommands([

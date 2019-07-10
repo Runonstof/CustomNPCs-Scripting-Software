@@ -51,6 +51,32 @@ import core\CustomEnchantsLoader.js;
 			},
 
 		]],
+		["!item addSellItem", function(pl, args, data){
+			var oItem = pl.getOffhandItem();
+			var mItem = pl.getMainhandItem();
+
+			var mNbt = mItem.getNbt();
+
+			if(oItem.isEmpty()) {
+				tellPlayer(pl, "&cYou don't have an chance item in your offhand!");
+				return false;
+			} else
+			if(mItem.isEmpty()) {
+				tellPlayer(pl, "&cYou don't have an sell item in your mainhand!");
+				return false;
+			} else {
+				var chanceItems = mNbt.has("CSTSellItems") ? Java.from(mNbt.getList("CSTSellItems", mNbt.getListType("CSTSellItems"))) : [];
+
+				chanceItems.push(oItem.getItemNbt());
+
+				mNbt.setList("CSTSellItems", chanceItems);
+
+				tellPlayer(pl, "&aAdded offhand item as chance item to sell item! To view sell item info, do &2!item sellItemInfo&a!");
+
+			}
+
+
+		}, "item.addSellItem"],
 		['!item removecstEnchant <name>', function(pl, args, data){
 			var mItem = pl.getMainhandItem();
 			var ench = getCSTEnchantByName(args.name);

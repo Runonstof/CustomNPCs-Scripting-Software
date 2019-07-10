@@ -1,4 +1,3 @@
-registerDataHandler("warp", Warp);
 
 @block register_commands_event
 	//REGISTER COMMANDS

@@ -1,5 +1,3 @@
-registerDataHandler("clan", Clan);
-
 var CLAN_CREATE_COST = getCoinAmount("500K");
 
 @block register_commands_event

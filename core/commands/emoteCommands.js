@@ -1,4 +1,3 @@
-registerDataHandler("emote", Emote);
 
 @block init_event
   (function(e){
