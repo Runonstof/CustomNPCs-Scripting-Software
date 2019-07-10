@@ -13,9 +13,20 @@ import core\xcommandsAPI.js;
 var PluginAPI = {
     DataHandlers: {
         implement: function(datahandlername, implementationFunc) {
-            PluginAPI.DataHandlers.implementFuncs[datahandlername] = implementationFunc;
+            if(!(datahandlername in PluginAPI.DataHandlers.implementFuncs)) {
+                PluginAPI.DataHandlers.implementFuncs[datahandlername] = [];
+            }
+            PluginAPI.DataHandlers.implementFuncs[datahandlername].push(implementationFunc);
         },
-        implementFuncs: {}
+        implementFuncs: {},
+        run: function(dhname, t) {
+            if(dhname in PluginAPI.DataHandlers.implementFuncs) {
+                var imf = PluginAPI.DataHandlers.implementFuncs[dhname];
+                for(var i in imf as im) {
+                    im.apply(t, []);
+                }
+            }
+        }
     },
     Players: {
         on: function(hook, func){
@@ -26,7 +37,7 @@ var PluginAPI = {
             PluginAPI.Players.hookFns[hook].push(func)
         },
         run: function(hook, args){
-            if(hook in PluginAPI.Players.hookFns) {
+            if(Object.keys(PluginAPI.Players.hookFns).indexOf(hook) > -1) {
                 for(var i in PluginAPI.Players.hookFns[hook] as hookFn) {
                     hookFn.apply(null, args);
                 }
@@ -69,7 +80,7 @@ registerXCommands([
             "PluginCount": PLUGIN_LIST.length
         }));
 
-        var hookFn = PluginAPI.Players.run("init");
+        PluginAPI.Players.run("init", [e]);
     }
 @endblock
 
@@ -177,6 +188,7 @@ function reloadPluginsFromDisk() {
     }
 
 
+
     //Load plugins
     var pluginDirs = pluginFolder.listFiles();
 
@@ -198,8 +210,12 @@ function reloadPluginsFromDisk() {
                             var lfile = new File(lfilepath);
                             if(lfile.exists()) {
                                 //loadPlugin.fileFuncs[lfilepath] = (loadPlugin.fileFuncs[lfilepath]||[]).push(readFileAsString(lfilepath));
-                                var fileFunc = new Function(readFileAsString(lfilepath));
-                                
+
+
+
+                                var fileScript = readFileAsString(lfilepath)
+                                var fileFunc = new Function(fileScript);
+
                                 fileFunc();
 
                             }
