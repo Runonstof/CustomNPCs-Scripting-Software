@@ -42,17 +42,7 @@ function getMoneyItemCount(pnbt, w) {
   return am;
 }
 
-function getArrItemCount(array, itemstack, ignoreNbt=false) {
-	var icount = 0;
-	for(var pi in array as pitem) {
-		var pinbt = pitem.getItemNbt();
-		var scount = parseInt(pinbt.getByte('Count'));
-		if(isItemEqual(itemstack, pitem, ignoreNbt))
-			icount += scount;
-	}
 
-	return icount;
-}
 
 function getItemMoney(stack, w) {
     for(var ival in _COINITEMS as ci) {
