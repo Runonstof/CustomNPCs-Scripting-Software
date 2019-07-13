@@ -68,17 +68,23 @@ registerXCommands([
     }, 'plugins'],
     ['!plugin reload', function(pl, args, data){
         if(reloadPluginsFromDisk()) {
-            tellPlayer(pl, "&aReloaded Plugins!");
+            tellPlayer(pl, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!".fill({
+                "PluginCount": PLUGIN_LIST.length
+            }));
         }
     }, 'plugins.reload'],
 ]);
 
+
+
+
 @block init_event
     if(e.player != null) {
-
         tellPlayer(e.player, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!".fill({
             "PluginCount": PLUGIN_LIST.length
         }));
+
+
 
         PluginAPI.Players.run("init", [e]);
     }
