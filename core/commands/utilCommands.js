@@ -183,7 +183,6 @@ function getCoinAmount(str) {
 	return amount*sgn;
 }
 
-var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries');
 
 var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.reskillable.api.ReskillableRegistries') : null);
 

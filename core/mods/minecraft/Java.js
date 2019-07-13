@@ -5,6 +5,8 @@ var MCItemBow = Java.type("net.minecraft.item.ItemBow");
 var MCItemSword = Java.type("net.minecraft.item.ItemSword");
 var MCItemTool = Java.type("net.minecraft.item.ItemTool");
 var EntityEqSlot = Java.type("net.minecraft.inventory.EntityEquipmentSlot");
+var REGISTRY = Java.type('net.minecraftforge.fml.common.registry.ForgeRegistries');
+
 
 function getItemType(iitemstack, mcentity=null) {
     var mcitem = iitemstack.getMCItemStack()[MCP.ItemStack_getItem]();
