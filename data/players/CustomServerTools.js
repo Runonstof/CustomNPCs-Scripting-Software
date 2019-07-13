@@ -1,4 +1,4 @@
-import core\utils\ServerConfigHandler.js;
+import core\utils\*.js;
 import core\math.js;
 import core\functions.js;
 import core\mods\noppes\*.js;
@@ -137,6 +137,9 @@ function chat(e) {
 	var allwdcolors = dpl.getAllowedColors(data, sb);
 	var esccolors = removeFromArray(_RAWCODES, allwdcolors);
 	var escmsg = escCcs(e.message.toString(), esccolors);
+
+	var logMsg = "["+e.player.getName()+"] -> "+escCcs(e.message.toString());
+
 	var prefcol = dpl.getChatColorPref(sb, data);
 	var chats = dpl.getChats(data);
 
@@ -258,7 +261,7 @@ function chat(e) {
 		}
 	}
 
-	Logger.info(newmsg);
+	Logger.info(logMsg);
 	e.setCanceled(true); //Cancel real message
 }
 
