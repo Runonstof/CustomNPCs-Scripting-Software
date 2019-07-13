@@ -22,7 +22,7 @@ function Player(name) {
 		"lastLogin": 0,
 		"color": null,
 		"UUID": null,
-		"money": DEFAULT_MONEY,
+		"money": CONFIG_SERVER.DEFAULT_MONEY,
 	};
 	if(PluginAPI) {
 		PluginAPI.DataHandlers.run("player", this);
@@ -54,7 +54,7 @@ function Player(name) {
 		}
 
 		if(this.data.chatcolor != null) {
-			pref = '&'+getColorId(this.data.chatColor);
+			pref = '&'+getColorId(this.data.chatcolor);
 		}
 
 
