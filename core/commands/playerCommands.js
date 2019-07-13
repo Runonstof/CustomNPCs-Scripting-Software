@@ -143,6 +143,11 @@ import core\Economy.js;
 	var playerCommands = new CommandFactory("player");
 
 	playerCommands
+	.setListTransformer(
+			function(player){
+				return "&e - &b"+player.name+" &3[Info]{run_command:!player info "+player.name+"}&r\n";
+			}
+		)
 		.genDefault(["create", "info"])
 		.register();
 
