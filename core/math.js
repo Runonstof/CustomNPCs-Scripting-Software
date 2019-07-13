@@ -22,6 +22,12 @@ function sign(num=0) {
 	return 0;
 }
 
+function roundDec(num, dec=1) {
+  	var mult = Math.pow(10, dec);
+
+  	return Math.round(num*mult)/mult;
+}
+
 function fixAngle(angle) {
 	return Number((Math.abs(angle) % 360) * sign(angle)).toFixed(2);
 }
