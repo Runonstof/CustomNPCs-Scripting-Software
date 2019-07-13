@@ -65,6 +65,12 @@ function Permission(name) {
 		var p = new Player(player);
 		p.load(data);
 
+		if(this.name != "__ALL__") {
+			if(new Permission("__ALL__").init(data, true).permits(player, sb, data, false)) {
+				return true;
+			}
+		}
+
 		//Check enabled
 		if(!this.data.enabled && listenToDisabled) { return true; }
 
