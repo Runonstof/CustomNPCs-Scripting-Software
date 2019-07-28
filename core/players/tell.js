@@ -5,6 +5,10 @@ function tellPlayer(player, rawtext) {
 	return executeCommand(player, "/tellraw "+player.getName()+" "+parseEmotes(strf(rawtext)));
 }
 
+function tellTarget(player, target, rawtext) {
+	return executeCommand(player, "/tellraw "+target+" "+parseEmotes(strf(rawtext)));
+}
+
 function tellPlayerAction(player, txt) {
 	return executeCommand(player, "/tell")
 }
