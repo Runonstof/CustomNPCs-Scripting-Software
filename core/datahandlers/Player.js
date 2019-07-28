@@ -39,6 +39,27 @@ function Player(name) {
 		this.name = ipl.getName();
 		return this;
 	};
+	this.getTeamName = function(sb) {
+		var t = sb.getPlayerTeam(this.name);
+		if(t != null) {
+			return t.getDisplayName();
+		} else if(this.data.title != null) {
+			return this.data.title;
+		}
+
+		return "";
+	};
+	this.getPlayerColor = function(sb){
+		var t = sb.getPlayerTeam(this.name);
+		var ccol = 'white';
+		if(this.data.color != null) {
+			ccol = this.data.color
+
+		} else if(t != null) {
+			ccol =t.getColor();
+		}
+		return ccol;
+	};
 	this.getChatColorPref = function(sb, data) {
 		var pref = '';
 		var prefeff = '';
@@ -63,6 +84,7 @@ function Player(name) {
 		}
 		return pref+prefeff;
 	};
+
 	this.getNameTag = function(sb, prefix, namesuff, teamsuff, ccChar, data=null) {
 		var t = sb.getPlayerTeam(this.name);
 		var dc = ccChar||'&';
