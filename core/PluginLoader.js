@@ -9,8 +9,21 @@ import core\xcommandsAPI.js;
 
 //
 
+//Initialize PLugin Folder
+var PLUGIN_FOLDER = CONFIG_SERVER.PLUGIN_FOLDER||"CST_plugins";
+var PLUGIN_LIST = [];
 
 var PluginAPI = {
+    Plugins: {
+        get: function(name){
+            for(var i in PLUGIN_LIST as plugin) {
+                if(plugin.id == name) {
+                    return plugin;
+                }
+            }
+            return null;
+        }
+    },
     DataHandlers: {
         implement: function(datahandlername, implementationFunc) {
             if(!(datahandlername in PluginAPI.DataHandlers.implementFuncs)) {
@@ -48,6 +61,8 @@ var PluginAPI = {
 };
 
 
+
+
 registerXCommands([
     ['!plugins', function(pl, args, data){
         var output = getTitleBar("Plugin List")+"\n&a";
@@ -65,7 +80,7 @@ registerXCommands([
         }
         tellPlayer(pl, output);
         return true;
-    }, 'plugins'],
+    }, 'plugins.list'],
     ['!plugin reload', function(pl, args, data){
         if(reloadPluginsFromDisk()) {
             tellPlayer(pl, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!".fill({
@@ -83,7 +98,18 @@ registerXCommands([
         tellPlayer(e.player, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!".fill({
             "PluginCount": PLUGIN_LIST.length
         }));
+        var w = e.player.world;
+        var data = w.storeddata;
 
+        var pluginPerm = new Permission("plugins");
+        if(!pluginPerm.exists(data)) {
+            pluginPerm.save(data);
+        }
+        var pluginListPerm = new Permission("plugins.list");
+        if(!pluginListPerm.exists(data)) {
+            pluginListPerm.data.enabled = false;
+            pluginListPerm.save(data);
+        }
 
 
         PluginAPI.Players.run("init", [e]);
@@ -179,9 +205,7 @@ registerXCommands([
 @endblock
 
 
-//Initialize PLugin Folder
-var PLUGIN_FOLDER = "CST_plugins";
-var PLUGIN_LIST = [];
+
 
 reloadPluginsFromDisk();
 
@@ -197,7 +221,7 @@ function reloadPluginsFromDisk() {
 
     //Load plugins
     var pluginDirs = pluginFolder.listFiles();
-
+    var pluginsToRun = [];
     //Loop plugin directories
     for(var p in pluginDirs as pluginDir) {
         if(pluginDir.isDirectory()) {
@@ -210,7 +234,6 @@ function reloadPluginsFromDisk() {
                         loadPlugin = JSON.parse(readFileAsString(pluginFile.getPath()));
 
                         //Load JS files
-                        loadPlugin.fileFuncs = {};
                         for(var lf in loadPlugin.files as lfilename) {
                             var lfilepath = pluginDir.getPath()+"/"+lfilename;
                             var lfile = new File(lfilepath);
@@ -220,9 +243,11 @@ function reloadPluginsFromDisk() {
 
 
                                 var fileScript = readFileAsString(lfilepath)
-                                var fileFunc = new Function(fileScript);
-
-                                fileFunc();
+                                var fileFunc = new Function("SETTINGS", "PLUGIN", fileScript);
+                                pluginsToRun.push({
+                                    "func": fileFunc,
+                                    "plugin": loadPlugin
+                                })
 
                             }
                         }
@@ -245,6 +270,14 @@ function reloadPluginsFromDisk() {
                 executeCommandGlobal("/tellraw @a "+strf(errtxt));
                 return false;
             }
+        }
+    }
+
+    for(var i in pluginsToRun as runPlugin) {
+        try {
+            runPlugin.func(runPlugin.plugin.settings||{}, runPlugin.plugin);
+        } catch(exc) {
+            handleError(exc);
         }
     }
 
