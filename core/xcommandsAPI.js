@@ -148,7 +148,7 @@ function CommandFactory(datahandler, cmdtree){
 				tellPlayer(pl, "&aSet property &2\""+property+"\"&a of "+dh.type+" &2\""+dh.name+"\"&a to "+cdata.out.val.fill(tellData)+"&r&a!");
 				return true;
 			},
-			this.cmdtree+'.set'+propname,
+			this.cmdtree.replaceAll(" ", ".")+'.set'+propname,
 			rules.concat([
 				{
 					"argname": "name",
@@ -195,7 +195,7 @@ function CommandFactory(datahandler, cmdtree){
 					return true;
 				}
 				return false;
-			}, this.cmdtree+'.create', [
+			}, this.cmdtree.replaceAll(" ", ".")+'.create', [
 				{
 					"argname": "name",
 					"type": "string",
@@ -223,7 +223,7 @@ function CommandFactory(datahandler, cmdtree){
 				dh.remove(data);
 				tellPlayer(pl, "&aRemoved "+dh.type+" '"+dh.name+"'!");
 				return true;
-			}, this.cmdtree+'.remove', [
+			}, this.cmdtree.replaceAll(" ", ".")+'.remove', [
 				{
 					"argname": "name",
 					"type": "datahandler",
@@ -262,7 +262,7 @@ function CommandFactory(datahandler, cmdtree){
 				}
 
 				return true;
-			}, this.cmdtree+'.info', [
+			}, this.cmdtree.replaceAll(" ", ".")+'.info', [
 				{
 					"argname": "name",
 					"type": "datahandler",
@@ -314,7 +314,7 @@ function CommandFactory(datahandler, cmdtree){
 
 				tellPlayer(pl, txt);
 				return true;
-			}, this.cmdtree+'.list', [],
+			}, this.cmdtree.replaceAll(" ", ".")+'.list', [],
 			{
 				"self": this,
 				"datatype": this.type,
@@ -335,7 +335,7 @@ function CommandFactory(datahandler, cmdtree){
 				dh.save(data);
 				tellPlayer(pl, "&aCopied "+dh.type+" '"+args.name+"' to '"+args.new_name+"'!");
 				return true;
-			}, this.cmdtree+'.copy', [
+			}, this.cmdtree.replaceAll(" ", ".")+'.copy', [
 				{
 					"argname": "new_name",
 					"type": "string",
@@ -692,7 +692,7 @@ function executeXCommand(str, player,permcheck=true) {
 }
 
 @block chat_event
-	if(e.message.substr(0, 1) == '!') {
+	if(e.message.substr(0, 1) == '!' && !e.isCanceled()) {
 		executeXCommand(e.message, e.player);
 		e.setCanceled(true);
 		return true;
