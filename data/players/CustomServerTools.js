@@ -51,7 +51,7 @@ function interact(e) {
 }
 
 function scriptCommand(e) {
-	worldOut("Args: "+Java.from(e.arguments).join(" "));
+	tellPlayer(e.player, "Args: "+Java.from(e.arguments).join(" "));
 }
 
 function slowTick(e) {
@@ -80,10 +80,6 @@ function customChestClicked(e){
 
 function customChestClosed(e){
 	yield customChestClosed_event;
-}
-
-function rangedLaunched(e) {
-
 }
 
 function login(e) {

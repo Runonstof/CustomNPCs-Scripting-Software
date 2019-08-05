@@ -65,9 +65,10 @@ var PluginAPI = {
 
 registerXCommands([
     ['!plugins', function(pl, args, data){
-        var output = getTitleBar("Plugin List")+"\n&a";
+        var output = getTitleBar("Plugin List")+"\n&dHover plugin name for more info\n&a";
         for(var p in PLUGIN_LIST as plugin) {
-            var pluginInfo = "$6$lName: $r$e{PluginName}\n$r$6$lAuthor: $r$e{PluginAuthor}\n$r$6$lVersion: $r$e{PluginVersion}\n\n$r$e{PluginDesc}$r".fill({
+            var pluginInfo = "$6$lName: $r$e{PluginName}\n$r$6$lID: $r$e{PluginId}\n$r$6$lAuthor: $r$e{PluginAuthor}\n$r$6$lVersion: $r$e{PluginVersion}\n\n$r$e{PluginDesc}$r".fill({
+                "PluginId": plugin.id,
                 "PluginName": plugin.name,
                 "PluginVersion": plugin.version,
                 "PluginDesc": plugin.description||"",

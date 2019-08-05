@@ -4,6 +4,7 @@ function init(e){
 	yield init_event;
 }
 
+
 function load(e) {
 	yield load_event;
 }

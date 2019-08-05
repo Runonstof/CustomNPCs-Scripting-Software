@@ -155,3 +155,15 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 
 	return txt;
 }
+
+
+function progressBar(value, max, length, progChar=null, fillColor="&a", leftColor="&c"){
+	var skillBar = '&r&l[&r';
+	var progress = Math.floor((value/max)*length);
+	var proc = Math.round(value/max*100);
+	for(var i = 0; i < length; i++) {
+		if(i < progress) skillBar += fillColor+(progChar||"|");
+		if(i >= progress) skillBar += leftColor+(progChar||"|");
+	}
+	return skillBar += "&r&l]";
+}
