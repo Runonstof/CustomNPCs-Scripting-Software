@@ -1,0 +1,69 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "360b3ea8f4b8d4bc9a63ab9fd5643f08",
+    "packages": [
+        {
+            "name": "tholu/php-packer",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tholu/php-packer.git",
+                "reference": "b6f63a6e1112a27db048353fbab50539a4a75764"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tholu/php-packer/zipball/b6f63a6e1112a27db048353fbab50539a4a75764",
+                "reference": "b6f63a6e1112a27db048353fbab50539a4a75764",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Tholu\\Packer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Lutz",
+                    "email": "thomaslutz.de@gmail.com"
+                },
+                {
+                    "name": "Dean Edwards"
+                },
+                {
+                    "name": "Nicolas Martin"
+                }
+            ],
+            "description": "A PHP version of Packer, JavaScript obfuscation library originally created by Dean Edwards",
+            "homepage": "https://github.com/tholu/php-packer",
+            "keywords": [
+                "JS",
+                "javascript",
+                "minification",
+                "minify",
+                "obfuscate",
+                "uglify"
+            ],
+            "time": "2016-04-19T10:33:55+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

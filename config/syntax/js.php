@@ -39,8 +39,17 @@ $GLOBALS['config']['syntaxRegex'] = [
 require($WORKSPACE . "\\bin\\functionTweak.php");
 require($WORKSPACE . "\\bin\\forLoopTweak.php");
 require($WORKSPACE . "\\bin\\mcp_deobf.php");
+require($WORKSPACE . "\\bin\\minifier.php");
+
 $GLOBALS['config']['addons'][] = 'fnTweak';
 $GLOBALS['config']['addons'][] = 'forLoopTweak';
+$GLOBALS['config']['addons'][] = [
+	'type'=>'static_class_call',
+	'class'=> 'JShrink\Minifier',
+	'method'=> 'minify'
+];
+
+
 //$GLOBALS['config']['addons'][] = 'mcp_deobf';
 
 ?>

@@ -88,7 +88,8 @@ Regex101.com is a great tool.
 
 */
 
-require('bin\functions.php');
+require(__DIR__ . '\vendor\autoload.php');
+require(__DIR__ . '\bin\functions.php');
 
 $GLOBALS['workspace'] = __DIR__;
 $WORKSPACE = &$GLOBALS['workspace'];
@@ -551,9 +552,19 @@ foreach($args as $key_arg=>$arg) {
 
 				//Addons
 				foreach($GLOBALS['config']['addons'] as $addon) {
-					if(function_exists($addon)) {
-						echo "Loading Addon: ".$addon."\n";
-						$scr = call_user_func_array($addon, [$scr]);
+					if(is_string($addon)) {
+						if(function_exists($addon)) {
+							echo "Loading Addon: ".$addon."\n";
+							$scr = call_user_func_array($addon, [$scr]);
+						}
+					} elseif(is_callable($addon)) {
+						$scr = $addon($scr);
+					} elseif(is_array($addon)) {
+						switch($addon['type']??"") {
+							case "static_class_call":
+								$scr = $addon['class']::{$addon['method']}($scr);
+								break;
+						}
 					}
 				}
 
