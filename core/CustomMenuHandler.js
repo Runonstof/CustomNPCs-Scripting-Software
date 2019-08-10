@@ -5,7 +5,7 @@ var MENU_TIMER_ID = 499; //Timer id for menus
 var MENU_TIMER_EXEC = null; //Timer function
 var MENU_TIMER_PAYLOAD = {}; //Data for timer
 
-@block timer_event
+@block timer_event_
     if(e.id == MENU_TIMER_ID) {
         if(MENU_TIMER_EXEC != null) {
             MENU_TIMER_EXEC(e.player, MENU_TIMER_PAYLOAD);
@@ -49,7 +49,51 @@ function reloadCustomMenusFromDisk() {
     return output;
 }
 
-@block customChestClicked_event
+function openCustomMenu(player, container, menujson) {
+    return populateCustomMenu(player.showChestGui(menujson.rows||6));
+}
+
+function populateCustomMenu(container, menudata) {
+
+    container.setName(parseEmotes(ccs(menudata.displayName)));
+    for(var i in menudata.items as menitem) {
+        var item = pl.world.createItem(menitem.id, menitem.damage||0, menitem.count||1);
+        if("name" in menitem) {
+            item.setCustomName(parseEmotes(ccs(menitem.name)));
+        }
+        if("lore" in menitem) {
+            var ilore = [];
+            var lores = menitem.lore;
+            for(var il in lores as ilo) {
+                ilore.push(parseEmotes(ccs("&r"+ilo)));
+            }
+            item.setLore(ilore);
+        }
+        if("nbt" in menitem) {
+            item.getNbt().merge(API.stringToNbt(JSON.stringify(menitem.nbt)));
+        }
+
+        var itemNbt = item.getNbt();
+
+        var passNbtData = [
+            "clickActions",
+            "clickFailedActions",
+            "requirements",
+        ];
+
+        for(var pp in passNbtData as pd) {
+            if(pd in menitem) {
+                itemNbt.setString(pd, JSON.stringify(menitem[pd]));
+            }
+        }
+
+        container.setSlot(parseInt(36+(menitem.slot||0)), item);
+    }
+
+    return container;
+}
+
+@block customChestClicked_event_
     if(!e.slotItem.isEmpty()) {
         var sNbt = e.slotItem.getNbt();
         var data = e.player.world.getStoreddata();
@@ -88,7 +132,7 @@ function reloadCustomMenusFromDisk() {
                             e.player.closeGui();
                             MENU_TIMER_PAYLOAD["menu"] = action.value||"";
                             MENU_TIMER_EXEC = function(player, payload){
-                                executeXCommand("!menu open "+payload.menu, player);
+                                //executeXCommand("!menu open "+payload.menu, player);
                             };
                             e.player.timers.forceStart(MENU_TIMER_ID, 1, false);
                             break;
