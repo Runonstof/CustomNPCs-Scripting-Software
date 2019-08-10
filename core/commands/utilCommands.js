@@ -260,32 +260,7 @@ var ReskillableRegistry = (hasMCMod("reskillable") ? Java.type('codersafterdark.
 				executeCommand(pl, "/tellraw @a "+parseEmotes(strf(tpo.getNameTag(pl.world.getScoreboard())+"&a&l HAS MADE THE &r:seagull:&a&lHOLY SEAGULL&r:seagull:&a&l ANGRY!!!")));
 			}
 		}, 'thunder', []],
-		['!getDoorCode', function(pl, args, data){
-			if(hasMCMod("malisisdoors")) {
-				var rt = pl.rayTraceBlock(16, false, false);
-				var rtb = rt.getBlock();
-
-				if(rtb.hasTileEntity()) {
-					var rnbt = rtb.getTileEntityNBT();
-					if(rnbt.has("id")) {
-						if(rnbt.getString("id") == "minecraft:doortileentity") {
-							if(rnbt.has("code")) {
-								tellPlayer(pl, "&6The code of this door is: &e"+rnbt.getString("code"));
-								return true;
-							} else {
-								tellPlayer(pl, "&6This is not an locked door.");
-								return false;
-							}
-						}
-					}
-				}
-
-				tellPlayer(pl, "&cYou are not looking at the handle of a door!");
-			} else {
-				tellPlayer(pl, "&6This command requires the 'Malisisdoors' mod to be installed.");
-			}
-			return true;
-		}, 'getDoorCode', []],
+		
 		['!sign edit <line> [...text]', function(pl, args, data){
 
 			var rt = pl.rayTraceBlock(16, false, false);
