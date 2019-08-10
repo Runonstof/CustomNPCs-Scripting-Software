@@ -14,23 +14,8 @@ function getDropChance(npcnbt, slot) {
 	return dropChance;
 }
 
-//Generate progress bar like [||||||]
-function progressBar(value, max, length, fillColor="&a", leftColor="&c"){
-	var skillBar = '&r&l[&r';
-	var progress = Math.floor((value/max)*length);
-	var proc = Math.round(value/max*100);
-	for(var i = 0; i < length; i++) {
-		if(i < progress) skillBar += "&a:box:";
-		if(i >= progress) skillBar += "&c:box:";
-	}
-	return skillBar += "&r&l]";
-}
 
-//sspeed = side speed, + = right, - = left
-//fspeed = forward speed, + = forward, - = backwards
-function entitySetMotion(entity, sspeed, fspeed, angle) {
 
-}
 
 function getHandItem(player) {
 	return player.getMainhandItem() || player.getOffhandItem();
