@@ -25,13 +25,12 @@ var MENU_ON_CLOSE = [];
 @endblock
 
 @block customChestClosed_event
-    for(var i in MENU_ON_CLOSE as closeEvent) {
-        try {
-            closeEvent.fn.apply(closeEvent.self, [e,closeEvent.data||{}]);
-        } catch(exc) {
-            handleError(exc, true, e.player.getName());
-        }
+    try {
+        handleMenuEvents(e.player, MENU_ON_CLOSE);
+    } catch(exc) {
+        handleError(exc, true, e.player.getName());
     }
+
     MENU_ON_CLOSE = [];
 @endblock
 
@@ -50,25 +49,37 @@ var MENU_ON_CLOSE = [];
 
 @endblock
 
-function handleMenuEvents(player, evs) {
+function fillObject(obj, data) {
+    for(var key in obj as val) {
+        obj[key] = val.fill(data);
+    }
+    return obj;
+}
+
+function handleMenuEvents(player, evs, filldata) {
+    filldata = objMerge({
+        "player": player.getName(),
+    }, filldata||{});
+
     for(var c in evs as ev) {
+        fillObject(ev, filldata);
         switch(ev.type) {
             case "run_command":
-                executeCommand(player, ev.meta.command||"");
+                executeCommand(player, ev.command||"");
                 break;
             case "run_xcommand":
             case "run_xcommand_admin":
-                executeXCommand(ev.meta.command||"", player, ev.type === "run_xcommand");
+                executeXCommand(ev.command||"", player, ev.type === "run_xcommand");
                 break;
             case "run_file":
-                var scrPath = ev.meta.file||"";
+                var scrPath = ev.file||"";
                 var scrFile = new File(scrPath);
                 if(scrFile.exists()) {
                     var scr = readFileAsString(scrPath);
                     var scrFunc = new Function('e', 'payload', scr);
                     var payl = objMerge({
                         //defaults
-                    }, ev.meta.payload||{});
+                    }, ev.payload||{});
 
                     try {
                         scrFunc(e, payl);
@@ -80,11 +91,11 @@ function handleMenuEvents(player, evs) {
                 }
                 break;
             case "run_script":
-                var scr = ev.meta.script||"";
+                var scr = ev.script||"";
                 var scrFunc = new Function('e', 'payload', scr);
                 var payl = objMerge({
                     //defaults
-                }, ev.meta.payload||{});
+                }, ev.payload||{});
 
                 try {
                     scrFunc(e, payl);
@@ -93,7 +104,7 @@ function handleMenuEvents(player, evs) {
                 }
                 break;
             case "open_menu":
-                var menuPath = ev.meta.file||"";
+                var menuPath = ev.file||"";
                 var menuFile = new File(menuPath);
                 if(menuFile.exists()) {
                     var menuFileText = readFileAsString(menuPath);
@@ -107,7 +118,7 @@ function handleMenuEvents(player, evs) {
 
                     if(menuJson !== null) {
                         player.closeGui();
-                        MENU_TIMER_PAYLOAD = {'menu':menuJson,'data':ev.meta.data||{},'onClose':menuJson.onClose||[]};
+                        MENU_TIMER_PAYLOAD = {'menu':menuJson,'data':ev.data||{},'onClose':menuJson.onClose||[]};
                         player.timers.forceStart(MENU_TIMER_ID, 1, false);
 
                     }
@@ -133,6 +144,9 @@ function CustomMenu(name) {
     this.name = name||"";
     this.rows = 6;
     this.items = [];
+    this.closeFns = [];
+    this.openFns = [];
+    this.filldata = {};
 
     this.fromJson = function(json) {
         this.name = json.name||"";
@@ -142,12 +156,25 @@ function CustomMenu(name) {
                 this.items.push(new CustomMenuItem().fromJson(jitem));
             }
         }
+        if(json.onClose) {
+            this.closeFns = json.onClose;
+        }
+        if(json.onOpen) {
+            this.openFns = json.onOpen;
+        }
+        if(json.data) {
+            this.filldata = json.data;
+        }
 
         return this;
     };
 
-    this.onClose = function(fn) {
-        MENU_ON_CLOSE.push({"fn":fn,"self":this});
+    this.onClose = function(ev) {
+        this.closeFns.push(ev);
+    };
+
+    this.onOpen = function(ev){
+        this.openFns.push(ev);
     };
 
     this.getItems = function() {
@@ -156,6 +183,9 @@ function CustomMenu(name) {
 
     this.open = function(player) {
         var container =  player.showChestGui(this.rows);
+
+        MENU_ON_CLOSE = fillObject(objMerge({}, this.closeFns), this.filldata);
+        handleMenuEvents(player, this.openFns, this.filldata);
         this.populate(player.world, container);
         return container;
     };
@@ -204,10 +234,9 @@ function CustomMenuItem(id, damage=0, count=1) {
     this.onClickFuncs = [];
 
     this.onClick = function(type, meta){
-        this.onClickFuncs.push({
+        this.onClickFuncs.push(objMerge({
             "type": type,
-            "meta": meta
-        });
+        }, meta));
     };
 
     this.fromItemStack = function(stack) {
