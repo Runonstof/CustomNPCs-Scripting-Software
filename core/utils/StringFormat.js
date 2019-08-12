@@ -74,8 +74,10 @@ function escCcs(str, esc_formats=null) {
 	return str.replace(new RegExp('&(['+esc_formats.join("")+'])', 'g'), '');
 }
 
-function parseEmotes(str, allwd=[]) {
-	str = str.replaceAll(objArray(CHAT_EMOTES), '');
+function parseEmotes(str, allwd=[], replaceOld=true) {
+	if(replaceOld) {
+		str = str.replaceAll(objArray(CHAT_EMOTES), '');
+	}
 	for(var ce in CHAT_EMOTES as chatemote) {
     	if(allwd.length == 0  || allwd.indexOf(ce) > -1) {
 		    str = str.replaceAll(':'+ce+':', chatemote);
