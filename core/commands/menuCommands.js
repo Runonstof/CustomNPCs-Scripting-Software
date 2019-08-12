@@ -20,7 +20,8 @@ import core\players\CustomMenus\CustomMenu.js;
                 }
 
                 var menu = new CustomMenu().fromJson(json);
-                menu.open(pl);
+                var c = menu.open(pl);
+                tellPlayer(pl, "The size is: "+c.getSize());
             } else {
                 tellPlayer(pl, "&cFile '"+path+"' doesn't exists!");
             }
