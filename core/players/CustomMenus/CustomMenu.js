@@ -11,6 +11,7 @@ import core\utils\FileUtils.js;
 var MENU_TIMER_ID = 420;
 var MENU_TIMER_PAYLOAD = null;
 var MENU_ON_CLOSE = [];
+var MENU_CAN_EDIT = false;
 
 @block timer_event
     if(e.id == MENU_TIMER_ID) {
@@ -32,28 +33,38 @@ var MENU_ON_CLOSE = [];
     }
 
     MENU_ON_CLOSE = [];
+    MENU_CAN_EDIT = false;
 @endblock
 
 @block customChestClicked_event
     var snbt = e.slotItem.getNbt();
-    if(snbt.getBoolean("takeable")) {
+    if(snbt.getBoolean("takeable") || MENU_CAN_EDIT) {
         var heldItem = e.heldItem.copy();
         e.heldItem = e.slotItem;
         e.slotItem = heldItem;
     }
 
     if(snbt.has("onClick")) {
-        var clickEvents = Java.from(nbtGetList(snbt, "onClick"));//map parse json
+        var clickEvents = Java.from(nbtGetList(snbt, "onClick"));
         handleMenuEvents(e.player, clickEvents.map(function(ce){ return JSON.parse(ce); }));
     }
 
 @endblock
 
 function fillObject(obj, data) {
+
     for(var key in obj as val) {
-        obj[key] = val.fill(data);
+        if(typeof val === 'string') {
+            //obj[key] = val.fill(data);
+        } else if(typeof val != 'number') {
+            //fillObject(obj[key], data);
+        }
     }
     return obj;
+}
+
+function containerGetRows(container) {
+    return (container.getSize()-36)/9;
 }
 
 function handleMenuEvents(player, evs, filldata) {
@@ -104,7 +115,7 @@ function handleMenuEvents(player, evs, filldata) {
                 }
                 break;
             case "open_menu":
-                var menuPath = ev.file||"";
+                var menuPath = "menus/"+(ev.file||"")+".json";
                 var menuFile = new File(menuPath);
                 if(menuFile.exists()) {
                     var menuFileText = readFileAsString(menuPath);
@@ -136,19 +147,49 @@ function handleMenuEvents(player, evs, filldata) {
             case "close_menu":
                 player.closeGui();
                 break;
+            case "function":
+                if(typeof ev.function === 'function') {
+                    var payl = objMerge({
+                        //defaults
+                    }, ev.payload||{});
+                    var c = player.getOpenContainer();
+                    ev.function(player, payl, c.getSize()>36 ? c : null);
+                }
+                break;
         }
     }
 }
 
-function CustomMenu(name) {
+function CustomMenu(name, meta) {
     this.name = name||"";
     this.rows = 6;
     this.items = [];
     this.closeFns = [];
     this.openFns = [];
     this.filldata = {};
+    this.meta = meta||{};
+
+    this.getFirstFreeSlot = function(container) {
+        var items = container.getItems();
+        for(var i in items as item) {
+            if(item.isEmpty() && i>=36) {
+                return i-36;
+            }
+        }
+        return -1;
+    };
+
+    this.fromContainer = function(container) {
+        this.name = container.getName();
+        this.items = container.getItems().map(function(item){
+            return new CustomMenuItem().fromItemStack(item);
+        });
+        this.rows = containerGetRows(container);
+
+    };
 
     this.fromJson = function(json) {
+        if(typeof json === 'string') { json = JSON.parse(json); }
         this.name = json.name||"";
         this.rows = Math.min(Math.max(json.rows||6, 1),6);
         if(json.items) {
@@ -164,6 +205,9 @@ function CustomMenu(name) {
         }
         if(json.data) {
             this.filldata = json.data;
+        }
+        if(json.meta) {
+            this.meta = json.meta;
         }
 
         return this;
@@ -184,8 +228,8 @@ function CustomMenu(name) {
     this.open = function(player) {
         var container =  player.showChestGui(this.rows);
 
-        MENU_ON_CLOSE = fillObject(objMerge({}, this.closeFns), this.filldata);
-        handleMenuEvents(player, this.openFns, this.filldata);
+        MENU_ON_CLOSE = fillObject(objMerge({}, this.closeFns), {});
+        handleMenuEvents(player, this.openFns);
         this.populate(player.world, container);
         return container;
     };
@@ -198,6 +242,7 @@ function CustomMenu(name) {
         container.setName(parseEmotes(ccs(this.name)));
         var items = this.items;
         for(var i in this.items as citem) {
+
             container.setSlot(36+citem.slot, citem.toItemStack(w));
         }
     };
@@ -210,11 +255,29 @@ function CustomMenuItem(id, damage=0, count=1) {
     this.count = count;
     this.damage = damage;
     this.nbt = null;
+    this.nbtstring = null;
     this.classes = [];
     this.name = null;
     this.takeable = false;
 
+    this.toJsonString = function(){
+        var json = {
+            "id": this.id,
+            "lore": this.lore,
+            "damage": this.damage,
+            "count": this.count,
+            "slot": this.slot,
+            "classes": this.classes,
+            "takeable": this.takeable
+        };
+        if(this.nbt) { json.nbt = this.nbt; }
+        if(this.name) { json.name = this.name }
+
+        return JSON.stringify(json);
+    };
+
     this.fromJson = function(json){
+        if(typeof json === 'string') { json = JSON.parse(json); }
         this.id=json.id;
         if("name" in json) {
             this.name = json.name;
@@ -242,16 +305,44 @@ function CustomMenuItem(id, damage=0, count=1) {
     this.fromItemStack = function(stack) {
         this.id = stack.getName();
         this.damage = stack.getItemDamage();
+        this.count = stack.getStackSize();
+        this.lore = stack.getLore()||[];
+        if(stack.hasCustomName()) {
+            this.name = stack.getDisplayName().replace("§", "&");
+        }
+        if(stack.hasNbt()) {
+            var snbt = stack.getNbt();
+            this.classes = nbtGetList(snbt, "classes")||[];
+            var clickActions = (nbtGetList(snbt, "onClick")||[]);
+            this.onClick = [];
+            for(var c in clickActions as ca) {
+                this.onClick.push(JSON.stringify(ca));
+            }
+            //print(nbtGetList(snbt, "onClick")||[]);
+            this.takeable = snbt.getBoolean("takeable")||false;
+
+
+            var setNbt = nbtCopy(snbt);
+            setNbt.remove("classes");
+            setNbt.remove("onClick");
+            setNbt.remove("takeable");
+            setNbt.remove("display");
+
+            this.nbtstring = setNbt.toJsonString();
+        }
+
 
         return this;
     };
     this.toItemStack = function(w){
         var item = w.createItem(this.id, this.damage, this.count);
-        item.setLore(this.lore.map(function(l){
-            return parseEmotes(ccs(l));
-        }));
+        if(this.nbt) {
+            //item.getNbt().merge(API.stringToNbt(JSON.stringify(this.nbt)));
+        }
+        var newLore = this.lore;
+        item.setLore(newLore);
         if(this.name) {
-            item.setCustomName(parseEmotes(ccs(this.name||"")));
+            item.setCustomName(parseEmotes(ccs(this.name||""), [], false));
         }
         var inbt = item.getNbt();
         inbt.setList("classes", (Java.from(inbt.getList("classes", inbt.getListType("classes")))||[]).concat.apply([], [this.classes]));
@@ -260,8 +351,8 @@ function CustomMenuItem(id, damage=0, count=1) {
 
 
 
-        if(this.nbt) {
-            inbt.merge(API.stringToNbt(JSON.stringify(this.nbt)));
+        if(this.nbtstring) {
+            inbt.merge(API.stringToNbt(this.nbtstring));
         }
         return item;
     };
