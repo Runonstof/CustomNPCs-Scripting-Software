@@ -569,10 +569,10 @@ foreach($args as $key_arg=>$arg) {
 				}
 
 
-
+				/*
 				if($doesMinify) {
 					echo "Minifying \033[33m$v\033[0m...\n";
-					$cRegex = '/\/\/[^\r\n]*/';
+					$cRegex = '/\/\/[^\r\n]*]/';
 
 					$cc = [];
 					preg_match_all($cRegex, $scr, $cc);
@@ -586,7 +586,7 @@ foreach($args as $key_arg=>$arg) {
 
 					//$scr = minify_js($scr);
 
-				}
+				}*/
 				echo "Saving\033[33m $v\033[0m to\033[33m $nf\033[0m...\n";
 				fwrite($newFile, $scr);
 				fclose($newFile);
