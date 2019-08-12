@@ -1,3 +1,5 @@
+import core\mods\noppes\Java.js;
+
 function ENbt(nbtObject) {
     this.nbt = nbtObject; /* INbt */
     this.copy = function() {
@@ -21,8 +23,12 @@ function ENbt(nbtObject) {
     this.toJsonObj = function() { return JSON.parse(this.toJsonString()); }
 }
 
-function nbtCopy(nbt, api) {
-	return api.stringToNbt(nbt.toJsonString());
+function nbtCopy(nbt) {
+	return API.stringToNbt(nbt.toJsonString());
+}
+
+function nbtToObject(nbt) {
+    return nbt.toJsonString().replace(/"([\w:]+?)": (\d)\w/g, '"$1": $2');
 }
 
 function nbtItem(nbt, w) {
@@ -32,7 +38,7 @@ function nbtItem(nbt, w) {
 }
 
 function nbtGetList(nbt, list) {
-    return nbt.has(list) ? nbt.getList(list, nbt.getListType(list)) : null;
+    return (nbt.has(list) ? nbt.getList(list, nbt.getListType(list)) : null);
 }
 
 //Turn String[] with item nbts to IItemStack[]
