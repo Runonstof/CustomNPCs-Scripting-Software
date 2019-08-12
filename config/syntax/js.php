@@ -43,11 +43,14 @@ require($WORKSPACE . "\\bin\\minifier.php");
 
 $GLOBALS['config']['addons'][] = 'fnTweak';
 $GLOBALS['config']['addons'][] = 'forLoopTweak';
-$GLOBALS['config']['addons'][] = [
-	'type'=>'static_class_call',
-	'class'=> 'JShrink\Minifier',
-	'method'=> 'minify'
-];
+if($GLOBALS['config']['minify']) {
+	$GLOBALS['config']['addons'][] = [
+		'type'=>'static_class_call',
+		'class'=> 'JShrink\Minifier',
+		'method'=> 'minify'
+	];
+}
+
 
 
 //$GLOBALS['config']['addons'][] = 'mcp_deobf';
