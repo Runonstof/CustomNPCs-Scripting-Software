@@ -1,4 +1,5 @@
-config/outputDirectories.php
+.gitignore
 build/**
-!build/players/**
 process-palette.json
+config/
+vendor/
