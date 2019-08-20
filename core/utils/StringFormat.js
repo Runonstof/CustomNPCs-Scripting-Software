@@ -1,5 +1,5 @@
-import core\JavaScript\Array.js;
-
+import "core\JavaScript\Array.js";
+import "core\utils\ServerConfigHandler.js";
 var _RAWCOLORS = {
 	'0': 'black',
 	'1': 'dark_blue',
