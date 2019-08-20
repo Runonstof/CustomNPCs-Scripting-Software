@@ -1,11 +1,11 @@
-import core\utils\World.js;
-import core\utils\TellrawFormat.js;
+import "core\utils\World.js";
+import "core\utils\TellrawFormat.js";
+import "core\utils\CSON.js";
+import "core\utils\ErrorHandler.js";
 
-import core\utils\ErrorHandler.js;
+import "core\players\executeCommand.js";
 
-import core\players\executeCommand.js;
-
-import core\xcommandsAPI.js;
+import "core\xcommandsAPI.js";
 
 //
 
@@ -16,12 +16,20 @@ var PLUGIN_LIST = [];
 var PluginAPI = {
     Plugins: {
         get: function(name){
-            for(var i in PLUGIN_LIST as plugin) {
-                if(plugin.id == name) {
-                    return plugin;
+            for(var i in PLUGIN_LIST as _plugin) {
+
+                if(_plugin.id.toString() === name.toString()) {
+                    return _plugin;
                 }
             }
             return null;
+        },
+        list: function(){
+            var ids = [];
+            for(var i in PLUGIN_LIST as plugin) {
+                ids.push(plugin);
+            }
+            return ids;
         }
     },
     DataHandlers: {
@@ -84,7 +92,7 @@ registerXCommands([
     }, 'plugins.list'],
     ['!plugin reload', function(pl, args, data){
         if(reloadPluginsFromDisk()) {
-            tellPlayer(pl, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!".fill({
+            tellPlayer(pl, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins! &2[Plugin List]{run_command:!plugins|show_text:$aClick to see plugins or do $o$a!plugins}&r".fill({
                 "PluginCount": PLUGIN_LIST.length
             }));
         }
@@ -93,10 +101,59 @@ registerXCommands([
 
 
 
+//1 if v1 > v2
+//0 if same
+//-1 if v1 < v2
+function compareVersion(v1, v2, options) {
+    var lexicographical = options && options.lexicographical,
+        zeroExtend = options && options.zeroExtend,
+        v1parts = v1.split('.'),
+        v2parts = v2.split('.');
+
+    function isValidPart(x) {
+        return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
+    }
+
+    if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
+        return NaN;
+    }
+
+    if (zeroExtend) {
+        while (v1parts.length < v2parts.length) v1parts.push("0");
+        while (v2parts.length < v1parts.length) v2parts.push("0");
+    }
+
+    if (!lexicographical) {
+        v1parts = v1parts.map(Number);
+        v2parts = v2parts.map(Number);
+    }
+
+    for (var i = 0; i < v1parts.length; ++i) {
+        if (v2parts.length == i) {
+            return 1;
+        }
+
+        if (v1parts[i] == v2parts[i]) {
+            continue;
+        }
+        else if (v1parts[i] > v2parts[i]) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
+    }
+
+    if (v1parts.length != v2parts.length) {
+        return -1;
+    }
+
+    return 0;
+}
 
 @block init_event
     if(e.player != null) {
-        tellPlayer(e.player, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!".fill({
+        tellPlayer(e.player, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!  &2[Plugin List]{run_command:!plugins|show_text:$aClick to see plugins or do $o$a!plugins}&r".fill({
             "PluginCount": PLUGIN_LIST.length
         }));
         var w = e.player.world;
@@ -232,8 +289,8 @@ function reloadPluginsFromDisk() {
                 //get config file
                 if(pluginFile.getName() == "plugin.json") {
                     try {
-                        loadPlugin = JSON.parse(readFileAsString(pluginFile.getPath()));
-
+                        loadPlugin = cson_parse(readFileAsString(pluginFile.getPath()));
+                        loadPlugin['DIR'] = pluginDir.getPath();
                         //Load JS files
                         for(var lf in loadPlugin.files as lfilename) {
                             var lfilepath = pluginDir.getPath()+"/"+lfilename;
@@ -275,10 +332,41 @@ function reloadPluginsFromDisk() {
     }
 
     for(var i in pluginsToRun as runPlugin) {
-        try {
-            runPlugin.func(runPlugin.plugin.settings||{}, runPlugin.plugin);
-        } catch(exc) {
-            handleError(exc);
+        //Check requirements
+        var canRun = true;
+        var req = (runPlugin.plugin.required||{});
+        var errtxt = "";
+        if(Object.keys(req).length > 0) {
+            for(var reqid in req as minver) {
+                var checkPlugin = PluginAPI.Plugins.get(reqid);
+                if(checkPlugin != null) {
+
+                    if(compareVersion(checkPlugin.version, minver) == -1) {
+                        errtxt += "&cError loading plugin '"+runPlugin.plugin.id+"' &4[Info]{*|show_text:{INFO}}&r\n".fill({
+                            "INFO": ("&cToo low version of plugin '"+reqid+"' installed! Current: &l"+checkPlugin.version+"&r&c Required: &l"+minver).replaceAll("&", "§")
+                        });
+                        canRun = false;
+                    }
+                } else {
+                    errtxt += "&cError loading plugin '"+runPlugin.plugin.id+"' &4[Info]{*|show_text:{INFO}}&r\n".fill({
+                        "INFO": ("&cThis plugin requires &o"+reqid+"&r&c to be installed!").replaceAll("&", "§")
+                    });
+                    canRun = false;
+                }
+            }
+
+
+        }
+
+        if(canRun) {
+            try {
+                //execute plugins
+                runPlugin.func(runPlugin.plugin.settings||{}, runPlugin.plugin);
+            } catch(exc) {
+                handleError(exc);
+            }
+        } else {
+            executeCommandGlobal("/tellraw @a "+strf(errtxt));
         }
     }
 
