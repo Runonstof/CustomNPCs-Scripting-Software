@@ -1,5 +1,5 @@
-import core\utils\TellrawFormat.js;
-
+import "core\utils\TellrawFormat.js";
+import "core\players\executeCommand.js";
 //Send player formatted message
 function tellPlayer(player, rawtext) {
 	return executeCommand(player, "/tellraw "+player.getName()+" "+parseEmotes(strf(rawtext)));
@@ -9,10 +9,9 @@ function tellTarget(player, target, rawtext) {
 	return executeCommand(player, "/tellraw "+target+" "+parseEmotes(strf(rawtext)));
 }
 
-function tellPlayerAction(player, txt) {
-	return executeCommand(player, "/tell")
+function tellPlayerTitle(player, rawtext, type="actionbar", target) {
+	return executeCommand(player, "/title "+(target||player.getName())+" "+type+" "+parseEmotes(strf(rawtext)))
 }
-
 //Send player multiple formatted messages from array
 function storytellPlayer(player, ar) {
 	for(var i in ar as ari) {
