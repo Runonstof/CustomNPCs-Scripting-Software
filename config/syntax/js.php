@@ -7,7 +7,7 @@ $GLOBALS['config']['syntaxRegex'] = [
 		Regex for importing a file, where 1st caputure group is filename (including extension)
 		2nd optional group extra vars in JSON format
 	*/
-	'importFile' => '/import\s+([-\w.\\\*]+\.[a-zA-Z\\*]+)(?:\s+with\s+({[\w:\s\'\",\[\]]*}))?(?:\s+as\s+([\w]+))?;/',
+	'importFile' => '/import\s+(?:"|\')?([-\w.\\\*\/]+\.[a-zA-Z\\*]+)(?:"|\')?(?:\s+with\s+({[\w:\s\'\",\[\]]*}))?(?:\s+as\s+([\w]+))?;/',
 	/*
 		Regex for defining a block code to yield later, where
 		1st capture group is for block name
