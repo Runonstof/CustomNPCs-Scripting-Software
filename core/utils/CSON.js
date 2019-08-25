@@ -2,5 +2,6 @@
 function cson_parse(cson_string) {
     var rgx_comments = /\/(?:\*{2,}\s[\s\S]+?|\*[^\*]+?)\*\/|([\s;])+\/\/.*$/gm;
     var rgx_commas = /,+\s*(\}|\])/g;
-    return JSON.parse(cson_string.replace(rgx_comments, '').replace(rgx_commas, '$1'));
+    //print("CSON::: "+cson_string.replace(rgx_comments, '').replace(rgx_commas, '$1').replace(/[\n\t]/g, ""));
+    return JSON.parse((cson_string.replace(rgx_comments, '').replace(rgx_commas, '$1')));
 }
