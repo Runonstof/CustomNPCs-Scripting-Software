@@ -1,3 +1,4 @@
+import "core\PluginLoader.js";
 //Superfunction (extendable)
 //Used to save function data object.
 function DataHandler(type, name) {
@@ -22,6 +23,10 @@ function DataHandler(type, name) {
 		}
 
 		return ids;
+	};
+
+	this.addData = function(dataObj){
+		this.data = objMerge(this.data, dataObj);
 	};
 
 	this.getAllDataEntries = function(data) {
@@ -107,4 +112,6 @@ function DataHandler(type, name) {
 	this.toJson = function() {
 		return JSON.stringify(this.data);
 	};
+
+	PluginAPI.Players.run(this.type, this);
 }
