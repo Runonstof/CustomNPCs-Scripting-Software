@@ -452,8 +452,8 @@ function getArgParams(arr) {
 	return params;
 }
 
-function executeXCommand(str, player,permcheck=true) {
-	var data = player.world.getStoreddata();
+function executeXCommand(str, player,permcheck=true,data) {
+	var data = data||player.world.getStoreddata();
 	var sb = player.world.getScoreboard();
 	for(var c in _COMMANDS as cmd) {
 		var cmdm = parseUsageRgx(cmd, str);
@@ -693,7 +693,7 @@ function executeXCommand(str, player,permcheck=true) {
 
 @block chat_event
 	if(e.message.substr(0, 1) == '!' && !e.isCanceled()) {
-		executeXCommand(e.message, e.player);
+		executeXCommand(e.message, e.player, true, getDiskHandler());
 		e.setCanceled(true);
 		return true;
 	}
