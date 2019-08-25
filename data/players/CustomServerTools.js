@@ -1,23 +1,23 @@
-import core\utils\*.js;
-import core\math.js;
-import core\functions.js;
-import core\mods\noppes\*.js;
-import core\mods\minecraft\*.js;
-import core\players\chatEmotes.js;
-import core\players\executeCommand.js;
-import core\players\tell.js;
-import core\players\bots\*.js;
+import "core/utils/*.js";
+import "core/math.js";
+import "core/functions.js";
+import "core/mods/noppes/*.js";
+import "core/mods/minecraft/*.js";
+import "core/players/chatEmotes.js";
+import "core/players/executeCommand.js";
+import "core/players/tell.js";
+import "core/players/bots/*.js";
 
-import core\xcommandsAPI.js;
-import core\datahandlers\*.js;
-import core\commands\*.js;
+import "core/xcommandsAPI.js";
+import "core/datahandlers/*.js";
+import "core/commands/*.js";
 
-import core\players\moreEvents.js;
-import core\players\chat\bots\*.js;
-import packages\CompatSkills\compatskills.js;
+import "core/players/moreEvents.js";
+import "core/players/chat/bots/*.js";
+import "packages/CompatSkills/compatskills.js";
 
-import core\PluginLoader.js;
-import core\CustomEnchantsLoader.js;
+import "core/PluginLoader.js";
+import "core/CustomEnchantsLoader.js";
 
 //
 
