@@ -10,7 +10,7 @@ import "core\xcommandsAPI.js";
 //
 
 //Initialize PLugin Folder
-var PLUGIN_FOLDER = CONFIG_SERVER.PLUGIN_FOLDER||"CST_plugins";
+var PLUGIN_FOLDER = CONFIG_SERVER.PLUGIN_FOLDER||"CustomServerTools/plugins";
 var PLUGIN_LIST = [];
 
 var PluginAPI = {
@@ -270,15 +270,16 @@ reloadPluginsFromDisk();
 function reloadPluginsFromDisk() {
     PLUGIN_LIST = [];
     PluginAPI.Players.hookFns = {};
-    var pluginFolder = new File(PLUGIN_FOLDER);
-    if(!pluginFolder.exists()) {
-        pluginFolder.mkdir();
+
+    if(!(new File(PLUGIN_FOLDER).exists())) {
+        mkPath(PLUGIN_FOLDER);
     }
 
 
 
+
     //Load plugins
-    var pluginDirs = pluginFolder.listFiles();
+    var pluginDirs = new File(PLUGIN_FOLDER).listFiles();
     var pluginsToRun = [];
     //Loop plugin directories
     for(var p in pluginDirs as pluginDir) {
