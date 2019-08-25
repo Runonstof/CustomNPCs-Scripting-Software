@@ -4,6 +4,22 @@ var Paths = Java.type("java.nio.file.Paths");
 var CHARSET_UTF_8 = Java.type("java.nio.charset.StandardCharsets").UTF_8;
 
 
+function mkPath(path) {
+	var expath = path.split("/");
+	var curpath = "";
+	for(var ex in expath as expt) {
+		curpath += (curpath == "" ? "" : "/")+expt;
+		var pfile = new File(curpath);
+		if(!pfile.exists()) {
+			if(expt.match(/[\w]+\.[\w]+/) === null) { //is dir?
+				pfile.mkdir();
+			} else {
+				pfile.createNewFile();
+			}
+		}
+	}
+}
+
 function readDir(dirPath){
 	var res = [];
 	var files = new File(dirPath).listFiles();
@@ -16,7 +32,10 @@ function readDir(dirPath){
 	return res;
 }
 
-function readFileAsString(filePath) { return Java.from( readFile(filePath) ).join("\n").replace(/\t/g, "  "); }
+function readFileAsString(filePath) {
+	return Java.from( readFile(filePath) ).join("\n").replace(/\t/g, "  ");
+}
+
 
 function readFile(filePath){
 	var path = Paths.get(filePath);
