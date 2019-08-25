@@ -129,3 +129,11 @@ function occurrences(string, subString, allowOverlapping=false, caseSensitive=tr
     }
     return n;
 }
+
+function stringIsNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+function stringIsBool(n) {
+	return (['true', 'false'].indexOf(n.toLowerCase()) > -1);
+}
