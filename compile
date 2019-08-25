@@ -434,7 +434,7 @@ function getIgnited($filepath, &$imported) {
 			}
 
 
-			$ignPath = __DIR__ . '\\' . $subIgnPath;
+			$ignPath = __DIR__ . '\\' . str_replace("/", "\\", $subIgnPath);
 			$addIgn = '';
 
 			foreach(glob($ignPath) as $gIgnPath) {
