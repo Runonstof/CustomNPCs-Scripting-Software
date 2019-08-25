@@ -49,6 +49,10 @@ if($GLOBALS['config']['minify']) {
 		'class'=> 'JShrink\Minifier',
 		'method'=> 'minify'
 	];
+	$GLOBALS['config']['addons'][] = function($script){
+		return $script;//preg_replace('/\/(?:\*{2,}\s[\s\S]+?|\*[^\*]+?)\*\/|\/\/.*$/', '', $script);
+	};
+
 }
 
 
