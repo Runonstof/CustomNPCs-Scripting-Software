@@ -1,9 +1,9 @@
 registerDataHandler("mail", Mail);
 function Mail(name) {
-	this.data = {
+	this.addData({
 		"from": null,
 		"to": [],
 		"title": "",
 		"message": ""
-	};
+	});
 }

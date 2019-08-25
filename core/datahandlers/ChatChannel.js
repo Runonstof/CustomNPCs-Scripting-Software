@@ -3,12 +3,12 @@ function ChatChannel(name) {
 	DataHandler.apply(this, ['chatchannel', name]);
 	extends function Permittable; //add getPermission etc
 
-	this.data = {
+	this.addData({
 		"displayName": name,
 		"players": [],
 		"color": "blue",
 		"desc": "",
-	};
+	});
 	this.addPlayers = function(players){
 		for(var p in players as player) {
 			this.data.players.push(player);

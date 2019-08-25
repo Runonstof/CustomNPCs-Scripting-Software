@@ -5,7 +5,7 @@ function Region(name) {
 	Permittable.apply(this, ['regions']); //Uses custom permission domain 'regions'
 
 
-	this.data = {
+	this.addData({
 		"displayName": this.name,
 		"positions": [],
 		"owner": null,//
@@ -23,7 +23,7 @@ function Region(name) {
 		"allBuild": false,
 		"allAttack": false,
 		"trusted": [],//
-	};
+	});
 
 	/*String player, IScoreboard sb, IData data*/
 	this.can = function(player, sb, data, action=null) {

@@ -2,13 +2,13 @@ registerDataHandler("permission", Permission);
 function Permission(name) {
 	DataHandler.apply(this, ['permission', name]);
 
-	this.data = {
+	this.addData({
 		"enabled": true,
 		"teams": CONFIG_SERVER.DEFAULT_PERM_TEAMS,
 		"players": [],
 		"jobs": [],
 		"meta": {}
-	};
+	});
 
 	this.addTeams = function(teams) {
 		if(typeof(teams) == 'string') { teams = [teams]; }
@@ -84,13 +84,15 @@ function Permission(name) {
 		if(this.data.players.indexOf(player) != -1) {
 			permitted = true;
 		}
+
 		//Check jobs
+		/*
 		var pjobs = p.getJobs(data);
 		for(var p in pjobs as pjob) {
 			if(this.data.jobs.indexOf(pjob.name) != -1) {
 				permitted = true;
 			}
-		}
+		}*/
 
 		//Check parents
 		var ppar = getParentPerms(this.name||"", data);

@@ -1,7 +1,7 @@
 registerDataHandler("job", Job);
 function Job(name) {
 	DataHandler.apply(this, ['job', name]);
-	this.data = {
+	this.addData({
 		"displayName": name,
 		"pay": getCoinAmount('5g'),
 		"payTime": getStringTime('20min'),
@@ -9,7 +9,7 @@ function Job(name) {
 		"capacity": 10,
 		"fireTime": getStringTime('1w'),
 		"companyId": null
-	};
+	});
 
 	this.getPlayers = function(data) {
 		var pl = [];

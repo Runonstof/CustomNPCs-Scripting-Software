@@ -3,14 +3,14 @@ registerDataHandler("giftcode", GiftCode);
 function GiftCode(name) {
 	DataHandler.apply(this, ['giftcode', name]);
 	Permittable.apply(this, ['giftcodes']);
-	this.data = {
+	this.addData({
 		"code": "",
         "uses": 0,
         "items": [],
 		"money": 0,
 		"emotes": [],
 		"players": [], //redeemed players
-	};
+	});
 
 	this.onCreate(function(self, data){
 		var perm = self.getPermission();

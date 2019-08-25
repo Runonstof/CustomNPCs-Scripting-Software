@@ -4,9 +4,9 @@ registerDataHandler("player", Player);
 function Player(name) {
 	DataHandler.apply(this, ['player', name]);
 
-	this.data = {
+	this.addData({
 		"lastPayed": 0,
-		"pay": CONFIG_SERVER.DEFAULT_PAY,
+		"pay": 0,
 		"payTime": getStringTime('20min'),
 		"maxJobs": 2,
 		"maxHomes": 2,
@@ -24,12 +24,9 @@ function Player(name) {
 		"lastLogin": 0,
 		"color": null,
 		"UUID": null,
-		"money": CONFIG_SERVER.DEFAULT_MONEY,
-	};
-	if(PluginAPI) {
-		PluginAPI.DataHandlers.run("player", this);
-	}
-
+		"money": 0,
+	});
+	
 
 	for(var v in VIRTUAL_CURRENCIES as crncy) {
 		this.data[crncy.name] = crncy.default||0;

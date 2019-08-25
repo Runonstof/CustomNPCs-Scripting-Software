@@ -9,12 +9,12 @@ function Warp(name) {
 		perm.save(data);
 	});
 
-	this.data = {
+	this.addData({
 		"pos": {
 			"x": null,
 			"y": null,
 			"z": null,
 		},
 		"price": 0,
-	};
+	});
 }
