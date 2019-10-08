@@ -1,4 +1,4 @@
-import core\utils\StringFormat.js;
+import "core/utils/StringFormat.js";
 
 function strf(str, toRaw=true, allowed=null) {
 	return strrawformat(str, toRaw, allowed);
@@ -156,7 +156,15 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
 	return txt;
 }
 
-
+/**
+ * 
+ * @param {Number} value Current value
+ * @param {Number} max Maximum value
+ * @param {Number} length Character length
+ * @param {String||"|"} progChar Progressbar character
+ * @param {String} fillColor Filled color code "&a"
+ * @param {String} leftColor Filles color code "&c"
+ */
 function progressBar(value, max, length, progChar=null, fillColor="&a", leftColor="&c"){
 	var skillBar = '&r&l[&r';
 	var progress = Math.floor((value/max)*length);

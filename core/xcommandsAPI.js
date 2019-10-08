@@ -1,9 +1,10 @@
-//To-Do: Comment this file
-import core\DataHandler.js;
-import core\utils\DataList.js;
-
 var _COMMANDS = [];
 var _DATAHANDLERS = {};
+//To-Do: Comment this file
+import "core/DataHandler.js";
+import "core/utils/DataList.js";
+
+
 
 function queryDataHandlers(qry) {
 

@@ -1,11 +1,11 @@
-import core\noppes\*.js;
-import core\utils\Romanize.js;
-import core\deobf\*.js;
+import "core/noppes/*.js";
+import "core/utils/Romanize.js";
+import "core/deobf/*.js";
 
 var _ENCHANTS = [];
 var CSTENCH_TAG = "CSTEnch";
 
-import core\enchants\*.js;
+import "core\enchants\*.js";
 
 function getCSTEnchantByName(name_id) {
     for(var i in _ENCHANTS as ench) {

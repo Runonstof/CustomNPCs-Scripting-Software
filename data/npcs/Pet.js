@@ -1,6 +1,6 @@
-import core\deobf\*.js;
-import core\math.js;
-import core\utils\World.js;
+import "core\deobf\*.js";
+import "core\math.js";
+import "core\utils\World.js";
 
 
 //FLY SETTINGS

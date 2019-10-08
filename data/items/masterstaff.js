@@ -1,9 +1,9 @@
-import core\functions.js;
-import core\players\executeCommand.js;
-import core\players\tell.js;
-import core\players\xcommands.js;
-import core\players\commands\*.js;
-import mods\compatskills.js;
+import "core\functions.js";
+import "core\players\executeCommand.js";
+import "core\players\tell.js";
+import "core\players\xcommands.js";
+import "core\players\commands\*.js";
+import "mods\compatskills.js";
 
 var staff_items = [
 	'variedcommodities:wooden_staff',

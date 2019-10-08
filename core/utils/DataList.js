@@ -1,3 +1,16 @@
+
+/**
+ * 
+ * @param {Array} items Items to show
+ * @param {Array} matches (Default: [])Matches to filter on
+ * @param {Number} showLen (Default: 10)Items to show per page
+ * @param {Number} curPage (Default: 1)Current page to output
+ * @param {String} navCmd Base command to generate new navigation commands on
+ * @param {Function} listingFn (item, index) Function that returns string as one item in list (line break needed)
+ * @param {Function} sortFn Function to sort items
+ * @param {Function} compareFn (item,matches)Custom Function to check if item is allowed in list
+ * @param {Enum("ASC", "DESC")} sortDesc (Default: ASC)Desc will reverse the items after sorting
+ */
 function genDataPageList(items, matches=[], showLen=10, curPage=1, navCmd=null, listingFn=null, sortFn=null, compareFn=null, sortDesc=false) {
 
 
@@ -57,7 +70,8 @@ function genDataPageList(items, matches=[], showLen=10, curPage=1, navCmd=null, 
         return navCmd.fill({
             "MATCHES": matches.join(" ")+" "+arrayFormat(excludes, "*{VALUE}"),
             "PAGE": _page,
-            "SHOWLEN": _showLen,
+            "SHOWLEN": _showLen, //Backwards compatability for some plugins
+            "SHOW": _showLen, //New change
             "SORT": (_sort ? "desc" : "asc")
         });
     }

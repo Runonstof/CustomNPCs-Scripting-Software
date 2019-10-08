@@ -1,6 +1,6 @@
-import core\xcommandsAPI.js;
+import "core\xcommandsAPI.js";
 
-import core\datahandlers\Badge.js;
+import "core\datahandlers\Badge.js";
 
 //
 

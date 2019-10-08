@@ -7,7 +7,8 @@ var CHARSET_UTF_8 = Java.type("java.nio.charset.StandardCharsets").UTF_8;
 function mkPath(path) {
 	var expath = path.split("/");
 	var curpath = "";
-	for(var ex in expath as expt) {
+	for(var ex in expath) {
+		var expt = expath[ex];
 		curpath += (curpath == "" ? "" : "/")+expt;
 		var pfile = new File(curpath);
 		if(!pfile.exists()) {

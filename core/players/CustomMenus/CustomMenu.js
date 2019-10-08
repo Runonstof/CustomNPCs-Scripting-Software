@@ -1,12 +1,12 @@
-import core\mods\noppes\Java.js;
+import "core\mods\noppes\Java.js";
 
-import core\mods\noppes\INbt.js;
+import "core\mods\noppes\INbt.js";
 
-import core\players\executeCommand.js;
+import "core\players\executeCommand.js";
 
-import core\xcommandsAPI.js;
+import "core\xcommandsAPI.js";
 
-import core\utils\FileUtils.js;
+import "core\utils\FileUtils.js";
 
 var MENU_TIMER_ID = 420;
 var MENU_TIMER_PAYLOAD = null;

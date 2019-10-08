@@ -1,5 +1,5 @@
 #template Npc data\npcs;
-import core\npcs\moreEvents.js;
+import "core\npcs\moreEvents.js";
 
 function init(e){
 	yield init_event;

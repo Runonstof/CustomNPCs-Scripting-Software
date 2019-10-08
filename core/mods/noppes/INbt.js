@@ -1,4 +1,4 @@
-import core\mods\noppes\Java.js;
+import "core\mods\noppes\Java.js";
 
 function ENbt(nbtObject) {
     this.nbt = nbtObject; /* INbt */
@@ -53,4 +53,8 @@ function nbtItemArr(nbtArr, w) {
 
 function isNbtEqual(nbt, otherNbt) {
     return nbt.toJsonString() == otherNbt.toJsonString();
+}
+
+function nbtHasSameData(nbt, onbt) {
+    //TODO:compare keys of nbt
 }

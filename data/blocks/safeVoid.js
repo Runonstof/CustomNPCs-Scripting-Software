@@ -1,5 +1,5 @@
-import core\blocks\blockTextured.js;
-import core\blocks\blockConfigurable.js;
+import "core\blocks\blockTextured.js";
+import "core\blocks\blockConfigurable.js";
 
 function init(e){
 	var config = {

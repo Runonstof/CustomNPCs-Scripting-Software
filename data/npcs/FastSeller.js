@@ -1,9 +1,9 @@
 {%set SERVER_CONFIG=gramados%}
 
-import core\config\%SERVER_CONFIG%\*.js;
-import core\npcs\moreEvents.js;
-import core\functions.js;
-import core\players\commands\utilCommands.js;
+import "core\config\%SERVER_CONFIG%\*.js";
+import "core\npcs\moreEvents.js";
+import "core\functions.js";
+import "core\players\commands\utilCommands.js";
 
 function init(e){
 	yield init_event;

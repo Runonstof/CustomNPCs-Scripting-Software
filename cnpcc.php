@@ -1,4 +1,6 @@
 <?php
+
+debugClear();
 /*
 Created By: Runonstof
 
@@ -88,6 +90,8 @@ Regex101.com is a great tool.
 
 */
 
+//print_r($argv);
+
 require(__DIR__ . '\vendor\autoload.php');
 require(__DIR__ . '\bin\functions.php');
 
@@ -101,6 +105,7 @@ $GLOBALS['config'] = [
 	'outputName' => '{FileName}.min.{FileExt}', //Name of merged file
 	'minify' => false, //If the merged script is minified or not (Written for JS (Minify config per syntax soon) removes whitespace, newlines and comments, but requires a strict syntax)
 	'compileOutput' => false,
+	'buildDirs' => [],
 	'debugMode' => false,
 	'syntaxRegex' => null,
 	/*What variables default to is they do not exists
@@ -203,7 +208,9 @@ $arg_opts = [
 	},*/
 	'-x' => function(){exit;},
 	'-w' => function($argv, $i, $arg) {
+		echo ">>>>>>>$arg\n";
 		$vars = substr($arg, 3, strlen($arg)-3);
+		
 		$varsReg = '/(?:([%\w]+)=([:%$.\/*+\-\/\w]+))*/';
 		$fileOptReg = '/(?:\$([\w]+)\$=([:{}%$.\/*+\-\w\\\]+))*/';
 		$allowedOptions = [
@@ -218,6 +225,7 @@ $arg_opts = [
 				foreach($f[1] as $fi=>$key) {
 					$val = $f[2][$fi];
 					if(indexOf($allowedOptions, $key) != -1) {
+						echo "$key\n";
 						$GLOBALS['config'][$key] = $val;
 					}
 
@@ -265,7 +273,7 @@ if(count($argv) == 1) {
 }
 
 //Add arg profiles
-/*
+
 $profiles = &$GLOBALS['config']['profiles'];
 foreach($profiles as $k=>$profile) {//Loop profiles
 	if(indexOf($argv, '@'.$k) != -1) {//Has current profile in argument
@@ -290,13 +298,13 @@ foreach($profiles as $k=>$profile) {//Loop profiles
 				$co = 'php '.basename(__FILE__) . ' ' . implode(' ', $pfile) . (count($ao) > 0 ? ' '.implode(' ', $ao) : '');
 				//echo "$co\n";
 				$oo = shell_exec($co);
-				echo $oo; //Echo command output
+				echo $oo; //echo command output
 
 			}
 		}
 	}
 }
-*/
+
 //Handle Arguments
 foreach($arg_opts as $a=>$o) {
 	foreach($argv as $i=>$arg) {
@@ -334,7 +342,7 @@ function getTabs($j, $filler="\t", $filler_last=null) {
 	return $t;
 }
 
-function getBlocks($scr) {
+function getBlocks($scr, $fileName) {
 	$syn = &$GLOBALS['config']['syntaxRegex'];
 	$getBlockRegex = $syn['defineBlock'];
 	$bMatches = [];
@@ -350,12 +358,12 @@ function getBlocks($scr) {
 
 		if(!isset($GLOBALS['blocks'][$blockname])) {
 			$GLOBALS['blocks'][$blockname] = [
-				"yieldcode" => "",
+				"yieldcode" => ""
 			];
 		}
 
 		$block = &$GLOBALS['blocks'][$blockname];
-
+		
 		$block['yieldcode'] .= $blockcontents;
 		$scr = str_replace($blockcode, "", $scr);
 
@@ -400,9 +408,18 @@ function getIgnited($filepath, &$imported) {
 		$ov = [];
 		$oVarPattern = $syn['optionalVar'];
 		preg_match_all($oVarPattern, $ifilescript, $ov);
+		//debug(print_r($ov,true));
+		
 		foreach($ov[0] as $i=>$optvar) {
-
-			$newvar = (isset($GLOBALS['vars'][$ov[1][$i]]) ? $GLOBALS['vars'][$ov[1][$i]] : $ov[2][$i]);
+			$useVar = isset($GLOBALS['vars'][$ov[1][$i]]);
+			$newvar = ($useVar ? $GLOBALS['vars'][$ov[1][$i]] : $ov[2][$i]);
+			//debug(print_r($newvar,true));
+			if(is_string($newvar) && $useVar) {
+				$newvar = '"'.$newvar.'"';
+			}
+			if(is_array($newvar)) {
+				$newvar = json_encode($newvar, JSON_PRETTY_PRINT);
+			}
 
 			$ifilescript = str_replace($optvar, $newvar, $ifilescript);
 
@@ -418,16 +435,17 @@ function getIgnited($filepath, &$imported) {
 		//Handle Imports
 		//$importCode = "";
 		foreach($im[1] as $i=>$subIgnPath) {//Loop all Imports
-			if($GLOBALS['config']['compileOutput']) {
-				echo getTabs($tabIndex, "\t", "|-------")."Importing " . $subIgnPath . "...\n";
+			if($GLOBALS['config']['debugMode']) {
+				echo "IMPORT $subIgnPath {$im[2][$i]}\n";
 			}
 			if($im[2][$i] != '') {//With vars
+				echo "DECODING\n";
 				$withVars = json_decode($im[2][$i]);
-				if(!is_null($withVars)) {
-					foreach($withVars as $w=>$v) {
-						$GLOBALS['vars'][$w] = $v;
-					}
+				foreach($withVars as $w=>$v) {
+					echo "NEW WITH VAR: $w => ".print_r($v,true)."\n";
+					$GLOBALS['vars'][$w] = $v;
 				}
+			
 			}
 			if($im[3][$i] != '') {//As var WIP
 
@@ -440,17 +458,23 @@ function getIgnited($filepath, &$imported) {
 			foreach(glob($ignPath) as $gIgnPath) {
 				if(!in_array($gIgnPath, $imported)) {
 					array_push($imported, $gIgnPath);
+
+					if($GLOBALS['config']['debugMode']) {
+						echo "Imported file \033[33m".$subIgnPath."\033[0m\n";
+					}
+
 					$importContent = getIgnited($gIgnPath, $imported);
 
-					$importContent = getBlocks($importContent);
+					$importContent = getBlocks($importContent, $gIgnPath);
 
 
 					$addIgn .= $importContent;
 
 
-				} else {
+
+				}/* elseif($GLOBALS['config']['debugMode']) {
 					echo "Skipped import of file \033[33m".$gIgnPath."\033[0m in file \033[33m".$filepath."\033[0m.\n";
-				}
+				}*/
 
 
 
@@ -526,7 +550,7 @@ foreach($args as $key_arg=>$arg) {
 			//Loop output dirs
 			foreach($odirs as $io=>$iodir) {
 				$nf = $iodir . '\\' . $outputDirs . $newName;
-
+				//echo "!!!$outputDirs\n";
 				$imported = [
 					$curpath
 				];
@@ -590,6 +614,11 @@ foreach($args as $key_arg=>$arg) {
 				echo "Saving\033[33m $v\033[0m to\033[33m $nf\033[0m...\n";
 				fwrite($newFile, $scr);
 				fclose($newFile);
+				foreach($GLOBALS['config']['buildDirs'] as $buildDir) {
+					$buildf = $buildDir . '\\' . $outputDirs . $newName;
+					echo "Copying\033[33m $v\033[0m to\033[33m $buildf\033[0m\n";
+					copy($nf, $buildf);
+				}
 				//echo json_encode($GLOBALS['blocks']);
 				//echo json_encode($imported);
 			}
@@ -663,5 +692,15 @@ function getClosing($str, $open='(', $close=')', $delimeter='|', $include_tags=f
 	return $ss;
 }
 
+
+function debugClear() {
+	$debugFilePath = __DIR__ . "\\debug.txt";
+	file_put_contents($debugFilePath, "");
+}
+
+function debug($str) {
+	$debugFilePath = __DIR__ . "\\debug.txt";
+	file_put_contents($debugFilePath, (file_get_contents($debugFilePath)??"").$str."\n");
+}
 
 ?>

@@ -1,4 +1,4 @@
-import core\mods\noppes\Java.js;
+import "core\mods\noppes\Java.js";
 
 function clonePlayerAsNpc(player) {
     var npc = API.createNPC(player.world.getMCWorld());

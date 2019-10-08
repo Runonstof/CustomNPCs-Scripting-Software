@@ -1,4 +1,4 @@
-import "core\PluginLoader.js";
+import "core/PluginLoader.js";
 //Superfunction (extendable)
 //Used to save function data object.
 function DataHandler(type, name) {
@@ -113,5 +113,5 @@ function DataHandler(type, name) {
 		return JSON.stringify(this.data);
 	};
 
-	PluginAPI.Players.run(this.type, this);
+	PluginAPI.DataHandlers.run(this.type, this);
 }

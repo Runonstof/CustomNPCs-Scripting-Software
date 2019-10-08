@@ -1,6 +1,6 @@
-import core\xcommandsAPI.js;
-import core\cutils\DataList.js;
-import core\utils\MCHeads.js;
+import "core\xcommandsAPI.js";
+import "core\cutils\DataList.js";
+import "core\utils\MCHeads.js";
 
 //
 

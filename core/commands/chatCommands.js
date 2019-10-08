@@ -1,4 +1,4 @@
-import core\utils\StringFormat.js;
+import "core\utils\StringFormat.js";
 
 //
 

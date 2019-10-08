@@ -15,6 +15,13 @@ function getPosAngle(x1, y1, x2, y2) {
 	return Math.atan2(y2-y1, x2-x1) *(180/Math.PI);
 }
 
+function roundByNum(num, rounder, mode) {
+	var m = 1/(rounder||1);
+	var mode = mode||"round";
+
+	return Math[mode](num*m)/m;
+}
+
 
 function sign(num=0) {
 	if(num > 0) { return 1; }

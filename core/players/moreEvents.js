@@ -34,3 +34,19 @@
 		}
 	})(e);
 @endblock
+
+
+@block init_event
+	(function(e){
+		var w = e.player.world;
+		var wdata = w.storeddata;
+		var plkey = "player_"+e.player.getUUID();
+		if(!wdata.has(plkey)) {
+			if(typeof firstLogin === 'function') {
+				firstLogin(e);
+			}
+			wdata.put(plkey);
+		}
+	})(e);
+@endblock
+

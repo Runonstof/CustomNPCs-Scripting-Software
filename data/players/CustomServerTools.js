@@ -1,3 +1,5 @@
+import "core/xcommandsAPI.js";
+
 import "core/utils/*.js";
 import "core/math.js";
 import "core/functions.js";
@@ -8,7 +10,6 @@ import "core/players/executeCommand.js";
 import "core/players/tell.js";
 import "core/players/bots/*.js";
 
-import "core/xcommandsAPI.js";
 import "core/datahandlers/*.js";
 import "core/commands/*.js";
 

@@ -1,5 +1,5 @@
-import core\mods\noppes\Java.js;
-import core\utils\TellrawFormat.js;
+import "core\mods\noppes\Java.js";
+import "core\utils\TellrawFormat.js";
 
 //
 function worldOut(str) {

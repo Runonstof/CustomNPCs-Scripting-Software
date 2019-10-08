@@ -1,7 +1,7 @@
-import core\players\commands\menuCommands.js;
-import core\players\commands\playerCommands.js;
-import core\functions.js;
-import core\config\minerim\chatEmotes.js;
+import "core\players\commands\menuCommands.js";
+import "core\players\commands\playerCommands.js";
+import "core\functions.js";
+import "core\config\minerim\chatEmotes.js";
 
 @block init_event
     if(config)

@@ -1,0 +1,16 @@
+{
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    "eslint.enable": false,
+    "problems.decorations.enabled": false,
+    "outline.problems.badges": false,
+    "outline.problems.colors": false,
+    "outline.problems.enabled": false,
+	"javascript.validate.enable": false,
+    "typescript.format.insertSpaceAfterCommaDelimiter": false,
+    "typescript.autoClosingTags": false,
+    "typescript.format.enable": false,
+    "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "typescript.format.insertSpaceAfterSemicolonInForStatements": false,
+    "javascript.suggest.autoImports": false
+}

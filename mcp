@@ -3,6 +3,19 @@ require_once(__DIR__ . '\bin\functions.php');
 
 $matches = array_take($argv, 1, count($argv));
 
+$params = [];
+
+
+foreach($matches as $match) {
+	$m = [];
+	if(preg_match('/\-([\w\-]+)(?::([\w\-]+))?/', $match, $m) !== false) {
+		if(count($m) > 0) {
+			$params[$m[1]] = isset($m[2]) ? $m[2] : true;
+		}
+	}
+}
+
+
 $files = [
 	"fields.csv",
 	"methods.csv",
@@ -21,10 +34,17 @@ foreach($files as $file) {
 		$f = explode(",", $field);
 		if(isset($f[0], $f[1])) {
 			foreach($matches as $match) {
-				if(strpos($f[1], $match) !== false) {
-					echo str_pad($f[1], 30).": ".$f[0]."\n";
-					$show++;
+				if(!($params['i']??false)) {
+					if(strpos($f[1], $match) !== false) {
+						echo str_pad($f[1], 30).": ".$f[0]."\n";
+						$show++;
+					}
+				} else {
+					if(strpos($f[0], $match) !== false) {
+						echo str_pad($f[0], 30).": ".$f[1]."\n";
+					}
 				}
+				
 			}
 		}
 	}

@@ -1,0 +1,27 @@
+{
+  "name": "customnpcs-scripting-software",
+  "version": "1.0.0",
+  "description": "Script for Custom NPCs 1.12.2",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Runonstof/CustomNPCs-Scripting-Software.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Runonstof/CustomNPCs-Scripting-Software/issues"
+  },
+  "homepage": "https://github.com/Runonstof/CustomNPCs-Scripting-Software#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.6.2",
+    "@babel/core": "^7.6.2",
+    "@babel/preset-env": "^7.6.2"
+  }
+}

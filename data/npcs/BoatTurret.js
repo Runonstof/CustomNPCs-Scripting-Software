@@ -1,12 +1,12 @@
-import core\functions.js;
+import "core\functions.js";
 
-import core\math.js;
+import "core\math.js";
 
-import core\mods\noppes\Java.js;
+import "core\mods\noppes\Java.js";
 
-import core\mods\noppes\IPos.js;
+import "core\mods\noppes\IPos.js";
 
-import core\players\executeCommand.js;
+import "core\players\executeCommand.js";
 
 var NPC_TYPE = "MINIGAME_BOAT_TURRET";
 

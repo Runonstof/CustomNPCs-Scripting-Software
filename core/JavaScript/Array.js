@@ -46,10 +46,6 @@ function removeFromArrayByKey(arr, keys) {
 	return narr;
 }
 
-function inArray(a, val) {
-	for(var k in a) { if(a[k] === val) { return true; } }
-	return false
-}
 
 function array_merge(a1, a2) {
 	var bb = [];

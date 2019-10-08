@@ -1,5 +1,5 @@
 #template Player data\players;
-import core\players\moreEvents.js;
+import "core\players\moreEvents.js";
 
 function init(e) {
 	yield init_event;

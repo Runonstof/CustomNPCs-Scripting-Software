@@ -1,11 +1,13 @@
-import "core\utils\World.js";
-import "core\utils\TellrawFormat.js";
-import "core\utils\CSON.js";
-import "core\utils\ErrorHandler.js";
+import "core/xcommandsAPI.js";
+import "core/datahandlers/Permission.js";
+import "core/utils/World.js";
+import "core/utils/TellrawFormat.js";
+import "core/utils/CSON.js";
+import "core/utils/ErrorHandler.js";
 
-import "core\players\executeCommand.js";
+import "core/players/executeCommand.js";
 
-import "core\xcommandsAPI.js";
+
 
 //
 
@@ -30,7 +32,14 @@ var PluginAPI = {
                 ids.push(plugin);
             }
             return ids;
-        }
+        },
+        export: function(key, value){
+            PluginAPI._exports[key] = value;
+        },
+        import: function(key){
+            return PluginAPI._exports[key];
+        },
+        _exports: {},
     },
     DataHandlers: {
         implement: function(datahandlername, implementationFunc) {
@@ -153,6 +162,9 @@ function compareVersion(v1, v2, options) {
 
 @block init_event
     if(e.player != null) {
+        
+        reloadPluginsFromDisk();
+
         tellPlayer(e.player, "&r[&eCSTPluginLoader{*|show_text:$eCustomServerTools PluginLoader}&r] &aLoaded &c{PluginCount} &aplugins!  &2[Plugin List]{run_command:!plugins|show_text:$aClick to see plugins or do $o$a!plugins}&r".fill({
             "PluginCount": PLUGIN_LIST.length
         }));
@@ -264,8 +276,6 @@ function compareVersion(v1, v2, options) {
 
 
 
-
-reloadPluginsFromDisk();
 
 function reloadPluginsFromDisk() {
     PLUGIN_LIST = [];

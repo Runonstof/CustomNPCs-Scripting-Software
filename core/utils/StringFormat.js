@@ -1,5 +1,5 @@
-import "core\JavaScript\Array.js";
-import "core\utils\ServerConfigHandler.js";
+import "core/JavaScript/Array.js";
+import "core/utils/ServerConfigHandler.js";
 var _RAWCOLORS = {
 	'0': 'black',
 	'1': 'dark_blue',
@@ -78,9 +78,10 @@ function escCcs(str, esc_formats=null) {
 
 function parseEmotes(str, allwd=[], replaceOld=true) {
 	if(replaceOld) {
-		str = str.replaceAll(objArray(CHAT_EMOTES), '');
+		str = str.replaceAll(Object.values(CHAT_EMOTES), '');
 	}
-	for(var ce in CHAT_EMOTES as chatemote) {
+	for(var ce in CHAT_EMOTES) {
+		var chatemote = CHAT_EMOTES[ce];
     	if(allwd.length == 0  || allwd.indexOf(ce) > -1) {
 		    str = str.replaceAll(':'+ce+':', chatemote);
 		    str = str.replaceAll(':/'+ce+'/:', ':'+ce+':');

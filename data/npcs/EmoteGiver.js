@@ -1,13 +1,13 @@
 {%set SERVER_CONFIG=gramados%}
 
-import core\config\%SERVER_CONFIG%\*.js;
-import core\config\*.js;
-import core\npcs\makeInvulnerable.js;
-import core\players\chatEmotes.js;
-import core\players\executeCommand.js;
-import core\players\tell.js;
-import core\functions.js;
-import core\players\xcommands.js;
+import "core\config\%SERVER_CONFIG%\*.js";
+import "core\config\*.js";
+import "core\npcs\makeInvulnerable.js";
+import "core\players\chatEmotes.js";
+import "core\players\executeCommand.js";
+import "core\players\tell.js";
+import "core\functions.js";
+import "core\players\xcommands.js";
 
 
 

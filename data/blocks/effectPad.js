@@ -1,6 +1,6 @@
-import core\blocks\blockTextured.js;
-import core\blocks\blockConfigurable.js;
-import core\players\commands\menuCommands.js;
+import "core\blocks\blockTextured.js";
+import "core\blocks\blockConfigurable.js";
+import "core\players\commands\menuCommands.js";
 
 function init(e){
 	var config = {

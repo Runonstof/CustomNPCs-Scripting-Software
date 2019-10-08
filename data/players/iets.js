@@ -1,3 +1,3 @@
-import core\utils\*.js;
+import "core\utils\*.js";
 
 //code van iets

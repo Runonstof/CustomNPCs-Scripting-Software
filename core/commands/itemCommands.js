@@ -1,5 +1,5 @@
-import core\utils\DataList.js;
-import core\CustomEnchantsLoader.js;
+import "core\utils\DataList.js";
+import "core\CustomEnchantsLoader.js";
 //
 
 @block register_commands_event

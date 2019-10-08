@@ -1,4 +1,4 @@
-import core\deobf\*.js;
+import "core\deobf\*.js";
 var MCItem = Java.type("net.minecraft.item.Item");
 var MCItemArmor = Java.type("net.minecraft.item.ItemArmor");
 var MCItemBow = Java.type("net.minecraft.item.ItemBow");

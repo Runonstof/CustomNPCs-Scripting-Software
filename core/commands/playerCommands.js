@@ -1,4 +1,4 @@
-import core\Economy.js;
+import "core\Economy.js";
 
 //
 

@@ -1,6 +1,6 @@
-import core\xcommandsAPI.js;
+import "core\xcommandsAPI.js";
 
-import core\players\tell.js;
+import "core\players\tell.js";
 
 var petdata = {
     "name": "Pet",

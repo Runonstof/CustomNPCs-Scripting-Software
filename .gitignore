@@ -3,3 +3,4 @@ build/**
 process-palette.json
 config/
 vendor/
+node_modules/

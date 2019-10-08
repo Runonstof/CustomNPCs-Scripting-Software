@@ -1,4 +1,4 @@
-import core\npc\moreEvents.js;
+import "core\npc\moreEvents.js";
 
 @block tick_event
 	(function(e){

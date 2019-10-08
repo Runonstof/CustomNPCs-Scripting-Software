@@ -7,7 +7,7 @@ $GLOBALS['config']['syntaxRegex'] = [
 		Regex for importing a file, where 1st caputure group is filename (including extension)
 		2nd optional group extra vars in JSON format
 	*/
-	'importFile' => '/import\s+(?:"|\')?([-\w.\\\*\/]+\.[a-zA-Z\\*]+)(?:"|\')?(?:\s+with\s+({[\w:\s\'\",\[\]]*}))?(?:\s+as\s+([\w]+))?;/',
+	'importFile' => '/import\s+(?:"|\')?([-\w.\\\*\/]+\.[a-zA-Z\\*]+)(?:"|\')?(?:\s+with\s+({[\s\S]*?}))?(?:\s+as\s+([\w]+))?;/',
 	/*
 		Regex for defining a block code to yield later, where
 		1st capture group is for block name
@@ -20,9 +20,9 @@ $GLOBALS['config']['syntaxRegex'] = [
 		Vars are handy but mostly you don't set them this way*/
 	'defineVar' => '/{\%set ([\%\w]+)=([\w\\\]+)\%}/',
 	/* Regex for getting a var, 1st group is varname */
-	'getVar' => '/%([\w]+)%/',
+	'getVar' => '/{{!\s*([\w]+)\s*!}}/',
 	/* Regex for getting a var, but optional, 1st group is varname, 2nd group is value if var does not exist */
-	'optionalVar' => '/%([\w]+)[\s]*\|\|[\s]*((?:.|[\s])+)%/',
+	'optionalVar' => '/{{!\s*([\w]+)\s*\|\|\s*(.+)\s+!}}/',
 	/* Regex for adding default arguments to regular functions
 		1st capture group is function name
 		2nd group is for all arguments (including comma's and possible characters occuring in default values)

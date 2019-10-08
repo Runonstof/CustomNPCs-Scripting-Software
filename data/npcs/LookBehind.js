@@ -1,4 +1,4 @@
-import core\math.js;
+import "core\math.js";
 
 //
 

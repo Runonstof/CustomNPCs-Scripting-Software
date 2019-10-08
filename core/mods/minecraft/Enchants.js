@@ -1,4 +1,4 @@
-import core\mods\minecraft\Java.js;
+import "core/mods/minecraft/Java.js";
 
 function getEnchIdByName(name) {
     var enchants = REGISTRY.ENCHANTMENTS.getValues();

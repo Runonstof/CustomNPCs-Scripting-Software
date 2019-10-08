@@ -1,7 +1,7 @@
-import core\xcommandsAPI.js;
+import "core\xcommandsAPI.js";
 
 
-import core\players\CustomMenus\CustomMenu.js;
+import "core\players\CustomMenus\CustomMenu.js";
 
 
 

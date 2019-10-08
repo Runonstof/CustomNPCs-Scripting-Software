@@ -1,4 +1,4 @@
-import core\utils\TellrawFormat.js;
+import "core\utils\TellrawFormat.js";
 
 function handleError(error, logsToConsole=true, target=null) {
     var world = API.getIWorld(0);

@@ -14,14 +14,14 @@ function CSTData(disk=null, create=false) {
     this.file = "";
 
     this.useDisk = function(diskname){
-        print("YOU CHOSE: "+diskname);
+
         diskname = diskname||CONFIG_SERVER.USE_DISK;
         if(Object.keys(CONFIG_SERVER.FILE_DISKS).indexOf(diskname) > -1) {
-            print("DISKPATH: "+ CONFIG_SERVER.FILE_DISKS[diskname].path);
+
             this.file = CONFIG_SERVER.FILE_DISKS[diskname].path.fill({
                 "worldname": getServerProperties()['level-name']
             });
-            print("DISKPATH FILLES: "+this.file);
+            
         }
         return this;
     };

@@ -1,4 +1,4 @@
-import core\functions.js;
+import "core\functions.js";
 
 var ITEM_TEXTURE_ID = 1;
 

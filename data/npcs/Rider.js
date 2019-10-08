@@ -1,4 +1,4 @@
-import core\math.js;
+import "core\math.js";
 
 function init(e){
 	yield init_event;

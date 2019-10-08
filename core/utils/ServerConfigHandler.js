@@ -1,8 +1,8 @@
-import core\config\default\*.js;
-import core\utils\ErrorHandler.js;
-import core\utils\FileUtils.js;
-import core\JavaScript\String.js;
-import core\mods\noppes\Java.js;
+import "core\config\default\*.js";
+import "core\utils\ErrorHandler.js";
+import "core\utils\FileUtils.js";
+import "core\JavaScript\*.js";
+import "core\mods\noppes\Java.js";
 
 
 //Check config file

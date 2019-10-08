@@ -1,4 +1,4 @@
-import core\mods\noppes\Java.js;
+import "core/mods/noppes/Java.js";
 
 function executeCommand(player, command, as_player=null) {
 	if(as_player == null) { as_player = player.getName(); }

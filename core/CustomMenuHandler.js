@@ -1,11 +1,11 @@
-import core\utils\ErrorHandler.js;
+import "core\utils\ErrorHandler.js";
 
 var CUSTOM_MENUS = {}; //Menus
 var MENU_TIMER_ID = 499; //Timer id for menus
 var MENU_TIMER_EXEC = null; //Timer function
 var MENU_TIMER_PAYLOAD = {}; //Data for timer
 
-@block timer_event_
+@block timer_event
     if(e.id == MENU_TIMER_ID) {
         if(MENU_TIMER_EXEC != null) {
             MENU_TIMER_EXEC(e.player, MENU_TIMER_PAYLOAD);
@@ -49,8 +49,8 @@ function reloadCustomMenusFromDisk() {
     return output;
 }
 
-function openCustomMenu(player, container, menujson) {
-    return populateCustomMenu(player.showChestGui(menujson.rows||6));
+function openCustomMenu(player, menujson) {
+    return populateCustomMenu(player.showChestGui(menujson.rows||6), menujson);
 }
 
 function populateCustomMenu(container, menudata) {
@@ -93,7 +93,7 @@ function populateCustomMenu(container, menudata) {
     return container;
 }
 
-@block customChestClicked_event_
+@block customChestClicked_event
     if(!e.slotItem.isEmpty()) {
         var sNbt = e.slotItem.getNbt();
         var data = e.player.world.getStoreddata();

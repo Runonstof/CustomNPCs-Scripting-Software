@@ -1,13 +1,13 @@
-import core\utils\ServerConfigHandler.js;
+import "core\utils\ServerConfigHandler.js";
 //
 
-import core\functions.js;
+import "core\functions.js";
 
-import core\players\executeCommand.js;
+import "core\players\executeCommand.js";
 
-import core\players\tell.js;
+import "core\players\tell.js";
 
-import core\mods\noppes\*.js;
+import "core\mods\noppes\*.js";
 
 //
 

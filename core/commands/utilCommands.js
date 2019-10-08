@@ -1,4 +1,4 @@
-import core\utils\DataList.js;
+import "core\utils\DataList.js";
 
 
 function genMoney(w, amount) {

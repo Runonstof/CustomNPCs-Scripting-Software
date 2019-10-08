@@ -1,6 +1,6 @@
 var PERMISSION_REGEX = /permission_([\w.\-]+)/g;
 
-import core\players\Permittable.js;
+import "core\players\Permittable.js";
 
 @block register_commands_event
 	//REGISTER PERMISSION COMMANDS

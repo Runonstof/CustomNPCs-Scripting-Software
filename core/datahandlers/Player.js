@@ -1,7 +1,9 @@
-import core\DataHandler.js;
+import "core\DataHandler.js";
 
 registerDataHandler("player", Player);
 function Player(name) {
+	
+
 	DataHandler.apply(this, ['player', name]);
 
 	this.addData({

@@ -1,8 +1,8 @@
-import core\JavaScript\*.js;
+import "core\JavaScript\*.js";
 
 
 //Java import
-import core\mods\noppes\Java.js;
+import "core\mods\noppes\Java.js";
 
 //UUIDLeast-Most
 function UUIDLM() { return rrandom_range(1, 99999); }

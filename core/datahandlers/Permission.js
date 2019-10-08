@@ -1,3 +1,5 @@
+import "core/datahandlers/Player.js";
+
 registerDataHandler("permission", Permission);
 function Permission(name) {
 	DataHandler.apply(this, ['permission', name]);
@@ -9,6 +11,11 @@ function Permission(name) {
 		"jobs": [],
 		"meta": {}
 	});
+
+	this.set = function(key,val) {
+		this.data[key] = val;
+		return this;
+	};
 
 	this.addTeams = function(teams) {
 		if(typeof(teams) == 'string') { teams = [teams]; }

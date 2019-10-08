@@ -1,4 +1,4 @@
-import core\mods\noppes\Java.js;
+import "core\mods\noppes\Java.js";
 
 function getEntityMobHead(entity) {
     //Player

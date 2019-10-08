@@ -1,71 +1,41 @@
-import core\players\tell.js;
-import core\JavaScript\*.js;
+import "core\utils\ServerConfigHandler.js";
+import "core\JavaScript\*.js";
+import "core\players\tell.js";
+import "core\npcs\npcUpdater.js";
 
-var NPCDATA = {
-	"HP_BASE": 20,
-	"HP_INCR": 2,
-	"DMG_BASE": 3,
-	"DMG_INCR": 0.5,
-	"LEVEL": 1,
-	"NAME": "Zombie"
+import "core\xcommandsAPI.js";
+import "core\mods\noppes\*.js";
+import "core\datahandlers\*.js";
+import "core\commands\*.js";
+import "core\PluginLoader.js";
+import "core\utils\Random.js";
+import "core\math.js";
+import "core\mods\noppes\IPlayer.js";
+
+////
+
+var stats = {
+	"level": 1,
 };
 
-function reloadNpcData(data) {
-	for(var key in NPCDATA as val) {
-		if(!data.has(key)) { data.put(key, val); }
-		else {
-			NPCDATA[key] = data.get(key);
-		}
-	}
-}
-
-function updateNpc(npc) {
-	var lc = getLevelColor(NPCDATA.LEVEL);
-	var newName = "&{X}&l[{LEVEL}]&r&{X} {NAME}&r".fill({
-		"LEVEL": NPCDATA.LEVEL,
-		"NAME": NPCDATA.NAME,
-		"X": lc
-	});
-	var disp = npc.getDisplay();
-
-	var barLen = 20;
-
-	var newTitle = "&f[[";
-	var hp = npc.getHealth();
-	var hpm = npc.getMaxHealth();
-	for(var i = 0; i < barLen; i++) {
-		newTitle += "&"+(i <= barLen/hpm*hp ? "a": "c")+"|";
-	}
-	newTitle += "&f]]&r";
-
-	if(disp.getName() != newName) {
-		disp.setName(ccs(newName));
-	}
-	if(disp.getTitle() != newTitle) {
-		disp.setTitle(ccs(newTitle));
-	}
-}
-
-var LVL_COLORS = [
-	'a',
-	'b',
-	'9',
-	'1',
-	'd',
-	'c',
-	'4',
-];
-var LVL_MAX = 100;
-
-function getLevelColor(level) {
-	return LVL_COLORS[Math.floor(LVL_COLORS.length/LVL_MAX*level)];
-}
-
 function init(e) {
-	var data = e.npc.getStoreddata();
-	reloadNpcData(data);
+	yield npc_init_event;
+
+	data_register(stats, e.npc.getStoreddata());-
 }
 
 function tick(e) {
-	updateNpc(e.npc);
+	yield npc_tick_event;
 }
+
+function calcMaxHp(lvl) {
+	return Math.round(10+((lvl-1)*2));
+}
+
+function calcDamage(lvl) {
+	return roundByNum(3+(lvl/5), .5);
+}
+
+npcSettings.Stats = objMerge(npcSettings.Stats, {
+	"MaxHealth": calcMaxHp(1)
+});
