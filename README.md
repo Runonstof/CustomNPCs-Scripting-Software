@@ -2,6 +2,7 @@
 Script for Custom NPCs 1.12.2
 
 **Useful info**    
+[How to install](https://github.com/Runonstof/CustomNPCs-Scripting-Software/wiki)    
 [Beta Testing](BETATESTING.md)    
 [Scripting Documentation](DOCUMENTATION.md)    
 
