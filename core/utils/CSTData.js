@@ -33,6 +33,7 @@ function CSTData(disk=null, create=false) {
     };
     this.create = function(){
         if(!this.exists()) {
+            print("DEBUGFILE: "+this.file);
             new File(this.file).createNewFile();
             writeToFile(this.file, "{}");
         }

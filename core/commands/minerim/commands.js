@@ -2,6 +2,10 @@ import "core/xcommands.js";
 import "core/players/tell.js";
 import "core/TellrawFormat.js";
 import "core/mods/reskillable/compatskills.js";
+import "core/commands/itemCommands.js";
+import "core/commands/utilCommands.js";
+import "core/commands/permCommands.js";
+import "core/commands/warpCommands.js";
 
 registerXCommands([
     ['!skills [...matches]', function(pl, args, data){

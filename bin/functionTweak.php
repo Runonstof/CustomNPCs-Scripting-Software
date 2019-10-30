@@ -27,7 +27,7 @@ function fnTweak($scr) {
 			
 			//Has default val given?
 			if($fna[2][$j] != "") {
-				$fn_replace .= "\n\tif(typeof({$arg_name}) == typeof(undefined)) { {$arg_name} = {$arg_val}; }";
+				$fn_replace .= "\n\tif(typeof({$arg_name}) == typeof(undefined) || {$arg_name} === null) { {$arg_name} = {$arg_val}; }";
 			}
 			
 		}

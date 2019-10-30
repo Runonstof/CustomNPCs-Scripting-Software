@@ -34,7 +34,12 @@ function readDir(dirPath){
 }
 
 function readFileAsString(filePath) {
-	return Java.from( readFile(filePath) ).join("\n").replace(/\t/g, "  ");
+	try {
+		return Java.from( readFile(filePath) ).join("\n").replace(/\t/g, "  ");
+		
+	} catch(exc) {
+		return readFile(filePath).join("\n").replace(/\t/g, "  ");
+	}
 }
 
 

@@ -208,6 +208,26 @@ function chat(e) {
 			}
 		}
 
+		
+		//replace URLS
+
+		// var URL_REGEX_gm = /(?:([a-z0-9]{2,}):\/\/)?(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|(?:[-\w_]{1,}\.[a-z]{2,}?))(?::[0-9]{1,5})?.*?(?=[!"§& ]|$)/gm;
+		// var URL_REGEX = /(?:([a-z0-9]{2,}):\/\/)?(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|(?:[-\w_]{1,}\.[a-z]{2,}?))(?::[0-9]{1,5})?.*?(?=[!"§& ]|$)/;
+		
+		// var urlmatch = null;
+		
+		
+		// while( (urlmatch = URL_REGEX_gm.exec(escmsg)) !== null ) { 
+		// 	if(urlmatch) {
+		// 		var urlinfo = urlmatch[0].match(URL_REGEX);
+		// 		var url = urlinfo[0];
+		// 		var url_has_type = (typeof urlinfo[1] !== 'undefined');
+	
+		// 		var newUrl = '&r&9&n'+url+'{open_url:'+(url_has_type ? '' : 'https://')+url+'}&r';
+		// 		escmsg = escmsg.replace(url, newUrl);
+		// 	}
+		// }
+
 		//Chat emotes
 		escmsg = parseEmotes(escmsg, dpl.getAllowedEmotes(sb, data));
 
@@ -254,13 +274,13 @@ function chat(e) {
 				if(toldPlayers.indexOf(wpl.getName()) == -1 && wplo.getChats(data).length == 0) {
 
 
-					executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(newmsg));
+					executeCommand(wpl, "/tellraw "+wpl.getName()+" "+strf(newmsg)); //send message to players
 					toldPlayers.push(wpl.getName());
 				}
 			}
 		}
 
-		Logger.info(logMsg);
+		//Logger.info(logMsg);
 		e.setCanceled(true); //Cancel real message
 	}
 }

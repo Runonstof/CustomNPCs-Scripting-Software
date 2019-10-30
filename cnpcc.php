@@ -115,7 +115,7 @@ $GLOBALS['config'] = [
 	'defaultFiles' => [],
 	'profiles' => [
 		'npcs' => [
-			'data\npcs\*.js', '-w:$outputDirs$=npcs\\'
+			'data\npcs\*\*.js data\npcs\*.js', '-w:$outputDirs$=npcs\\'
 		],
 		'blocks' => [
 			'data\blocks\*.js', '-w:$outputDirs$=blocks\\'

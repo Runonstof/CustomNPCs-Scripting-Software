@@ -3,8 +3,8 @@ function data_get(data, keys) {
 	var get = {};
 	for(var k in keys) {
 		//var key = keys[k];
-		get[k] = data.get(k);
-		if(get[k] == null) { get[k] = keys[k]; }
+		get[keys[k]] = data.get(keys[k]);
+		//if(get[keys[k]] == null) { get[keys[k]] = keys[k]; }
 	}
 
 	return get;

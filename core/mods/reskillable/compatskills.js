@@ -16,17 +16,18 @@ function checkLevelUp(player, callback=null) {
 		for(var i = 0; i < skillData.length; i++) {
 			var skill = skillData[i];
 			if(skill.xp >= skill.maxXp) {
+				skill.mcSkill.setLevel(skill.level+1);
+				skill.sbScore.setValue(skill.xp - skill.maxXp);
 				if(typeof callback === 'function') {
 					var e = {
 						player: player,
-						skill: skill
+						skill: getPlayerSkill(player, skill.name)
 					};
 					if(typeof callback === 'function') {
 						callback(e);
 					}
 				}
-				skill.mcSkill.setLevel(skill.level+1);
-				skill.sbScore.setValue(skill.xp - skill.maxXp);
+				
 			}
 		}
 	}
@@ -45,7 +46,8 @@ function getPlayerSkills(player) {
 		var sb = player.world.getScoreboard();
 
 		for(var s in skillDataList as skillData) {
-			var sxp = skillData.skill.getKey().replace(/\w+\.(\w+)/g, '$1_xp');//id.name to name_xp
+			var skillslug = skillData.skill.getKey().replace(/\w+(?:\.|:)(\w+)/g, '$1');
+			var sxp = skillslug+'_xp';//id.name to name_xp
 
 			var sb_xp = sb.getObjective(sxp);
 
@@ -61,12 +63,13 @@ function getPlayerSkills(player) {
 
 			var fskill = {
 				name: skillData.skill.getName(),
+				skillslug: skillslug,
 				xpname: sxp,
 				key: skillData.skill.getKey(),
 				level: skillData.getLevel(),
 				points: skillData.getSkillPoints(),
 				xp: pl_xp.getValue(),
-				maxXp: skillData.getLevelUpCost(),
+				maxXp: getMaxXp(skillData.getLevel()),
 				traits: [],
 				mcSkill: skillData,
 				sbObjective: sb_xp,
@@ -98,8 +101,13 @@ function getPlayerSkills(player) {
 function getPlayerSkill(player, skill_id) {
 	var skills = getPlayerSkills(player);
 
+	
+
 	for(var i in skills) {
-		if(skills[i].key == skill_id) {
+		if(skills[i].key == skill_id
+		|| skills[i].name == skill_id
+		|| skills[i].skillslug == skill_id
+		) {
 			return skills[i];
 		}
 	}
@@ -107,24 +115,58 @@ function getPlayerSkill(player, skill_id) {
 	return null;
 }
 
-function getBTW(prijs) {
-	return prijs * 1.23;
-}
-
 
 function givePlayerXP(player, skill_id, amount) {
 	var _API = Java.type("noppes.npcs.api.NpcAPI").Instance();
 	var cmd = _API.createNPC(player.world.getMCWorld());
 	var skill = getPlayerSkill(player, skill_id);
-	var xpname = skill_id.replace(/\w+\.(\w+)/g, '$1_xp');
-
-	cmd.executeCommand("/scoreboard players set "+xpname+" "+(amount > 0 ? "add" : "remove")+" "+Math.abs(amount).toString());
-
-
-	if(skillGetXp) {
-		skillGetXp({
+	amount = Math.round(amount);
+	var xpname = skill_id.replace(/\w+(?:\.|:)(\w+)/g, '$1')+'_xp';
+	if(skill) {
+		var event = {
 			player: player,
-			skill: skill
+			skill: skill,
+			amount: amount,
+			_canceled: false,
+			setCanceled: function(bool){
+				this._canceled = bool;
+			}
+		};
+		if(typeof skillGetXP === 'function') {
+			skillGetXP(event);
+		}
+	
+		if(!event._canceled) {
+			var putamount = Math.round(event.amount);
+			var cmdOutput = cmd.executeCommand("/scoreboard players "+(putamount > 0 ? "add" : "remove")+" "+player.getName()+" "+xpname+" "+Math.abs(putamount).toString());
+			
+
+			if(typeof skillHasXP === 'function') {
+				
+				skillHasXP(objMerge(event,{
+					skill: getPlayerSkill(player, skill_id)
+				}));
+			}
+		}
+
+	} else {
+		handleError({
+			'fileName': 'function givePlayerXP',
+			'message': '\''+skill_id+'\' is not a registered skill id!',
+			'stack': 'Blame Runonstof'
 		});
 	}
+
+}
+
+function getMaxXp(lvl) {
+	var mxp = 0;
+	if(lvl < 16) {
+		mxp = 2 * lvl + 7;
+	} else if(lvl < 31) {
+		mxp = 5 * lvl - 38;
+	} else {
+		mxp = 9 * lvl - 158;
+	}
+	return mxp *2;
 }

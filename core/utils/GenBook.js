@@ -32,7 +32,7 @@ function generateBook(w, bookstring) {
 			
 		}
 		
-		putpages.push(strf(page));
+		putpages.push(strf('&0'+page.replaceAll("&r", "&r&0")));
 		
 	}
 	

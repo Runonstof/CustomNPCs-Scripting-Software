@@ -1,15 +1,13 @@
-var newDayInit = false;
-@block tick_event
-	(function(e){
-		var w = e.npc.world;
-		if(getDayTime(w.getTime()) < 100 && newDayInit == false) {
-			if(typeof(newDay) != typeof(undefined)) {
-				newDay(e);
+@block npc_role_event
+	if(e.npc.getRole().getType() == RoleType_TRADER) {
+		if(e.sold == null) {
+			if(typeof tradeFailed === 'function') {
+				tradeFailed(e);
 			}
-			newDayInit = true;
+		} else {
+			if(typeof trade === 'function') {
+				trade(e);
+			}
 		}
-		if(getDayTime(w.getTime()) >= 100 && newDayInit == true) {
-			newDayInit = false;
-		}
-	})(e);
+	}
 @endblock

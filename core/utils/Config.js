@@ -31,7 +31,7 @@ function Config(name, startvalues) {
         }
 
         return null;
-    }
+    };
 
     this.put = function(key, value) {
         var o = this.all();

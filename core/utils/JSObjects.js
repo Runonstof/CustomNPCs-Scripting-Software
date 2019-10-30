@@ -1,14 +1,15 @@
-function array_compare(arr1, arr2) {
-    for(var i = 0; i < arr1.length; i++) {
-        if(arr2.indexOf(arr1[i]) == -1) {
-            return false;
-        }
-    }
-    for(var j = 0; j < arr2.length; j++) {
-        if(arr1.indexOf(arr2[i]) == -1) {
-            return false;
-        }
-    }
-    return true;
-}
+function array_compare(array1, array2, compareFn) {
+    var same = true;
+    for(var i in array1) {
+      if(compareFn ? !compareFn(array1[i],array2) : (array2.indexOf(array1[i]) == -1)) {
+          same = false;
+      }
+  }
+    for(var i in array2) {
+      if(compareFn ? !compareFn(array2[i],array1) : (array1.indexOf(array2[i]) == -1)) {
+          same = false;
+      }
+  }
 
+    return same;
+}

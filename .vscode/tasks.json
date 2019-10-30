@@ -6,7 +6,7 @@
         {
             "label": "Compile",
             "type":"shell",
-            "command": "php cnpcc.php @blocks;php cnpcc.php @npcs;php cnpcc.php @players;php cnpcc.php @items",
+            "command": "php cnpcc.php @blocks;php cnpcc.php @npcs;php cnpcc.php @players;php cnpcc.php @items;php cnpcc.php @forge",
             "group": {
                 "kind":"test",
                 "isDefault":true

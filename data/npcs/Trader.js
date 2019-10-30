@@ -1,6 +1,3 @@
-import "core\utils\ServerConfigHandler.js";
-//
-
 import "core\functions.js";
 
 import "core\players\executeCommand.js";
@@ -13,6 +10,12 @@ import "core\mods\noppes\*.js";
 
 function init(e){
 	yield init_event;
+
+	var display = e.npc.display;
+	var ai = e.npc.ai;
+
+	ai.setReturnsToHome(false);
+	
 }
 
 function load(e) {

@@ -161,17 +161,17 @@ function rawformat(str_pieces, fullraw=true, allowed=null) {
  * @param {Number} value Current value
  * @param {Number} max Maximum value
  * @param {Number} length Character length
- * @param {String||"|"} progChar Progressbar character
- * @param {String} fillColor Filled color code "&a"
- * @param {String} leftColor Filles color code "&c"
+ * @param {String||'|'} progChar Progressbar character
+ * @param {String} fillColor Filled color code '&a'
+ * @param {String} leftColor Filles color code '&c'
  */
-function progressBar(value, max, length, progChar=null, fillColor="&a", leftColor="&c"){
-	var skillBar = '&r&l[&r';
+function progressBar(value, max, length, progChar=null, fillColor='&a', leftColor='&c', opener='&l[', closer='&l]'){
+	var skillBar = '&r'+opener+'&r';
 	var progress = Math.floor((value/max)*length);
 	var proc = Math.round(value/max*100);
 	for(var i = 0; i < length; i++) {
-		if(i < progress) skillBar += fillColor+(progChar||"|");
-		if(i >= progress) skillBar += leftColor+(progChar||"|");
+		if(i < progress) skillBar += fillColor+(progChar||'|');
+		if(i >= progress) skillBar += leftColor+(progChar||'|');
 	}
-	return skillBar += "&r&l]";
+	return skillBar += '&r'+closer+'&r';
 }
