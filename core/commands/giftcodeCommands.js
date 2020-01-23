@@ -234,7 +234,7 @@
   	['!giftcode unredeem <name> <player>', function(pl, args, data){
 	  var code = new GiftCode(args.name);
 	  code.load(data);
-	  if(code.data.player.indexOf(args.player) == -1) {
+	  if(code.data.players.indexOf(args.player) == -1) {
 		  tellPlayer(pl, "&cCode isn't activated yet!");
 		  return false;
 	  }

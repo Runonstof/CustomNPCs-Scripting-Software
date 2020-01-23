@@ -1,10 +1,10 @@
 //Convert object to array
 function objArray(obj) {
-	var a = [];
-	for(var i in obj as o) {
-		a.push(o);
-	}
-	return a;
+    var a = [];
+    for (var i in obj as o) {
+        a.push(o);
+    }
+    return a;
 }
 
 function clone(obj) {
@@ -50,18 +50,41 @@ function getAllFuncs(obj) {
     } while (obj = Object.getPrototypeOf(obj));
 
     return props.sort().filter(function(e, i, arr) {
-       if (e!=arr[i+1] && typeof obj[e] == 'function') return true;
+        if (e != arr[i + 1] && typeof obj[e] == 'function') return true;
     });
 }
 
 //Merge 2 objects
-function objMerge(obj1, obj2, inheritNewProps=true){
+function objMerge(obj1, obj2, inheritNewProps = true) {
     var obj3 = {};
     for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
     for (var attrname in obj2) {
-        if(inheritNewProps || Object.keys(obj1).indexOf(attrname) > -1) {
+        if (inheritNewProps || Object.keys(obj1).indexOf(attrname) > -1) {
             obj3[attrname] = obj2[attrname];
         }
     }
     return obj3;
 }
+
+Object.__proto__.assign = function() {
+    var obj = arguments[0];
+
+    for (var i = 1; i < arguments.length; i++) {
+        var arg = arguments[i];
+        for (var key in arg as value) {
+            obj[key] = value;
+        }
+    }
+
+    return obj;
+};
+
+Object.__proto__.values = function(obj) {
+        var vals = [];
+        for (var i in obj) {
+            vals.push(obj[i]);
+        }
+
+        return vals;
+    }
+    /* */

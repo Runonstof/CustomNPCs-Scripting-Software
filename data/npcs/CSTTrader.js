@@ -1,9 +1,6 @@
 import "core\functions.js";
-
 import "core\players\executeCommand.js";
-
 import "core\players\tell.js";
-
 import "core\mods\noppes\*.js";
 
 //
@@ -27,7 +24,11 @@ function interact(e) {
     yield interact_event;
     //
     if (e.npc.getRole().getType() == 1 && e.player.getGamemode() == 1) {
-        tellPlayer(e.player, "&cYou cannot trade with this trader in creative mode! &4[Why?]{*|show_text:$cThis is an patched trader to work with items from mods like $c$oAnimania$r$c and $c$oHarvestCraft$r$c and adds more functionalities to traders. Those functionalities don't work to well if player is in creative}&r");
+        if (e.player.isSneaking()) {
+
+        } else {
+            tellPlayer(e.player, "&cYou cannot trade with this trader in creative mode! &4[Why?]{*|show_text:$cThis is an patched trader to work with items from mods like $c$oAnimania$r$c and $c$oHarvestCraft$r$c and adds more functionalities to traders. Those functionalities don't work to well if player is in creative}&r");
+        }
         e.setCanceled(true);
     }
 }

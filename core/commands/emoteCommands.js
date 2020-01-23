@@ -1,3 +1,5 @@
+import "core/datahandlers/Emote.js";
+
 
 @block init_event
   (function(e){
